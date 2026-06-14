@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BuildForce ERP - Login</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-fixed": "#1b1c1c",
+                      "tertiary-container": "#bfbebe",
+                      "on-surface": "#1a1c1c",
+                      "primary-fixed-dim": "#fdbc13",
+                      "on-background": "#1a1c1c",
+                      "surface-variant": "#e2e2e2",
+                      "surface-bright": "#f9f9f9",
+                      "on-primary": "#ffffff",
+                      "surface-container-low": "#f3f3f3",
+                      "on-tertiary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "background": "#f9f9f9",
+                      "on-secondary-fixed-variant": "#474746",
+                      "secondary-fixed": "#e5e2e1",
+                      "inverse-on-surface": "#f1f1f1",
+                      "outline-variant": "#d4c4ac",
+                      "on-primary-fixed-variant": "#5d4200",
+                      "inverse-primary": "#fdbc13",
+                      "secondary-container": "#e2dfde",
+                      "primary-container": "#f4b400",
+                      "on-error": "#ffffff",
+                      "on-tertiary-fixed-variant": "#464747",
+                      "surface-tint": "#7a5900",
+                      "on-secondary-fixed": "#1c1b1b",
+                      "primary": "#7a5900",
+                      "error": "#ba1a1a",
+                      "surface-container": "#eeeeee",
+                      "on-error-container": "#93000a",
+                      "surface-dim": "#dadada",
+                      "on-primary-fixed": "#261900",
+                      "outline": "#827560",
+                      "tertiary-fixed": "#e3e2e2",
+                      "tertiary": "#5e5e5e",
+                      "on-secondary-container": "#636262",
+                      "secondary": "#5f5e5e",
+                      "secondary-fixed-dim": "#c8c6c5",
+                      "on-primary-container": "#654800",
+                      "on-surface-variant": "#504533",
+                      "on-tertiary-container": "#4d4d4d",
+                      "tertiary-fixed-dim": "#c7c6c6",
+                      "inverse-surface": "#2f3131",
+                      "surface-container-highest": "#e2e2e2",
+                      "surface-container-high": "#e8e8e8",
+                      "on-secondary": "#ffffff",
+                      "surface": "#f9f9f9",
+                      "primary-fixed": "#ffdea3",
+                      "surface-container-lowest": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "md": "16px",
+                      "xs": "4px",
+                      "margin-mobile": "16px",
+                      "xl": "32px",
+                      "lg": "24px",
+                      "sm": "8px",
+                      "gutter": "16px",
+                      "margin-desktop": "32px",
+                      "unit": "4px"
+              },
+              "fontFamily": {
+                      "display-lg-mobile": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "table-data": ["Inter"],
+                      "label-md": ["JetBrains Mono"],
+                      "body-sm": ["Inter"],
+                      "headline-sm": ["Inter"],
+                      "body-md": ["Inter"],
+                      "body-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "display-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                      "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                      "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                      "table-data": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                      "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                      "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                      "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                      "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Input Focus Styles as per guidance */
+        .form-input:focus {
+            outline: none;
+            border-color: #1a1c1c; /* Deep Black (on-surface) */
+            border-bottom-width: 2px;
+            border-bottom-color: #f4b400; /* Primary Yellow (primary-container) */
+            padding-bottom: calc(0.5rem - 1px); /* Adjust padding to prevent jump */
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen flex items-center justify-center relative overflow-hidden font-body-md text-on-background">
+<!-- Background Image Layer -->
+<div class="absolute inset-0 z-0">
+<div class="absolute inset-0 bg-on-surface/70 z-10 mix-blend-multiply"></div>
+<img alt="Construction site at dusk" class="w-full h-full object-cover object-center" src="https://lh3.googleusercontent.com/aida/AP1WRLuTSMUtts1ugBEgbaoXjhA2CUkRDldTSrTBbOKDvEb78TsDeTVTnvvUR2TAEC4GFvXoVp2tOC0wmPsKleEogE0XegrGcrQ-oaV3ZRYlWCMbvu9TarPGAu7p5H2tkfxu_TSSigrPaD4FmpIevnqAaIOxLJt3aNisz62c0YM3D_tbwJ4Sfjr2iVY5bLRq0wTbvY-vxqAbordfDbROSzEQ72FPe4pUJYzDTjzahXk32yGXPd5IwA_zmt5djQ58"/>
+</div>
+<!-- Login Container -->
+<main class="relative z-20 w-full max-w-[440px] px-margin-mobile md:px-0">
+<!-- Glassmorphism Card -->
+<div class="bg-surface-container-lowest/95 backdrop-blur-md rounded-xl p-xl shadow-2xl border border-surface-variant">
+<!-- Logo & Branding -->
+<div class="flex flex-col items-center mb-xl">
+<img alt="BuildForce Logo" class="h-16 w-auto mb-lg object-contain drop-shadow-sm" src="https://lh3.googleusercontent.com/aida/AP1WRLt6D76iqkgM9cKMDbZsdtlfdUTaQQOBv4xNVeI1gFgSoSG2JigFk6MIJtxLNevJa4oiwzQYGag4f2dUTUTDb1e4yasc1nv96hpHqa6gKmaOS4NtMF_nTKS7G3iK0COs77xOG2dDRCS_wffBEq2vm5oyOJlEWr4B_-e9mYblMmk9c39c8NQ1Sj8hmrtk6XwQU4Zk686obB4kY4-46mzi07QXAj6GEUH1u3T33djXFlieVJ1lRpbYjxVF0gk1"/>
+<h1 class="font-headline-md text-headline-md text-on-surface text-center">Authentication</h1>
+<p class="font-label-md text-label-md text-outline tracking-widest uppercase mt-sm text-center">Premium Construction Management</p>
+</div>
+<!-- Login Form -->
+<form action="#" class="space-y-lg" method="POST">
+<!-- Employee ID / Mobile Number Field -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs" for="identifier">Employee ID / Mobile Number</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 flex items-center pl-sm text-outline">
+<span class="material-symbols-outlined text-[20px]">badge</span>
+</span>
+<input class="form-input block w-full pl-xl pr-md py-sm bg-surface border border-outline-variant rounded-DEFAULT font-table-data text-table-data text-on-surface transition-all placeholder:text-surface-dim" id="identifier" name="identifier" placeholder="Enter your ID or number" required="" type="text"/>
+</div>
+</div>
+<!-- Password Field -->
+<div>
+<div class="flex items-center justify-between mb-xs">
+<label class="block font-label-md text-label-md text-on-surface-variant" for="password">Password</label>
+<a class="font-label-md text-label-md text-primary hover:text-surface-tint transition-colors" href="#">Forgot Password?</a>
+</div>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 flex items-center pl-sm text-outline">
+<span class="material-symbols-outlined text-[20px]">lock</span>
+</span>
+<input class="form-input block w-full pl-xl pr-md py-sm bg-surface border border-outline-variant rounded-DEFAULT font-table-data text-table-data text-on-surface transition-all placeholder:text-surface-dim" id="password" name="password" placeholder="Enter your password" required="" type="password"/>
+</div>
+</div>
+<!-- Action Button -->
+<div class="pt-sm">
+<button class="w-full flex justify-center items-center gap-sm bg-primary-container text-on-primary-container font-label-md text-label-md uppercase tracking-widest py-md px-lg rounded-DEFAULT hover:bg-inverse-primary active:scale-[0.98] transition-all shadow-sm" type="submit">
+<span>Login to System</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</form>
+<!-- Security Notice -->
+<div class="mt-xl pt-lg border-t border-surface-variant text-center">
+<p class="font-body-sm text-body-sm text-outline flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">encrypted</span>
+                    Secure Encrypted Connection
+                </p>
+</div>
+</div>
+</main>
+</body></html>

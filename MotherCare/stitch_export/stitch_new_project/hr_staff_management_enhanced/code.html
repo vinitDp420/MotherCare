@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MotherCare | HR &amp; Staff Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "inverse-primary": "#70d8c8",
+                "background": "#f8f9ff",
+                "on-tertiary-fixed-variant": "#65394b",
+                "surface-bright": "#f8f9ff",
+                "surface-dim": "#cbdbf5",
+                "secondary-fixed": "#d6e5ef",
+                "on-error-container": "#93000a",
+                "primary-fixed": "#8df5e4",
+                "inverse-surface": "#213145",
+                "tertiary-fixed-dim": "#f2b6cb",
+                "on-secondary-container": "#56656e",
+                "outline": "#6d7a77",
+                "on-secondary-fixed": "#0f1d25",
+                "surface-container-highest": "#d3e4fe",
+                "tertiary": "#7d4e60",
+                "surface-tint": "#006b5f",
+                "outline-variant": "#bcc9c5",
+                "secondary-fixed-dim": "#bac9d3",
+                "secondary-container": "#d3e2ed",
+                "surface-variant": "#d3e4fe",
+                "tertiary-container": "#996679",
+                "surface-container-high": "#dce9ff",
+                "surface-container-low": "#eff4ff",
+                "primary-container": "#008376",
+                "on-surface": "#0b1c30",
+                "on-primary-fixed": "#00201c",
+                "error": "#ba1a1a",
+                "on-primary-container": "#f4fffb",
+                "on-tertiary": "#ffffff",
+                "surface-container-lowest": "#ffffff",
+                "surface-container": "#e5eeff",
+                "primary-fixed-dim": "#70d8c8",
+                "secondary": "#526069",
+                "on-secondary-fixed-variant": "#3b4951",
+                "on-primary-fixed-variant": "#005048",
+                "tertiary-fixed": "#ffd9e4",
+                "surface": "#f8f9ff",
+                "primary": "#00685d",
+                "inverse-on-surface": "#eaf1ff",
+                "on-error": "#ffffff",
+                "on-tertiary-container": "#fffbff",
+                "error-container": "#ffdad6",
+                "on-surface-variant": "#3d4946",
+                "on-primary": "#ffffff",
+                "on-tertiary-fixed": "#330f1f",
+                "on-secondary": "#ffffff",
+                "on-background": "#0b1c30"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "lg": "24px",
+                "xs": "4px",
+                "xl": "32px",
+                "gutter": "24px",
+                "sm": "12px",
+                "base": "8px",
+                "md": "16px",
+                "margin-mobile": "16px",
+                "margin-desktop": "40px"
+            },
+            "fontFamily": {
+                "title-lg": ["Inter"],
+                "headline-lg": ["Inter"],
+                "label-lg": ["Inter"],
+                "body-md": ["Inter"],
+                "label-md": ["Inter"],
+                "headline-lg-mobile": ["Inter"],
+                "body-lg": ["Inter"],
+                "display-lg": ["Inter"],
+                "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "label-md": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s ease, color 0.3s ease; }
+        .dark body { background-color: #0b1c30; color: #f8f9ff; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .active-tab { border-bottom: 2px solid #00685d; color: #00685d; font-weight: 600; }
+        .dark .active-tab { border-bottom-color: #70d8c8; color: #70d8c8; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        
+        /* Dark mode overrides */
+        .dark aside { background-color: #0b1c30; border-color: #3d4946; }
+        .dark header { background-color: #0b1c30; }
+        .dark .bg-surface-container-low { background-color: #213145; }
+        .dark .bg-surface-container-lowest { background-color: #0b1c30; border-color: #3d4946; }
+        .dark .text-on-surface { color: #f8f9ff; }
+        .dark .text-on-surface-variant { color: #bac9d3; }
+        .dark .border-outline-variant { border-color: #3d4946; }
+    </style>
+</head>
+<body class="text-on-background bg-background dark:bg-on-surface dark:text-surface-bright">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-surface border-r border-outline-variant flex flex-col p-lg z-50 dark:bg-on-surface dark:border-outline">
+<div class="mb-xl">
+<h1 class="text-primary font-headline-md text-headline-md font-bold dark:text-primary-fixed">MotherCare</h1>
+<p class="text-on-surface-variant font-label-md text-label-md dark:text-secondary-fixed-dim">Shakuntala Hospital</p>
+</div>
+<nav class="flex-grow space-y-xs">
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low rounded-lg px-md py-sm transition-colors dark:text-secondary-fixed-dim dark:hover:bg-surface-container-highest/10" href="#">
+<span class="material-symbols-outlined">person_heart</span>
+<span class="font-label-lg text-label-lg">Patients</span>
+</a>
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low rounded-lg px-md py-sm transition-colors dark:text-secondary-fixed-dim dark:hover:bg-surface-container-highest/10" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-lg text-label-lg">Appointments</span>
+</a>
+<a class="flex items-center gap-md bg-secondary-container text-on-secondary-container rounded-lg px-md py-sm mb-xs dark:bg-primary-container dark:text-on-primary-container" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+<span class="font-label-lg text-label-lg">Doctors &amp; Staff</span>
+</a>
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low rounded-lg px-md py-sm transition-colors dark:text-secondary-fixed-dim dark:hover:bg-surface-container-highest/10" href="#">
+<span class="material-symbols-outlined">biotech</span>
+<span class="font-label-lg text-label-lg">Lab</span>
+</a>
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low rounded-lg px-md py-sm transition-colors dark:text-secondary-fixed-dim dark:hover:bg-surface-container-highest/10" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-lg text-label-lg">Settings</span>
+</a>
+</nav>
+<button class="mt-lg w-full bg-primary text-on-primary py-sm rounded-lg font-label-lg text-label-lg hover:opacity-90 transition-all dark:bg-primary-fixed dark:text-on-primary-fixed">
+            New Consultation
+        </button>
+<div class="mt-auto pt-lg border-t border-outline-variant space-y-xs dark:border-outline">
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low rounded-lg px-md py-sm transition-colors dark:text-secondary-fixed-dim dark:hover:bg-surface-container-highest/10" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-lg text-label-lg">Support</span>
+</a>
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low rounded-lg px-md py-sm transition-colors dark:text-secondary-fixed-dim dark:hover:bg-surface-container-highest/10" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-lg text-label-lg">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-[280px] min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="flex justify-between items-center h-16 w-full px-margin-desktop bg-surface-bright sticky top-0 z-40 dark:bg-on-surface">
+<div class="flex items-center gap-md w-1/3">
+<div class="relative w-full max-w-sm">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-secondary-fixed-dim">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-label-md focus:ring-2 focus:ring-primary dark:bg-surface-container-highest/10 dark:text-surface-bright" placeholder="Global Search: staff, schedules, files..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<button class="p-2 hover:bg-secondary-container rounded-full transition-colors dark:hover:bg-surface-container-highest/10" onclick="toggleDarkMode()">
+<span class="material-symbols-outlined" id="dark-mode-icon">dark_mode</span>
+</button>
+<button class="p-2 hover:bg-secondary-container rounded-full transition-colors relative dark:hover:bg-surface-container-highest/10">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-surface-bright dark:border-on-surface"></span>
+</button>
+<button class="p-2 hover:bg-secondary-container rounded-full transition-colors dark:hover:bg-surface-container-highest/10">
+<span class="material-symbols-outlined">chat_bubble</span>
+</button>
+<div class="flex items-center gap-sm ml-sm cursor-pointer group">
+<div class="text-right hidden lg:block">
+<p class="font-label-lg text-label-lg text-on-surface dark:text-surface-bright">Dr. Sarah Thompson</p>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider dark:text-secondary-fixed-dim">HR Director</p>
+</div>
+<img alt="Profile" class="w-10 h-10 rounded-full object-cover border-2 border-primary-container" src="https://lh3.googleusercontent.com/aida/AP1WRLtCh_3lT8TfMqswbLfhHGoK7SuouHI4xl7ZMx-aMu1Z5L7pnrBimSlIZsvopxnjw2aG4LwA6xfPS6rHsLS6cSmjYhDGZgLFT2SFv1E4vNNlY30HUEOpD8j4isvzQSB-c1zb6ryClz4S4yIsN6lo4Ux1ztV-yIGw4-HwLVUBA84WwmlUhJeENj1ALsoZydaB51wIgBFKyImuqQ2k7B-ypQB9BLHFhkQ4-9mrI9cGvc4n3xIpbuQfmxOjNhKM"/>
+</div>
+</div>
+</header>
+<div class="p-margin-desktop">
+<!-- Breadcrumbs -->
+<div class="flex items-center gap-xs mb-md text-label-md font-label-md text-on-surface-variant dark:text-secondary-fixed-dim">
+<a class="hover:text-primary transition-colors" href="#">Dashboard</a>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-on-surface dark:text-surface-bright font-semibold">Staff</span>
+</div>
+<!-- Header Section -->
+<div class="flex justify-between items-end mb-lg">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface dark:text-surface-bright">Staff Management</h2>
+<p class="font-body-md text-body-md text-on-surface-variant dark:text-secondary-fixed-dim">Manage your clinical and administrative team efficiently.</p>
+</div>
+<div class="flex gap-sm">
+<button class="flex items-center gap-xs px-md py-sm bg-surface-container-high rounded-lg font-label-lg text-label-lg hover:bg-surface-container-highest transition-colors dark:bg-surface-container-highest/10 dark:text-surface-bright">
+<span class="material-symbols-outlined">download</span> Export Report
+                    </button>
+<button class="flex items-center gap-xs px-md py-sm bg-primary text-on-primary rounded-lg font-label-lg text-label-lg hover:opacity-90 transition-all shadow-sm dark:bg-primary-fixed dark:text-on-primary-fixed">
+<span class="material-symbols-outlined">person_add</span> Add New Staff
+                    </button>
+</div>
+</div>
+<!-- Statistics Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-xl">
+<!-- Total Staff -->
+<div class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-sm dark:bg-on-surface">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-2 bg-primary-container/20 rounded-lg dark:bg-primary-container/10">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">groups</span>
+</div>
+<span class="text-primary font-label-md text-label-md bg-primary-fixed px-2 py-0.5 rounded-full dark:bg-primary-container/20 dark:text-primary-fixed">+4 this month</span>
+</div>
+<p class="text-on-surface-variant font-label-lg text-label-lg dark:text-secondary-fixed-dim">Total Staff</p>
+<p class="text-on-surface font-headline-lg text-headline-lg mt-xs dark:text-surface-bright">248</p>
+</div>
+<!-- Present Today -->
+<div class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-sm dark:bg-on-surface">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-2 bg-secondary-container/20 rounded-lg dark:bg-secondary-container/10">
+<span class="material-symbols-outlined text-secondary dark:text-secondary-fixed-dim">how_to_reg</span>
+</div>
+<span class="text-secondary font-label-md text-label-md bg-secondary-fixed px-2 py-0.5 rounded-full dark:bg-secondary-container/20 dark:text-secondary-fixed-dim">92% attendance</span>
+</div>
+<p class="text-on-surface-variant font-label-lg text-label-lg dark:text-secondary-fixed-dim">Present Today</p>
+<p class="text-on-surface font-headline-lg text-headline-lg mt-xs dark:text-surface-bright">226</p>
+</div>
+<!-- On Leave -->
+<div class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-sm dark:bg-on-surface">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-2 bg-tertiary-container/20 rounded-lg dark:bg-tertiary-container/10">
+<span class="material-symbols-outlined text-tertiary dark:text-tertiary-fixed-dim">event_busy</span>
+</div>
+</div>
+<p class="text-on-surface-variant font-label-lg text-label-lg dark:text-secondary-fixed-dim">On Leave</p>
+<p class="text-on-surface font-headline-lg text-headline-lg mt-xs dark:text-surface-bright">14</p>
+</div>
+<!-- Payroll Due -->
+<div class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-sm dark:bg-on-surface">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-2 bg-error-container/20 rounded-lg dark:bg-error-container/10">
+<span class="material-symbols-outlined text-error">payments</span>
+</div>
+<span class="text-error font-label-md text-label-md bg-error-container px-2 py-0.5 rounded-full dark:bg-error-container/20">Due in 3 days</span>
+</div>
+<p class="text-on-surface-variant font-label-lg text-label-lg dark:text-secondary-fixed-dim">Payroll Due</p>
+<p class="text-on-surface font-headline-lg text-headline-lg mt-xs dark:text-surface-bright">$142k</p>
+</div>
+</div>
+<!-- Dynamic Tabs & Table Container -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden dark:bg-on-surface">
+<!-- Navigation Tabs -->
+<div class="flex px-lg pt-lg border-b border-outline-variant overflow-x-auto scrollbar-hide dark:border-outline">
+<button class="px-md py-sm font-label-lg text-label-lg active-tab whitespace-nowrap transition-all" id="tab-directory" onclick="switchTab('directory')">Staff Directory</button>
+<button class="px-md py-sm font-label-lg text-label-lg text-on-surface-variant hover:text-primary whitespace-nowrap transition-all dark:text-secondary-fixed-dim dark:hover:text-primary-fixed" id="tab-attendance" onclick="switchTab('attendance')">Attendance Calendar</button>
+<button class="px-md py-sm font-label-lg text-label-lg text-on-surface-variant hover:text-primary whitespace-nowrap transition-all dark:text-secondary-fixed-dim dark:hover:text-primary-fixed" id="tab-payroll" onclick="switchTab('payroll')">Payroll &amp; Slip</button>
+<button class="px-md py-sm font-label-lg text-label-lg text-on-surface-variant hover:text-primary whitespace-nowrap transition-all dark:text-secondary-fixed-dim dark:hover:text-primary-fixed" id="tab-leave" onclick="switchTab('leave')">Leave Status</button>
+<button class="px-md py-sm font-label-lg text-label-lg text-on-surface-variant hover:text-primary whitespace-nowrap transition-all dark:text-secondary-fixed-dim dark:hover:text-primary-fixed" id="tab-shift" onclick="switchTab('shift')">Shift Assignments</button>
+</div>
+<!-- Views Container -->
+<div class="p-lg">
+<!-- Staff Directory View (Default) -->
+<div class="view-content block" id="view-directory">
+<div class="flex flex-col sm:flex-row gap-md justify-between items-center mb-md">
+<div class="flex gap-sm overflow-x-auto w-full sm:w-auto">
+<select class="bg-surface-container-low border-outline-variant rounded-lg text-label-md font-label-md dark:bg-surface-container-highest/10 dark:text-surface-bright dark:border-outline">
+<option>All Departments</option>
+<option>Obstetrics</option>
+<option>Pediatrics</option>
+<option>Nursing</option>
+<option>Admin</option>
+</select>
+<select class="bg-surface-container-low border-outline-variant rounded-lg text-label-md font-label-md dark:bg-surface-container-highest/10 dark:text-surface-bright dark:border-outline">
+<option>Active Status</option>
+<option>On Leave</option>
+<option>Resigned</option>
+</select>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="text-on-surface-variant border-b border-outline-variant dark:text-secondary-fixed-dim dark:border-outline">
+<tr>
+<th class="py-sm font-label-lg text-label-lg">Employee ID</th>
+<th class="py-sm font-label-lg text-label-lg">Name</th>
+<th class="py-sm font-label-lg text-label-lg">Department</th>
+<th class="py-sm font-label-lg text-label-lg">Role</th>
+<th class="py-sm font-label-lg text-label-lg">Status</th>
+<th class="py-sm font-label-lg text-label-lg text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30 dark:divide-outline/30">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low transition-colors group dark:hover:bg-surface-container-highest/5">
+<td class="py-md font-body-md text-body-md">#MC-9082</td>
+<td class="py-md">
+<div class="flex items-center gap-sm">
+<img alt="Dr. Anita" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLs5qLoYTqb68zAUfLjBMlWnHY08_OC-gulttwexacuNGNjqOWr5Nvi6wDwGLjeZBF2hhDLVx20Oq8ZxDurvpzTnoN3XJmT5KIOyNPNXPXPpo07CslSeo1q58Ulfe2d77aAxpB3tokZMgf6DxVmQAwgrRNmcPr3uA4i_CfDJsAvPhicGu0fYNpJeSB0EaSfMiim4S03oH_RqQcBqK4XkTrcAdP3-iSntrjXAAJv5F1CzxSZFUmffI7ANnefN"/>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface dark:text-surface-bright">Dr. Anita Nair</p>
+<p class="text-[10px] text-on-surface-variant dark:text-secondary-fixed-dim">anita.n@mothercare.com</p>
+</div>
+</div>
+</td>
+<td class="py-md font-body-md text-body-md">Obstetrics</td>
+<td class="py-md font-body-md text-body-md">Sr. Consultant</td>
+<td class="py-md">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary uppercase dark:bg-primary-container/20 dark:text-primary-fixed">Active</span>
+</td>
+<td class="py-md text-right">
+<div class="flex justify-end gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:bg-surface-container-highest rounded transition-colors dark:hover:bg-surface-container-highest/20" title="Download Payslip">
+<span class="material-symbols-outlined text-[20px] text-primary dark:text-primary-fixed">receipt_long</span>
+</button>
+<button class="p-1 hover:bg-surface-container-highest rounded transition-colors dark:hover:bg-surface-container-highest/20">
+<span class="material-symbols-outlined text-[20px] text-on-surface-variant">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low transition-colors group dark:hover:bg-surface-container-highest/5">
+<td class="py-md font-body-md text-body-md">#MC-8541</td>
+<td class="py-md">
+<div class="flex items-center gap-sm">
+<img alt="James" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLuIOgldlIQTMUJ9RH_WQ4YMi42Oro-y3otaRGBSj8flfMzA8gp4hO35jCnBfdRbYZNS2zmOhGcPhEI2ElVscrqQ4WcQGENw9A78uRqn5G0Uwaf4-kP2NPm84o4EqOKv8gmzyZkL6CtSahUxgM9dMx9iefPAp3r_w5rsUv41MtFL3XFyVuOr7THeCvwhD_F3fyYifZrD8zoGmgXTuwozykyyPJPckVIwl6qwwa2IKOuoGUHlAsO4VulDQSQC"/>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface dark:text-surface-bright">James Wilson</p>
+<p class="text-[10px] text-on-surface-variant dark:text-secondary-fixed-dim">james.w@mothercare.com</p>
+</div>
+</div>
+</td>
+<td class="py-md font-body-md text-body-md">Nursing</td>
+<td class="py-md font-body-md text-body-md">Head Nurse</td>
+<td class="py-md">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-tertiary-fixed-dim/20 text-tertiary uppercase dark:bg-tertiary-container/20 dark:text-tertiary-fixed-dim">On Leave</span>
+</td>
+<td class="py-md text-right">
+<div class="flex justify-end gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:bg-surface-container-highest rounded transition-colors dark:hover:bg-surface-container-highest/20" title="Download Payslip">
+<span class="material-symbols-outlined text-[20px] text-primary dark:text-primary-fixed">receipt_long</span>
+</button>
+<button class="p-1 hover:bg-surface-container-highest rounded transition-colors dark:hover:bg-surface-container-highest/20">
+<span class="material-symbols-outlined text-[20px] text-on-surface-variant">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Attendance Calendar View -->
+<div class="view-content hidden" id="view-attendance">
+<div class="flex items-center justify-between mb-md">
+<h3 class="font-title-lg text-title-lg text-on-surface dark:text-surface-bright">October 2023</h3>
+<div class="flex gap-sm">
+<button class="p-1 rounded border border-outline-variant dark:border-outline hover:bg-surface-container-low dark:hover:bg-surface-container-highest/10"><span class="material-symbols-outlined">chevron_left</span></button>
+<button class="p-1 rounded border border-outline-variant dark:border-outline hover:bg-surface-container-low dark:hover:bg-surface-container-highest/10"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+</div>
+<div class="grid grid-cols-7 gap-px bg-outline-variant dark:bg-outline border border-outline-variant dark:border-outline rounded-lg overflow-hidden">
+<!-- Header -->
+<div class="bg-surface-container-low dark:bg-surface-container-highest/10 p-sm text-center font-label-md text-label-md">Sun</div>
+<div class="bg-surface-container-low dark:bg-surface-container-highest/10 p-sm text-center font-label-md text-label-md">Mon</div>
+<div class="bg-surface-container-low dark:bg-surface-container-highest/10 p-sm text-center font-label-md text-label-md">Tue</div>
+<div class="bg-surface-container-low dark:bg-surface-container-highest/10 p-sm text-center font-label-md text-label-md">Wed</div>
+<div class="bg-surface-container-low dark:bg-surface-container-highest/10 p-sm text-center font-label-md text-label-md">Thu</div>
+<div class="bg-surface-container-low dark:bg-surface-container-highest/10 p-sm text-center font-label-md text-label-md">Fri</div>
+<div class="bg-surface-container-low dark:bg-surface-container-highest/10 p-sm text-center font-label-md text-label-md">Sat</div>
+<!-- Sample Days -->
+<div class="bg-surface-container-lowest dark:bg-on-surface h-24 p-xs text-on-surface-variant opacity-50">28</div>
+<div class="bg-surface-container-lowest dark:bg-on-surface h-24 p-xs text-on-surface-variant opacity-50">29</div>
+<div class="bg-surface-container-lowest dark:bg-on-surface h-24 p-xs text-on-surface-variant opacity-50">30</div>
+<div class="bg-surface-container-lowest dark:bg-on-surface h-24 p-xs font-bold">1</div>
+<div class="bg-surface-container-lowest dark:bg-on-surface h-24 p-xs font-bold relative">2
+        <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 w-full px-1">
+<span class="w-2 h-2 bg-primary rounded-full"></span>
+<span class="text-[8px] text-center truncate w-full">226 Present</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest dark:bg-on-surface h-24 p-xs font-bold">3</div>
+<div class="bg-surface-container-lowest dark:bg-on-surface h-24 p-xs font-bold">4</div>
+<!-- ... more days -->
+</div>
+</div>
+<!-- Payroll View -->
+<div class="view-content hidden" id="view-payroll">
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="text-on-surface-variant border-b border-outline-variant dark:text-secondary-fixed-dim dark:border-outline">
+<tr>
+<th class="py-sm font-label-lg text-label-lg">Name</th>
+<th class="py-sm font-label-lg text-label-lg">Month</th>
+<th class="py-sm font-label-lg text-label-lg">Salary</th>
+<th class="py-sm font-label-lg text-label-lg">Net Salary</th>
+<th class="py-sm font-label-lg text-label-lg text-right">Download Slip</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30 dark:divide-outline/30">
+<tr class="hover:bg-surface-container-low transition-colors dark:hover:bg-surface-container-highest/5">
+<td class="py-md font-label-lg text-label-lg text-on-surface dark:text-surface-bright">Dr. Rahul Sharma</td>
+<td class="py-md font-body-md text-body-md">October 2023</td>
+<td class="py-md font-body-md text-body-md">$8,500.00</td>
+<td class="py-md font-label-lg text-label-lg text-primary dark:text-primary-fixed">$8,850.00</td>
+<td class="py-md text-right">
+<button class="flex items-center gap-xs ml-auto px-md py-1 bg-surface-container-high dark:bg-surface-container-highest/10 rounded-lg text-label-md font-label-md hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined text-[18px]">download</span> PDF
+    </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Leave Status Tracking -->
+<div class="view-content hidden" id="view-leave">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-lg">
+<div class="space-y-md">
+<h3 class="font-title-lg text-title-lg text-on-surface dark:text-surface-bright">Pending Requests</h3>
+<div class="bg-surface-container-low dark:bg-surface-container-highest/10 p-md rounded-lg border border-outline-variant dark:border-outline">
+<div class="flex justify-between items-start mb-sm">
+<div class="flex items-center gap-sm">
+<img alt="Sarah" class="w-8 h-8 rounded-full" src="https://lh3.googleusercontent.com/aida/AP1WRLs-SCbLPq3uq7OofCFBs2h5olxdmJxEIPdoxv2rDEauk29m-pp6ngQ-yB8VEdPclzmPb_eAKqEdkznPpPzdbPfmGWgUlx8D0rCcCanN-g6VJHEVsgcUhQl2AhEU4XXQDNBOjBmWwcAQrfXl4EqiQO0evgrDyTq3oQoTgdt6aK1M5Jc6QIYSMi6XxloZWzJ8OSdjhjD8047YPiirVlZP5IB2BslPVncpPD_O4Jg2ubBkIlANNX5suXbxCjU"/>
+<div>
+<p class="font-label-lg text-on-surface dark:text-surface-bright">Sarah Lee</p>
+<p class="text-label-md text-on-surface-variant">Sick Leave • 2 Days</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-warning/10 text-orange-600 dark:text-orange-400 bg-orange-100 uppercase">Pending</span>
+</div>
+<div class="flex gap-sm mt-md">
+<button class="flex-1 py-1.5 bg-primary text-on-primary rounded text-label-md">Approve</button>
+<button class="flex-1 py-1.5 bg-surface-container-highest dark:bg-surface-container-highest/20 text-on-surface rounded text-label-md">Reject</button>
+</div>
+</div>
+</div>
+<div class="space-y-md">
+<h3 class="font-title-lg text-title-lg text-on-surface dark:text-surface-bright">Upcoming Absences</h3>
+<div class="space-y-sm">
+<div class="flex items-center justify-between p-sm border-b border-outline-variant dark:border-outline">
+<p class="text-label-lg">James Wilson</p>
+<p class="text-label-md text-on-surface-variant">Oct 26 - Oct 30</p>
+</div>
+<div class="flex items-center justify-between p-sm border-b border-outline-variant dark:border-outline">
+<p class="text-label-lg">Dr. Anita Nair</p>
+<p class="text-label-md text-on-surface-variant">Nov 02 - Nov 05</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Shift Assignment View -->
+<div class="view-content hidden" id="view-shift">
+<div class="flex justify-between items-center mb-lg">
+<h3 class="font-title-lg text-title-lg text-on-surface dark:text-surface-bright">Shift Schedule: Oct 24, 2023</h3>
+<button class="px-md py-1.5 bg-primary-container text-on-primary-container rounded-lg text-label-md font-label-md">Auto-Assign Shifts</button>
+</div>
+<div class="space-y-md">
+<!-- Morning Shift -->
+<div class="bg-surface-container-low dark:bg-surface-container-highest/5 p-md rounded-xl border-l-4 border-primary">
+<div class="flex justify-between items-center mb-sm">
+<h4 class="font-label-lg text-primary">Morning Shift (07:00 - 15:00)</h4>
+<span class="text-label-md text-on-surface-variant">12 Staff assigned</span>
+</div>
+<div class="flex flex-wrap gap-xs">
+<img class="w-8 h-8 rounded-full border-2 border-surface" src="https://lh3.googleusercontent.com/aida/AP1WRLs5qLoYTqb68zAUfLjBMlWnHY08_OC-gulttwexacuNGNjqOWr5Nvi6wDwGLjeZBF2hhDLVx20Oq8ZxDurvpzTnoN3XJmT5KIOyNPNXPXPpo07CslSeo1q58Ulfe2d77aAxpB3tokZMgf6DxVmQAwgrRNmcPr3uA4i_CfDJsAvPhicGu0fYNpJeSB0EaSfMiim4S03oH_RqQcBqK4XkTrcAdP3-iSntrjXAAJv5F1CzxSZFUmffI7ANnefN"/>
+<img class="w-8 h-8 rounded-full border-2 border-surface" src="https://lh3.googleusercontent.com/aida/AP1WRLvAWAppcVTmrpPwsj00OlcDfk4-CBcuXC-FZV78FkgGWWrPCNWd_ESupniPlw1fKTXC2UUugtNhxQ7fuP6FWJqxHkZh2mC6PSC3WVbhiXp4aHw7R8iK3a0xlq4PCz3kp8H23kCUxj_zuKtvKX3w0i_7JBKPOLFFyFh1XdRGSHAapUbTSNUPrZx-v2mIsqJB9T3Ow7gYxKvK-kHX4N_rnHOnFSt-_NWgGXWx51mGM8PP1-jL57gVsuLghtk"/>
+<button class="w-8 h-8 rounded-full bg-surface-container-high dark:bg-surface-container-highest/20 flex items-center justify-center text-[18px]"><span class="material-symbols-outlined">add</span></button>
+</div>
+</div>
+<!-- Afternoon Shift -->
+<div class="bg-surface-container-low dark:bg-surface-container-highest/5 p-md rounded-xl border-l-4 border-secondary">
+<div class="flex justify-between items-center mb-sm">
+<h4 class="font-label-lg text-secondary">Afternoon Shift (15:00 - 23:00)</h4>
+<span class="text-label-md text-on-surface-variant">8 Staff assigned</span>
+</div>
+<div class="flex flex-wrap gap-xs">
+<img class="w-8 h-8 rounded-full border-2 border-surface" src="https://lh3.googleusercontent.com/aida/AP1WRLuIOgldlIQTMUJ9RH_WQ4YMi42Oro-y3otaRGBSj8flfMzA8gp4hO35jCnBfdRbYZNS2zmOhGcPhEI2ElVscrqQ4WcQGENw9A78uRqn5G0Uwaf4-kP2NPm84o4EqOKv8gmzyZkL6CtSahUxgM9dMx9iefPAp3r_w5rsUv41MtFL3XFyVuOr7THeCvwhD_F3fyYifZrD8zoGmgXTuwozykyyPJPckVIwl6qwwa2IKOuoGUHlAsO4VulDQSQC"/>
+<button class="w-8 h-8 rounded-full bg-surface-container-high dark:bg-surface-container-highest/20 flex items-center justify-center text-[18px]"><span class="material-symbols-outlined">add</span></button>
+</div>
+</div>
+<!-- Night Shift -->
+<div class="bg-surface-container-low dark:bg-surface-container-highest/5 p-md rounded-xl border-l-4 border-tertiary">
+<div class="flex justify-between items-center mb-sm">
+<h4 class="font-label-lg text-tertiary">Night Shift (23:00 - 07:00)</h4>
+<span class="text-label-md text-on-surface-variant">5 Staff assigned</span>
+</div>
+<div class="flex flex-wrap gap-xs">
+<button class="w-8 h-8 rounded-full bg-surface-container-high dark:bg-surface-container-highest/20 flex items-center justify-center text-[18px]"><span class="material-symbols-outlined">add</span></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual FAB -->
+<button class="fixed bottom-lg right-lg bg-primary text-on-primary w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-50 dark:bg-primary-fixed dark:text-on-primary-fixed">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<script>
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('dark-mode-icon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.textContent = 'dark_mode';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                icon.textContent = 'light_mode';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Initialize theme
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            document.getElementById('dark-mode-icon').textContent = 'light_mode';
+        }
+
+        function switchTab(tabId) {
+            const views = document.querySelectorAll('.view-content');
+            views.forEach(v => {
+                v.classList.add('hidden');
+                v.classList.remove('block');
+            });
+
+            const tabs = document.querySelectorAll('[id^="tab-"]');
+            tabs.forEach(t => {
+                t.classList.remove('active-tab');
+                t.classList.add('text-on-surface-variant', 'dark:text-secondary-fixed-dim');
+            });
+
+            const activeView = document.getElementById('view-' + tabId);
+            if(activeView) {
+                activeView.classList.remove('hidden');
+                activeView.classList.add('block');
+            }
+
+            const activeTab = document.getElementById('tab-' + tabId);
+            if(activeTab) {
+                activeTab.classList.add('active-tab');
+                activeTab.classList.remove('text-on-surface-variant', 'dark:text-secondary-fixed-dim');
+            }
+        }
+    </script>
+</body></html>

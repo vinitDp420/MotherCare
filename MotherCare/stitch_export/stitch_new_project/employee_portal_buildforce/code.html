@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BuildForce - Employee Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#1b1c1c",
+                        "tertiary-container": "#bfbebe",
+                        "on-surface": "#1a1c1c",
+                        "primary-fixed-dim": "#fdbc13",
+                        "on-background": "#1a1c1c",
+                        "surface-variant": "#e2e2e2",
+                        "surface-bright": "#f9f9f9",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f3f3f3",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "background": "#f9f9f9",
+                        "on-secondary-fixed-variant": "#474746",
+                        "secondary-fixed": "#e5e2e1",
+                        "inverse-on-surface": "#f1f1f1",
+                        "outline-variant": "#d4c4ac",
+                        "on-primary-fixed-variant": "#5d4200",
+                        "inverse-primary": "#fdbc13",
+                        "secondary-container": "#e2dfde",
+                        "primary-container": "#f4b400",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#464747",
+                        "surface-tint": "#7a5900",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "primary": "#7a5900",
+                        "error": "#ba1a1a",
+                        "surface-container": "#eeeeee",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#dadada",
+                        "on-primary-fixed": "#261900",
+                        "outline": "#827560",
+                        "tertiary-fixed": "#e3e2e2",
+                        "tertiary": "#5e5e5e",
+                        "on-secondary-container": "#636262",
+                        "secondary": "#5f5e5e",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "on-primary-container": "#654800",
+                        "on-surface-variant": "#504533",
+                        "on-tertiary-container": "#4d4d4d",
+                        "tertiary-fixed-dim": "#c7c6c6",
+                        "inverse-surface": "#2f3131",
+                        "surface-container-highest": "#e2e2e2",
+                        "surface-container-high": "#e8e8e8",
+                        "on-secondary": "#ffffff",
+                        "surface": "#f9f9f9",
+                        "primary-fixed": "#ffdea3",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "xs": "4px",
+                        "margin-mobile": "16px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "gutter": "16px",
+                        "margin-desktop": "32px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "display-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "table-data": ["Inter"],
+                        "label-md": ["JetBrains Mono"],
+                        "body-sm": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "table-data": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[style*="FILL' 1"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen flex antialiased">
+<!-- SideNavBar (Hidden on Mobile) -->
+<nav class="hidden md:flex flex-col h-screen w-64 py-lg bg-on-surface text-primary-container border-r border-outline flex-shrink-0 sticky top-0">
+<div class="px-md mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-primary-container">BuildForce</h1>
+<p class="font-label-md text-label-md uppercase tracking-widest text-secondary-fixed-dim mt-xs">Enterprise Resource Planning</p>
+</div>
+<div class="px-md mb-lg">
+<button class="w-full bg-primary-container text-on-primary-container py-sm px-md rounded font-label-md text-label-md uppercase tracking-widest hover:opacity-90 transition-opacity flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                New Project
+            </button>
+</div>
+<ul class="flex-1 overflow-y-auto px-sm space-y-xs">
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-r-full hover:bg-secondary-container hover:text-on-secondary-container transition-all duration-200 ease-in-out font-label-md text-label-md uppercase tracking-widest bg-primary-container text-on-primary-container border-l-4 border-primary font-bold" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+                    Workforce
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-r-full text-secondary-fixed-dim hover:text-surface-bright hover:bg-secondary-container transition-all duration-200 ease-in-out font-label-md text-label-md uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined">payments</span>
+                    Payroll
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-r-full text-secondary-fixed-dim hover:text-surface-bright hover:bg-secondary-container transition-all duration-200 ease-in-out font-label-md text-label-md uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined">construction</span>
+                    Projects
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-r-full text-secondary-fixed-dim hover:text-surface-bright hover:bg-secondary-container transition-all duration-200 ease-in-out font-label-md text-label-md uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined">precision_manufacturing</span>
+                    Equipment
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-r-full text-secondary-fixed-dim hover:text-surface-bright hover:bg-secondary-container transition-all duration-200 ease-in-out font-label-md text-label-md uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+                    Materials
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-r-full text-secondary-fixed-dim hover:text-surface-bright hover:bg-secondary-container transition-all duration-200 ease-in-out font-label-md text-label-md uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined">person_add</span>
+                    Recruitment
+                </a>
+</li>
+</ul>
+<div class="px-sm mt-auto border-t border-outline pt-md space-y-xs">
+<a class="flex items-center gap-md px-md py-sm rounded-r-full text-secondary-fixed-dim hover:text-surface-bright hover:bg-secondary-container transition-all duration-200 ease-in-out font-label-md text-label-md uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+<a class="flex items-center gap-md px-md py-sm rounded-r-full text-secondary-fixed-dim hover:text-surface-bright hover:bg-secondary-container transition-all duration-200 ease-in-out font-label-md text-label-md uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined">contact_support</span>
+                Support
+            </a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col min-w-0 bg-surface">
+<!-- TopNavBar (Mobile Only) -->
+<header class="md:hidden flex justify-between items-center h-16 px-margin-mobile w-full z-50 bg-surface-container-lowest border-b-2 border-primary-container shadow-sm">
+<div class="font-display-lg-mobile text-display-lg-mobile font-black text-on-surface tracking-tighter">
+                BUILDFORCE
+            </div>
+<div class="flex items-center gap-md text-primary">
+<button class="hover:bg-surface-container-high p-sm rounded-full transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden border border-outline-variant">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="A close up portrait of a male construction worker wearing a yellow hard hat and a high visibility vest. The lighting is bright and sunny, highlighting the rugged features of his face. The background is slightly blurred, showing a construction site." src="https://lh3.googleusercontent.com/aida/AP1WRLtz8sGt6z83ezQx5V_EJlaoFP0jhq5Qs3f3rRpkWN8PpXabMUgtQsynxZFW514CAG0fxflXqCPOTvVxEP2W2ZhuSJ5FcKl6qd-QWbIH381ENYNqHJzaGv2KQ2FQBKPIaegEE5Mj4w-fv4UxGC5ldF5Oy043XL9FGj2dZ8Fngn8b9ylD7lhpt44Y0JzomiUmwQfgaww2RQRcqZrhq5EqbHCTe6ysx-v22KQRkZ7Ixm3iuZrDB8_GSEKTyQ70"/>
+</div>
+</div>
+</header>
+<!-- Top Header Area (Desktop Content) -->
+<div class="hidden md:flex justify-between items-center h-16 px-margin-desktop w-full border-b border-surface-variant bg-surface">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Employee Dashboard</h2>
+<div class="flex items-center gap-md text-on-surface-variant">
+<button class="hover:bg-surface-container-high p-xs rounded transition-colors cursor-pointer">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="hover:bg-surface-container-high p-xs rounded transition-colors cursor-pointer">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="flex items-center gap-sm ml-sm">
+<div class="text-right">
+<p class="font-label-md text-label-md text-on-surface">James Wilson</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Site Supervisor</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-variant overflow-hidden border border-outline-variant">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="A close up portrait of a male construction worker wearing a yellow hard hat and a high visibility vest. The lighting is bright and sunny, highlighting the rugged features of his face. The background is slightly blurred, showing a construction site." src="https://lh3.googleusercontent.com/aida/AP1WRLuh7is8JH84yH4IUTYasFeI-BM3-HwB9RVZnwWr8N7D4e_0UMMqBPoGbn_AMsu7VIBE4kJwSiFBLOG3EZ_glbpMlijnFyO1xTAMehaw14ClQYtfyY9eMuJPQ3srN5EnC6FOGNwOkvp7x4C9Zh-HGBD9uK3L7A_0dqHQzHzJW2nN-PwcGzlYhZWWsz3pYqSCKVt9toHerRSbvb085MierAotTbDyuM3WVKjYNnd7E-mIGmSKJ6wTklQCnFMf"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Dashboard Content -->
+<div class="flex-1 overflow-y-auto p-margin-mobile md:p-margin-desktop space-y-lg md:space-y-xl">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface">Welcome back, James</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-xs">Here is your attendance and earnings overview for October.</p>
+</div>
+<button class="bg-primary-container text-on-primary-container font-label-md text-label-md py-md px-lg rounded flex items-center justify-center gap-sm hover:opacity-90 transition-opacity whitespace-nowrap shadow-[0px_2px_4px_rgba(0,0,0,0.05)]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">how_to_reg</span>
+                    MARK ATTENDANCE
+                </button>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter md:gap-lg">
+<!-- Today's Status Card (Col Span 4) -->
+<div class="md:col-span-4 bg-surface-container-lowest border border-surface-variant rounded-lg p-md relative overflow-hidden shadow-[0px_2px_4px_rgba(0,0,0,0.05)]">
+<div class="absolute top-0 left-0 w-unit h-full bg-primary-container"></div>
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mb-md">Today's Status</h3>
+<div class="flex items-center gap-md mb-lg">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div>
+<p class="font-headline-sm text-headline-sm text-on-surface">Checked In</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Downtown Plaza Project</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-sm pt-sm border-t border-surface-variant">
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant">TIME IN</p>
+<p class="font-body-md text-body-md font-semibold text-on-surface">06:45 AM</p>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant">EST. TIME OUT</p>
+<p class="font-body-md text-body-md font-semibold text-on-surface">04:00 PM</p>
+</div>
+</div>
+</div>
+<!-- Earnings Summary Card (Col Span 4) -->
+<div class="md:col-span-4 bg-surface-container-lowest border border-surface-variant rounded-lg p-md relative shadow-[0px_2px_4px_rgba(0,0,0,0.05)]">
+<div class="absolute top-0 left-0 w-full h-unit bg-on-surface"></div>
+<div class="flex justify-between items-start mb-md">
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Oct Earnings</h3>
+<span class="material-symbols-outlined text-on-surface-variant">payments</span>
+</div>
+<div class="mb-lg">
+<p class="font-display-lg text-display-lg text-on-surface">$4,250.00</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Est. gross pay this month</p>
+</div>
+<div class="space-y-sm pt-sm border-t border-surface-variant">
+<div class="flex justify-between items-center">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Regular Hours (140h)</span>
+<span class="font-body-sm text-body-sm text-on-surface font-semibold">$3,500.00</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Overtime (20h)</span>
+<span class="font-body-sm text-body-sm text-on-surface font-semibold">$750.00</span>
+</div>
+</div>
+</div>
+<!-- Quick Stats Card (Col Span 4) -->
+<div class="md:col-span-4 bg-surface-container-lowest border border-surface-variant rounded-lg p-md shadow-[0px_2px_4px_rgba(0,0,0,0.05)]">
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mb-md">Monthly Stats</h3>
+<div class="space-y-md">
+<div>
+<div class="flex justify-between items-center mb-xs">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Days Present</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">18 / 22</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-primary-container h-full" style="width: 80%;"></div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-md pt-sm">
+<div class="bg-surface-container-low p-sm rounded border border-surface-variant text-center">
+<p class="font-display-lg-mobile text-display-lg-mobile text-on-surface">0</p>
+<p class="font-label-md text-label-md text-on-surface-variant mt-xs">ABSENCES</p>
+</div>
+<div class="bg-surface-container-low p-sm rounded border border-surface-variant text-center">
+<p class="font-display-lg-mobile text-display-lg-mobile text-on-surface">2</p>
+<p class="font-label-md text-label-md text-on-surface-variant mt-xs">LATE IN</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Monthly Calendar (Col Span 8) -->
+<div class="md:col-span-8 bg-surface-container-lowest border border-surface-variant rounded-lg p-md shadow-[0px_2px_4px_rgba(0,0,0,0.05)] flex flex-col">
+<div class="flex justify-between items-center mb-md pb-sm border-b border-surface-variant">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">October 2023</h3>
+<div class="flex gap-sm">
+<button class="p-xs hover:bg-surface-container rounded transition-colors"><span class="material-symbols-outlined text-[20px]">chevron_left</span></button>
+<button class="p-xs hover:bg-surface-container rounded transition-colors"><span class="material-symbols-outlined text-[20px]">chevron_right</span></button>
+</div>
+</div>
+<div class="grid grid-cols-7 gap-xs text-center mb-sm">
+<div class="font-label-md text-label-md text-on-surface-variant">SUN</div>
+<div class="font-label-md text-label-md text-on-surface-variant">MON</div>
+<div class="font-label-md text-label-md text-on-surface-variant">TUE</div>
+<div class="font-label-md text-label-md text-on-surface-variant">WED</div>
+<div class="font-label-md text-label-md text-on-surface-variant">THU</div>
+<div class="font-label-md text-label-md text-on-surface-variant">FRI</div>
+<div class="font-label-md text-label-md text-on-surface-variant">SAT</div>
+</div>
+<!-- Dummy Calendar Grid -->
+<div class="grid grid-cols-7 gap-xs flex-1">
+<!-- Empty slots for previous month -->
+<div class="aspect-square p-xs border border-surface-variant rounded bg-surface-container-lowest opacity-50"></div>
+<div class="aspect-square p-xs border border-surface-variant rounded bg-surface-container-lowest opacity-50"></div>
+<!-- Days -->
+<div class="aspect-square p-xs border border-surface-variant rounded bg-surface-container-low relative group">
+<span class="font-body-sm text-body-sm text-on-surface">1</span>
+<div class="absolute bottom-xs left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary-container"></div>
+</div>
+<div class="aspect-square p-xs border border-surface-variant rounded bg-surface-container-low relative">
+<span class="font-body-sm text-body-sm text-on-surface">2</span>
+<div class="absolute bottom-xs left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary-container"></div>
+</div>
+<div class="aspect-square p-xs border border-surface-variant rounded bg-surface-container-low relative">
+<span class="font-body-sm text-body-sm text-on-surface">3</span>
+<div class="absolute bottom-xs left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary-container"></div>
+</div>
+<div class="aspect-square p-xs border border-surface-variant rounded bg-surface-container-low relative">
+<span class="font-body-sm text-body-sm text-on-surface">4</span>
+<div class="absolute bottom-xs left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary-container"></div>
+</div>
+<div class="aspect-square p-xs border border-surface-variant rounded bg-surface-container-lowest text-on-surface-variant">
+<span class="font-body-sm text-body-sm">5</span>
+</div>
+<!-- ... more days would go here in a real implementation ... -->
+<div class="aspect-square p-xs border border-surface-variant rounded bg-surface-container-lowest text-on-surface-variant">
+<span class="font-body-sm text-body-sm">6</span>
+</div>
+<div class="aspect-square p-xs border border-surface-variant rounded bg-surface-container-low relative">
+<span class="font-body-sm text-body-sm text-on-surface">7</span>
+<div class="absolute bottom-xs left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary-container"></div>
+</div>
+<div class="aspect-square p-xs border border-surface-variant rounded bg-surface-container-low relative">
+<span class="font-body-sm text-body-sm text-on-surface">8</span>
+<div class="absolute bottom-xs left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary-container"></div>
+</div>
+<div class="aspect-square p-xs border border-surface-variant rounded bg-surface-container-low relative">
+<span class="font-body-sm text-body-sm text-on-surface">9</span>
+<div class="absolute bottom-xs left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-error"></div> <!-- Example of absence/late -->
+</div>
+<div class="aspect-square p-xs border border-surface-variant rounded bg-surface-container-low relative">
+<span class="font-body-sm text-body-sm text-on-surface">10</span>
+<div class="absolute bottom-xs left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary-container"></div>
+</div>
+<div class="aspect-square p-xs border border-primary bg-primary/5 relative">
+<span class="font-body-sm text-body-sm font-bold text-primary">11</span>
+<div class="absolute bottom-xs left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary-container"></div>
+</div>
+<div class="aspect-square p-xs border border-surface-variant rounded bg-surface-container-lowest text-on-surface-variant">
+<span class="font-body-sm text-body-sm">12</span>
+</div>
+<div class="aspect-square p-xs border border-surface-variant rounded bg-surface-container-lowest text-on-surface-variant">
+<span class="font-body-sm text-body-sm">13</span>
+</div>
+<div class="aspect-square p-xs border border-surface-variant rounded bg-surface-container-lowest">
+<span class="font-body-sm text-body-sm text-on-surface">14</span>
+</div>
+</div>
+<div class="mt-sm flex gap-md justify-end">
+<div class="flex items-center gap-xs font-body-sm text-body-sm text-on-surface-variant"><div class="w-2 h-2 rounded-full bg-primary-container"></div> Present</div>
+<div class="flex items-center gap-xs font-body-sm text-body-sm text-on-surface-variant"><div class="w-2 h-2 rounded-full bg-error"></div> Issue</div>
+</div>
+</div>
+<!-- Recent Attendance List (Col Span 4) -->
+<div class="md:col-span-4 bg-surface-container-lowest border border-surface-variant rounded-lg p-md shadow-[0px_2px_4px_rgba(0,0,0,0.05)] flex flex-col h-[400px]">
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Recent Logs</h3>
+<a class="font-label-md text-label-md text-primary hover:underline" href="#">View All</a>
+</div>
+<div class="flex-1 overflow-y-auto pr-xs space-y-xs">
+<!-- List Item -->
+<div class="flex items-center justify-between p-sm border border-surface-variant rounded hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+</div>
+<div>
+<p class="font-body-md text-body-md font-semibold text-on-surface">Oct 11, Today</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">06:45 AM - Active</p>
+</div>
+</div>
+<span class="px-2 py-1 rounded bg-primary/10 text-primary font-label-md text-[10px] uppercase">Present</span>
+</div>
+<!-- List Item -->
+<div class="flex items-center justify-between p-sm border border-surface-variant rounded hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+</div>
+<div>
+<p class="font-body-md text-body-md font-semibold text-on-surface">Oct 10, Tue</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">07:00 AM - 04:15 PM</p>
+</div>
+</div>
+<span class="px-2 py-1 rounded bg-surface-dim text-on-surface font-label-md text-[10px] uppercase">9.25h</span>
+</div>
+<!-- List Item -->
+<div class="flex items-center justify-between p-sm border border-surface-variant rounded hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+</div>
+<div>
+<p class="font-body-md text-body-md font-semibold text-on-surface">Oct 09, Mon</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">07:15 AM - 04:00 PM</p>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="px-2 py-1 rounded bg-error/10 text-error font-label-md text-[10px] uppercase">Late</span>
+<span class="font-body-sm text-[10px] text-on-surface-variant mt-1">8.75h</span>
+</div>
+</div>
+<!-- List Item -->
+<div class="flex items-center justify-between p-sm border border-surface-variant rounded hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+</div>
+<div>
+<p class="font-body-md text-body-md font-semibold text-on-surface">Oct 08, Sun</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Weekend</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

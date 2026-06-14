@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BuildForce - Selfie Attendance</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#1b1c1c",
+                        "tertiary-container": "#bfbebe",
+                        "on-surface": "#1a1c1c",
+                        "primary-fixed-dim": "#fdbc13",
+                        "on-background": "#1a1c1c",
+                        "surface-variant": "#e2e2e2",
+                        "surface-bright": "#f9f9f9",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f3f3f3",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "background": "#f9f9f9",
+                        "on-secondary-fixed-variant": "#474746",
+                        "secondary-fixed": "#e5e2e1",
+                        "inverse-on-surface": "#f1f1f1",
+                        "outline-variant": "#d4c4ac",
+                        "on-primary-fixed-variant": "#5d4200",
+                        "inverse-primary": "#fdbc13",
+                        "secondary-container": "#e2dfde",
+                        "primary-container": "#f4b400",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#464747",
+                        "surface-tint": "#7a5900",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "primary": "#7a5900",
+                        "error": "#ba1a1a",
+                        "surface-container": "#eeeeee",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#dadada",
+                        "on-primary-fixed": "#261900",
+                        "outline": "#827560",
+                        "tertiary-fixed": "#e3e2e2",
+                        "tertiary": "#5e5e5e",
+                        "on-secondary-container": "#636262",
+                        "secondary": "#5f5e5e",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "on-primary-container": "#654800",
+                        "on-surface-variant": "#504533",
+                        "on-tertiary-container": "#4d4d4d",
+                        "tertiary-fixed-dim": "#c7c6c6",
+                        "inverse-surface": "#2f3131",
+                        "surface-container-highest": "#e2e2e2",
+                        "surface-container-high": "#e8e8e8",
+                        "on-secondary": "#ffffff",
+                        "surface": "#f9f9f9",
+                        "primary-fixed": "#ffdea3",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "xs": "4px",
+                        "margin-mobile": "16px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "gutter": "16px",
+                        "margin-desktop": "32px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "display-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "table-data": ["Inter"],
+                        "label-md": ["JetBrains Mono"],
+                        "body-sm": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "table-data": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen flex flex-col md:flex-row antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar (Web) -->
+<nav class="hidden md:flex flex-col w-64 bg-on-surface dark:bg-inverse-surface border-r border-outline dark:border-on-tertiary-fixed-variant h-screen fixed left-0 py-lg z-40 transition-all duration-200 ease-in-out">
+<div class="px-md mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined fill">domain</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary-container tracking-tighter">BuildForce</h1>
+<p class="font-label-md text-label-md uppercase tracking-widest text-secondary-fixed-dim text-[10px]">ERP</p>
+</div>
+</div>
+</div>
+<div class="flex-1 px-sm space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-on-secondary-container hover:text-surface-bright transition-all duration-200" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md uppercase tracking-widest">Workforce</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-on-secondary-container hover:text-surface-bright transition-all duration-200" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md text-label-md uppercase tracking-widest">Payroll</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-on-secondary-container hover:text-surface-bright transition-all duration-200" href="#">
+<span class="material-symbols-outlined">construction</span>
+<span class="font-label-md text-label-md uppercase tracking-widest">Projects</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-on-secondary-container hover:text-surface-bright transition-all duration-200" href="#">
+<span class="material-symbols-outlined">precision_manufacturing</span>
+<span class="font-label-md text-label-md uppercase tracking-widest">Equipment</span>
+</a>
+</div>
+<div class="px-sm space-y-1 mt-auto pb-4">
+<a class="flex items-center gap-3 px-3 py-2 rounded text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-on-secondary-container hover:text-surface-bright transition-all duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md uppercase tracking-widest">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Top AppBar (Mobile/Tablet) -->
+<header class="md:hidden flex justify-between items-center h-16 px-margin-mobile w-full bg-surface-container-lowest border-b-2 border-primary-container shadow-sm z-50 sticky top-0">
+<h1 class="font-display-lg-mobile text-display-lg-mobile font-black text-on-surface tracking-tighter">BUILDFORCE</h1>
+<div class="flex gap-4 text-primary">
+<span class="material-symbols-outlined cursor-pointer hover:opacity-80">notifications</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="A close-up portrait of a male construction worker wearing a hard hat, softly lit in a modern industrial setting with warm, subtle lighting emphasizing the robust, professional corporate mood." src="https://lh3.googleusercontent.com/aida/AP1WRLuahXCbyuwwGe08EkIQKuTeE3Pb9AYm0-fF3tdlPlXflnAsPq-zrn0zU7jGxZO2mWar2jgpd0zPt4Qs2eAl05XOuxVLqbGHJ_z_UvBMg8EOs8S-cxnwBn3M8Pf3paH3hpbT5hmgA4eyylCVGX1IOR091-UEJCCp2Q1bJJOUD_EXwWY44xrtz5FVUFKrcikofxCKqxXrqtv7kYzzNPJ9e8aGwM4fbuMcRpde8oVrrQFkaU5WP0pGWpbj_SpK"/>
+</div>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 w-full md:ml-64 p-margin-mobile md:p-margin-desktop bg-surface overflow-y-auto">
+<!-- Header -->
+<div class="mb-lg flex justify-between items-end">
+<div>
+<h2 class="font-display-lg text-display-lg text-on-surface mb-xs">Site Attendance</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Verify identity and location to log hours.</p>
+</div>
+<button class="hidden md:flex items-center gap-2 px-4 py-2 bg-on-surface text-on-primary rounded font-label-md text-label-md uppercase tracking-widest hover:bg-primary transition-colors border border-outline">
+<span class="material-symbols-outlined text-[18px]">close</span>
+                Cancel Entry
+            </button>
+</div>
+<!-- Content Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter max-w-6xl mx-auto">
+<!-- Left Column: Camera View -->
+<div class="lg:col-span-8 flex flex-col gap-gutter">
+<div class="bg-surface-container-lowest border border-surface-variant rounded-lg overflow-hidden relative shadow-sm h-[500px] flex flex-col">
+<!-- Camera Header -->
+<div class="flex justify-between items-center p-md border-b border-surface-variant bg-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container fill">videocam</span>
+<span class="font-label-md text-label-md uppercase tracking-widest text-on-surface">Live Feed</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Recording</span>
+</div>
+</div>
+<!-- Viewfinder Area -->
+<div class="flex-1 relative bg-on-surface">
+<!-- Placeholder Image for Camera Feed -->
+<img alt="Camera Feed" class="w-full h-full object-cover opacity-80" data-alt="A first-person viewpoint looking out over a bustling construction site during the day. Scaffolding, steel beams, and heavy machinery are visible under a clear, bright sky, conveying a realistic industrial environment suited for a corporate tracking application." src="https://lh3.googleusercontent.com/aida/AP1WRLsjUAo6f_pq-FleRmsDcA3TAkbUM4bMnoLnLUPP3U9K7RxWMoSLldUieizJedwHet0DO0w_apf_usj9DPvmEHc-_XTOGiTQle_PdzHe2kUhRMWMiJMdPFEik4eVHMctuHEtaA8ba_Ofe7cG01CXieRE-ANiWp3IlKV-MiNVTPUw5df8EQaDUcHfu3exbDryLl-jimJaFeBdcIINmSfkr3pZtfPpvsTJAFD1ny3xEx803iC4AVjMYUDrkRaO"/>
+<!-- Face Guide Overlay -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<div class="w-64 h-80 border-2 border-primary-container border-dashed rounded-[40px] opacity-70"></div>
+</div>
+<!-- Bottom Controls Overlay -->
+<div class="absolute bottom-0 left-0 right-0 p-lg bg-gradient-to-t from-black/80 to-transparent flex justify-center">
+<button class="flex items-center justify-center gap-2 px-8 py-4 bg-primary-container text-on-primary-fixed font-headline-sm text-headline-sm rounded hover:bg-primary transition-colors shadow-md w-full max-w-sm" id="captureBtn">
+<span class="material-symbols-outlined">photo_camera</span>
+                                Capture Selfie
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Verification Data -->
+<div class="lg:col-span-4 flex flex-col gap-gutter">
+<!-- GPS Verification Card -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-lg p-md shadow-sm">
+<div class="flex items-start gap-3 mb-md">
+<div class="w-10 h-10 rounded bg-surface-container-low flex items-center justify-center text-primary">
+<span class="material-symbols-outlined fill">location_on</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">GPS Verification</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Checking site boundaries</p>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center py-2 border-b border-surface-variant">
+<span class="font-body-md text-body-md text-on-surface-variant">Status</span>
+<span class="px-2 py-1 bg-[#E6F4EA] text-[#137333] font-label-md text-label-md rounded border border-[#CEEAD6] flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> Verified
+                            </span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-surface-variant">
+<span class="font-body-md text-body-md text-on-surface-variant">Coordinates</span>
+<span class="font-label-md text-label-md text-on-surface font-mono tracking-wider">34.0522° N, 118.2437° W</span>
+</div>
+<div class="flex justify-between items-center py-2">
+<span class="font-body-md text-body-md text-on-surface-variant">Proximity</span>
+<span class="font-label-md text-label-md text-on-surface">Within Site Area (15m)</span>
+</div>
+</div>
+<!-- Mini Map Placeholder -->
+<div class="mt-md h-32 bg-surface-container rounded border border-surface-variant overflow-hidden relative">
+<img alt="Map Location" class="w-full h-full object-cover opacity-60" data-alt="A stylized, overhead satellite map view showing an urban construction plot with surrounding city blocks. A subtle yellow pin drops directly onto the active work zone, highlighting GPS tracking accuracy within a modern, data-dense interface." data-location="Los Angeles" src="https://lh3.googleusercontent.com/aida/AP1WRLt-9tbdGLSWe0ReXm6uLQNwShUtBgg4HcH4mWc3AK3Z3BX7oGqycXwT9pNeYGzDE8Cyzwa8R2wCVwKEZo5t4SbPcMTokrPxVpoiJfRUbLVNrEbE3DrUwEfWozI1hJg4fXY47qI8AB6hpQVyJcjdZl-EfnWKLOJ3AufmuH4rhH1aouLpxVe8aOSOKcSkHwrlGIvdTH_AuA7cLdNNSMXFLjEqU71BoCMrpngOHWj5I4Jch-LOzml7lzxObxdF"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-4 h-4 bg-primary-container rounded-full border-2 border-on-primary shadow-sm animate-pulse"></div>
+</div>
+</div>
+</div>
+<!-- Time Card -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-lg p-md shadow-sm relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary-container"></div>
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-on-surface-variant">schedule</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Current Time</h3>
+</div>
+<div class="font-display-lg text-display-lg text-on-surface tracking-tighter tabular-nums" id="live-time">
+                        07:58 AM
+                    </div>
+<div class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mt-1" id="live-date">
+                        OCT 24, 2023
+                    </div>
+</div>
+</div>
+</div>
+</main>
+<!-- Success Overlay (Hidden by default) -->
+<div class="fixed inset-0 bg-on-surface/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-4" id="successOverlay">
+<div class="bg-surface-container-lowest rounded-lg shadow-xl w-full max-w-md p-xl border border-surface-variant text-center transform scale-95 opacity-0 transition-all duration-300" id="successCard">
+<div class="w-20 h-20 bg-[#E6F4EA] rounded-full mx-auto flex items-center justify-center mb-6 border-4 border-surface-container-lowest shadow-sm">
+<span class="material-symbols-outlined text-[40px] text-[#137333]">done_all</span>
+</div>
+<h2 class="font-display-lg-mobile text-display-lg-mobile text-on-surface mb-2">Attendance Logged</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">Your shift entry has been recorded securely to the ERP.</p>
+<div class="bg-surface-container-low p-4 rounded text-left border border-surface-variant mb-6 space-y-3">
+<div class="flex justify-between items-center">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Status</span>
+<span class="font-headline-sm text-headline-sm text-[#137333]">On Time</span>
+</div>
+<div class="flex justify-between items-center border-t border-surface-variant pt-3">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Time Logged</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">07:59 AM</span>
+</div>
+</div>
+<button class="w-full py-3 bg-on-surface text-on-primary rounded font-label-md text-label-md uppercase tracking-widest hover:bg-primary transition-colors border border-outline" onclick="closeSuccess()">
+                Return to Dashboard
+            </button>
+</div>
+</div>
+<script>
+        // Simple script to trigger success state
+        document.getElementById('captureBtn').addEventListener('click', function() {
+            const overlay = document.getElementById('successOverlay');
+            const card = document.getElementById('successCard');
+            
+            // Show overlay
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+            
+            // Animate card in
+            setTimeout(() => {
+                card.classList.remove('scale-95', 'opacity-0');
+                card.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        });
+
+        function closeSuccess() {
+            const overlay = document.getElementById('successOverlay');
+            const card = document.getElementById('successCard');
+            
+            card.classList.remove('scale-100', 'opacity-100');
+            card.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                overlay.classList.remove('flex');
+            }, 300);
+        }
+    </script>
+</body></html>

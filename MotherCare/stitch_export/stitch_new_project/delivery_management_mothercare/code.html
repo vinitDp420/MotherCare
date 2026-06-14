@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Delivery Management | MotherCare</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#006b5f",
+                        "on-primary-container": "#f4fffb",
+                        "surface-container": "#e5eeff",
+                        "secondary-fixed-dim": "#bac9d3",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "background": "#f8f9ff",
+                        "secondary-fixed": "#d6e5ef",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#d3e4fe",
+                        "primary-fixed": "#8df5e4",
+                        "primary": "#00685d",
+                        "on-error": "#ffffff",
+                        "surface": "#f8f9ff",
+                        "inverse-surface": "#213145",
+                        "tertiary-fixed": "#ffd9e4",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#0f1d25",
+                        "surface-variant": "#d3e4fe",
+                        "primary-fixed-dim": "#70d8c8",
+                        "on-primary-fixed-variant": "#005048",
+                        "inverse-primary": "#70d8c8",
+                        "surface-dim": "#cbdbf5",
+                        "on-primary-fixed": "#00201c",
+                        "surface-container-high": "#dce9ff",
+                        "tertiary": "#7d4e60",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#fffbff",
+                        "secondary-container": "#d3e2ed",
+                        "surface-container-low": "#eff4ff",
+                        "outline": "#6d7a77",
+                        "on-surface-variant": "#3d4946",
+                        "secondary": "#526069",
+                        "on-background": "#0b1c30",
+                        "on-tertiary-fixed-variant": "#65394b",
+                        "on-secondary-fixed-variant": "#3b4951",
+                        "inverse-on-surface": "#eaf1ff",
+                        "outline-variant": "#bcc9c5",
+                        "surface-bright": "#f8f9ff",
+                        "primary-container": "#008376",
+                        "on-tertiary-fixed": "#330f1f",
+                        "tertiary-container": "#996679",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#f2b6cb",
+                        "on-surface": "#0b1c30",
+                        "on-secondary-container": "#56656e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "12px",
+                        "base": "8px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "40px",
+                        "gutter": "24px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d3e2ed; border-radius: 10px; }
+        .soft-ambient-shadow { shadow: 0px 4px 20px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="bg-background text-on-background overflow-hidden">
+<!-- SideNavBar (Predicted Component) -->
+<aside class="fixed left-0 top-0 h-full w-[280px] flex flex-col py-lg px-md z-40 bg-surface-container-low dark:bg-surface-dim">
+<div class="mb-xl px-sm">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">child_care</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight">MotherCare</h1>
+<p class="text-label-md font-label-md text-secondary opacity-75">Shakuntala Hospital</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-xs overflow-y-auto custom-scrollbar">
+<a class="flex items-center gap-md px-md py-sm text-secondary hover:bg-secondary-container/30 transition-all rounded-lg font-label-lg text-label-lg active:translate-x-1" href="#">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center gap-md px-md py-sm text-secondary hover:bg-secondary-container/30 transition-all rounded-lg font-label-lg text-label-lg active:translate-x-1" href="#">
+<span class="material-symbols-outlined">pregnant_woman</span> Patient Registry
+            </a>
+<a class="flex items-center gap-md px-md py-sm bg-primary-container text-on-primary-container rounded-lg font-bold font-label-lg text-label-lg active:translate-x-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">baby_changing_station</span> Deliveries
+            </a>
+<a class="flex items-center gap-md px-md py-sm text-secondary hover:bg-secondary-container/30 transition-all rounded-lg font-label-lg text-label-lg active:translate-x-1" href="#">
+<span class="material-symbols-outlined">medical_services</span> Labor Ward
+            </a>
+<a class="flex items-center gap-md px-md py-sm text-secondary hover:bg-secondary-container/30 transition-all rounded-lg font-label-lg text-label-lg active:translate-x-1" href="#">
+<span class="material-symbols-outlined">child_care</span> NICU
+            </a>
+<a class="flex items-center gap-md px-md py-sm text-secondary hover:bg-secondary-container/30 transition-all rounded-lg font-label-lg text-label-lg active:translate-x-1" href="#">
+<span class="material-symbols-outlined">analytics</span> Reports
+            </a>
+</nav>
+<div class="mt-auto pt-lg border-t border-outline-variant/30">
+<button class="w-full bg-primary text-on-primary py-md rounded-lg font-label-lg text-label-lg flex items-center justify-center gap-sm mb-lg shadow-md hover:brightness-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined">add</span> Admit New Patient
+            </button>
+<div class="space-y-xs">
+<a class="flex items-center gap-md px-md py-sm text-secondary hover:bg-secondary-container/30 transition-all rounded-lg font-label-lg text-label-lg" href="#">
+<span class="material-symbols-outlined">settings</span> Settings
+                </a>
+<a class="flex items-center gap-md px-md py-sm text-error hover:bg-error-container/30 transition-all rounded-lg font-label-lg text-label-lg" href="#">
+<span class="material-symbols-outlined">logout</span> Logout
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<main class="ml-[280px] min-h-screen flex flex-col">
+<!-- TopNavBar (Predicted Component) -->
+<header class="fixed top-0 left-[280px] right-0 h-16 bg-surface z-50 flex justify-between items-center px-margin-desktop shadow-sm border-b border-outline-variant/10">
+<div class="flex items-center gap-lg flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full pl-xl py-xs text-body-md focus:ring-2 focus:ring-primary/20 placeholder:text-outline-variant transition-all" placeholder="Search by mother name, ID, or doctor..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md ml-lg">
+<button class="p-base rounded-full hover:bg-surface-container-low transition-colors cursor-pointer active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+<button class="p-base rounded-full hover:bg-surface-container-low transition-colors cursor-pointer active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant">help</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant/30 mx-xs"></div>
+<div class="flex items-center gap-sm cursor-pointer hover:bg-surface-container-low p-xs rounded-lg transition-all">
+<div class="text-right">
+<p class="text-label-lg font-label-lg text-on-surface leading-none">Dr. Aris Thorne</p>
+<p class="text-label-md font-label-md text-secondary">Chief Medical Officer</p>
+</div>
+<img alt="Chief Medical Officer profile" class="w-10 h-10 rounded-full object-cover border-2 border-primary-container" src="https://lh3.googleusercontent.com/aida/AP1WRLsVvrZ2BfU3OjK_C_AevfB9joj4Md56PyUyYF3pkvhuCvTLBQOuK7QVmbp_VqytpIaZ2oI895albNagUXcFFRPLew0n00DEEINcZxw8Uv5_h5iFY9YC8zuLksRePpUoC2W4GC1u1NTFLWCma_wNmBvRaYtKOfReGaced6dJaZ8YMw3yd5zQTlfhIDhwMmYZgYH2BnKptvw1Ybo7pf6Az5QOFxcTasfpi_VaGzYRd7kSR68jxwf5b46_lVU"/>
+</div>
+</div>
+</header>
+<!-- Page Canvas -->
+<div class="mt-16 p-margin-desktop overflow-y-auto h-[calc(100vh-64px)] custom-scrollbar">
+<!-- Page Header -->
+<div class="flex justify-between items-end mb-xl">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-background">Delivery Management</h2>
+<p class="text-body-lg text-secondary">Monitor and record maternal deliveries and newborn arrivals.</p>
+</div>
+<button class="flex items-center gap-sm bg-primary text-on-primary px-lg py-md rounded-lg font-label-lg text-label-lg shadow-lg hover:shadow-xl transition-all active:scale-95">
+<span class="material-symbols-outlined">add_circle</span> New Delivery Entry
+                </button>
+</div>
+<!-- KPI Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-lg mb-xl">
+<div class="bg-surface-container-lowest p-lg rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/10">
+<p class="text-label-lg text-secondary mb-xs">Deliveries Today</p>
+<div class="flex items-end gap-sm">
+<h3 class="font-display-lg text-display-lg text-on-surface leading-none">12</h3>
+<span class="text-primary text-label-lg font-bold flex items-center mb-xs">
+<span class="material-symbols-outlined text-[18px]">trending_up</span> +2
+                        </span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-lg rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/10">
+<p class="text-label-lg text-secondary mb-xs">Normal Deliveries</p>
+<div class="flex items-end gap-sm">
+<h3 class="font-display-lg text-display-lg text-on-surface leading-none">8</h3>
+<span class="text-primary text-label-lg font-bold flex items-center mb-xs opacity-60">66%</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-lg rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/10">
+<p class="text-label-lg text-secondary mb-xs">C-Sections</p>
+<div class="flex items-end gap-sm">
+<h3 class="font-display-lg text-display-lg text-on-surface leading-none">3</h3>
+<span class="text-secondary text-label-lg font-bold flex items-center mb-xs opacity-60">25%</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-lg rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border-2 border-error-container relative overflow-hidden">
+<div class="absolute top-0 right-0 p-xs">
+<span class="bg-error text-on-error text-[10px] px-sm py-xs rounded-full font-bold uppercase tracking-wider">High Risk</span>
+</div>
+<p class="text-label-lg text-secondary mb-xs">High-Risk Deliveries</p>
+<div class="flex items-end gap-sm">
+<h3 class="font-display-lg text-display-lg text-error leading-none">1</h3>
+<span class="text-error text-label-lg font-bold flex items-center mb-xs animate-pulse">
+<span class="material-symbols-outlined text-[18px]">warning</span> Critical
+                        </span>
+</div>
+</div>
+</div>
+<!-- Main Content Area: Split Layout -->
+<div class="flex flex-col lg:flex-row gap-lg">
+<!-- Left Column: Delivery Records -->
+<div class="lg:w-[70%] space-y-lg">
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/10 overflow-hidden">
+<!-- Table Filter Header -->
+<div class="p-lg border-b border-outline-variant/10 flex flex-wrap items-center justify-between gap-md">
+<div class="flex items-center gap-md">
+<h4 class="font-title-lg text-title-lg text-on-surface">Live Delivery Feed</h4>
+<span class="bg-primary-container/20 text-primary px-sm py-xs rounded-full text-label-md font-bold">Real-time</span>
+</div>
+<div class="flex items-center gap-sm">
+<select class="bg-surface-container-low border-none rounded-lg text-label-lg text-on-surface-variant focus:ring-primary/20 px-lg pr-xl">
+<option>All Types</option>
+<option>Normal</option>
+<option>C-Section</option>
+<option>Assisted</option>
+</select>
+<button class="p-sm bg-surface-container-low rounded-lg text-secondary hover:bg-secondary-container transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+</div>
+<!-- Data Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50 text-secondary uppercase text-[11px] font-bold tracking-widest">
+<th class="px-lg py-md border-b border-outline-variant/10">Mother Name</th>
+<th class="px-lg py-md border-b border-outline-variant/10">Doctor</th>
+<th class="px-lg py-md border-b border-outline-variant/10">Type</th>
+<th class="px-lg py-md border-b border-outline-variant/10">Date &amp; Time</th>
+<th class="px-lg py-md border-b border-outline-variant/10">Baby</th>
+<th class="px-lg py-md border-b border-outline-variant/10">Status</th>
+<th class="px-lg py-md border-b border-outline-variant/10"></th>
+</tr>
+</thead>
+<tbody class="text-body-md text-on-surface">
+<!-- Row 1 -->
+<tr class="hover:bg-primary-container/5 transition-colors cursor-pointer group bg-surface-container-lowest">
+<td class="px-lg py-md border-b border-outline-variant/5">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-primary font-bold text-xs">ER</div>
+<span class="font-semibold">Elena Rodriguez</span>
+</div>
+</td>
+<td class="px-lg py-md border-b border-outline-variant/5 text-secondary">Dr. Anjali Sharma</td>
+<td class="px-lg py-md border-b border-outline-variant/5">
+<span class="bg-surface-container-high text-on-surface-variant px-sm py-xs rounded-lg text-label-md">Normal</span>
+</td>
+<td class="px-lg py-md border-b border-outline-variant/5 text-secondary">Oct 24, 10:45 AM</td>
+<td class="px-lg py-md border-b border-outline-variant/5 text-center font-bold">1</td>
+<td class="px-lg py-md border-b border-outline-variant/5">
+<span class="flex items-center gap-xs text-primary font-bold text-label-md">
+<span class="w-2 h-2 rounded-full bg-primary"></span> Completed
+                                            </span>
+</td>
+<td class="px-lg py-md border-b border-outline-variant/5">
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-primary-container/5 transition-colors cursor-pointer group bg-surface-container-low/20">
+<td class="px-lg py-md border-b border-outline-variant/5">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-primary font-bold text-xs">SJ</div>
+<span class="font-semibold">Sarah Jenkins</span>
+</div>
+</td>
+<td class="px-lg py-md border-b border-outline-variant/5 text-secondary">Dr. Robert Chen</td>
+<td class="px-lg py-md border-b border-outline-variant/5">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-sm py-xs rounded-lg text-label-md">C-Section</span>
+</td>
+<td class="px-lg py-md border-b border-outline-variant/5 text-secondary">Oct 24, 02:15 PM</td>
+<td class="px-lg py-md border-b border-outline-variant/5 text-center font-bold">2</td>
+<td class="px-lg py-md border-b border-outline-variant/5">
+<span class="flex items-center gap-xs text-secondary font-bold text-label-md">
+<span class="w-2 h-2 rounded-full bg-secondary"></span> Post-Op
+                                            </span>
+</td>
+<td class="px-lg py-md border-b border-outline-variant/5">
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-primary-container/5 transition-colors cursor-pointer group bg-surface-container-lowest">
+<td class="px-lg py-md border-b border-outline-variant/5">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-primary font-bold text-xs">MK</div>
+<span class="font-semibold">Meera Kapoor</span>
+</div>
+</td>
+<td class="px-lg py-md border-b border-outline-variant/5 text-secondary">Dr. Sarah Smith</td>
+<td class="px-lg py-md border-b border-outline-variant/5">
+<span class="bg-surface-container-high text-on-surface-variant px-sm py-xs rounded-lg text-label-md">Normal</span>
+</td>
+<td class="px-lg py-md border-b border-outline-variant/5 text-secondary">Oct 24, 05:30 PM</td>
+<td class="px-lg py-md border-b border-outline-variant/5 text-center font-bold">1</td>
+<td class="px-lg py-md border-b border-outline-variant/5">
+<span class="flex items-center gap-xs text-primary font-bold text-label-md">
+<span class="w-2 h-2 rounded-full bg-primary"></span> Completed
+                                            </span>
+</td>
+<td class="px-lg py-md border-b border-outline-variant/5">
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-primary-container/5 transition-colors cursor-pointer group bg-surface-container-low/20">
+<td class="px-lg py-md border-b border-outline-variant/5">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-primary font-bold text-xs">JT</div>
+<span class="font-semibold">Jessica Thompson</span>
+</div>
+</td>
+<td class="px-lg py-md border-b border-outline-variant/5 text-secondary">Dr. Anjali Sharma</td>
+<td class="px-lg py-md border-b border-outline-variant/5">
+<span class="bg-secondary-fixed text-on-secondary-fixed-variant px-sm py-xs rounded-lg text-label-md">Assisted</span>
+</td>
+<td class="px-lg py-md border-b border-outline-variant/5 text-secondary">Oct 24, 06:12 PM</td>
+<td class="px-lg py-md border-b border-outline-variant/5 text-center font-bold">1</td>
+<td class="px-lg py-md border-b border-outline-variant/5">
+<span class="flex items-center gap-xs text-on-tertiary-container font-bold text-label-md">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span> In Progress
+                                            </span>
+</td>
+<td class="px-lg py-md border-b border-outline-variant/5">
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Right Column: Delivery Details Panel -->
+<div class="lg:w-[30%]">
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_12px_32px_rgba(0,0,0,0.1)] border border-primary/10 flex flex-col h-full sticky top-margin-desktop">
+<div class="p-lg bg-primary/5 border-b border-primary/10">
+<h4 class="font-title-lg text-title-lg text-primary">Delivery Details</h4>
+<p class="text-label-md font-label-md text-secondary tracking-widest uppercase">#DEL-2023-142</p>
+</div>
+<div class="p-lg space-y-lg overflow-y-auto custom-scrollbar flex-1">
+<!-- Mother Info -->
+<div class="flex items-center gap-md">
+<img alt="Patient profile" class="w-16 h-16 rounded-xl object-cover shadow-sm border border-outline-variant/30" data-alt="A professional medical profile photograph of a serene Hispanic woman in her late 20s, Elena Rodriguez. She is in a high-key, softly lit clinical environment with a clean white background. The aesthetic is modern healthcare, focusing on maternal wellness, with soft teal accents in the lighting and atmosphere. The image feels bright, calm, and reliable." src="https://lh3.googleusercontent.com/aida/AP1WRLsLjCp0pKRxEmhF_Z-WiTTKIJ7_YcRp85HjND19FF-zvc9qfpB3ldlQ8mfLZEc_8O4i8Rs0ucIibpslAUnFVArjoz0724IpbUR1tMloU6p56xPKHoFt0FPQjumYu7FIUj5CG6te3ymPiI626Y-_05-tYTxbem9JBUqud_hVhmjGZfT7AmnIf37bHcxCvAJki2yzmTyAk_8RXQcHTzaX-g_wyauaxlASUtvhlDrxcjZ-A5zlilQD_CCrpwaK"/>
+<div>
+<p class="font-headline-md text-headline-md text-on-surface leading-tight">Elena Rodriguez</p>
+<p class="text-label-lg font-label-lg text-primary font-bold">ID: #MC-2934</p>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-md bg-surface-container-low p-md rounded-lg">
+<div class="text-center">
+<p class="text-[10px] text-secondary font-bold uppercase">Week</p>
+<p class="font-title-lg text-on-surface">39</p>
+</div>
+<div class="text-center border-x border-outline-variant/30">
+<p class="text-[10px] text-secondary font-bold uppercase">Gravida</p>
+<p class="font-title-lg text-on-surface">2</p>
+</div>
+<div class="text-center">
+<p class="text-[10px] text-secondary font-bold uppercase">Para</p>
+<p class="font-title-lg text-on-surface">1</p>
+</div>
+</div>
+<div class="space-y-sm">
+<div class="flex items-center gap-xs text-primary">
+<span class="material-symbols-outlined text-[20px]">notes</span>
+<h5 class="text-label-lg font-bold">Delivery Notes</h5>
+</div>
+<p class="text-body-md text-on-surface-variant leading-relaxed italic border-l-2 border-primary-container pl-md">
+                                    "Spontaneous onset of labor. Smooth progression. Healthy cry immediately after birth."
+                                </p>
+</div>
+<div class="space-y-sm">
+<div class="flex items-center gap-xs text-error">
+<span class="material-symbols-outlined text-[20px]">emergency</span>
+<h5 class="text-label-lg font-bold">Complications</h5>
+</div>
+<div class="bg-error-container/20 text-on-error-container p-sm rounded-lg text-label-lg">
+                                    None reported.
+                                </div>
+</div>
+<div class="space-y-sm">
+<div class="flex items-center gap-xs text-secondary">
+<span class="material-symbols-outlined text-[20px]">medical_information</span>
+<h5 class="text-label-lg font-bold">Assigned Doctor</h5>
+</div>
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-primary-container/20 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">person</span>
+</div>
+<p class="text-body-md font-semibold">Dr. Anjali Sharma</p>
+</div>
+</div>
+</div>
+<div class="p-lg border-t border-outline-variant/10 space-y-sm">
+<button class="w-full border-2 border-primary text-primary py-md rounded-lg font-label-lg text-label-lg flex items-center justify-center gap-sm hover:bg-primary/5 transition-all active:scale-95">
+<span class="material-symbols-outlined">edit</span> Edit Record
+                            </button>
+<button class="w-full bg-secondary text-on-secondary py-md rounded-lg font-label-lg text-label-lg flex items-center justify-center gap-sm hover:brightness-110 shadow-md transition-all active:scale-95">
+<span class="material-symbols-outlined">description</span> Generate Birth Certificate
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Micro-interaction for table rows
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('click', () => {
+                // In a real app, this would update the right panel data
+                row.classList.add('bg-primary-container/10');
+                setTimeout(() => row.classList.remove('bg-primary-container/10'), 300);
+            });
+        });
+    </script>
+</body></html>

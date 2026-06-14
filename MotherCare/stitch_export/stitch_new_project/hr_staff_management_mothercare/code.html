@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MotherCare | HR &amp; Staff Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "inverse-primary": "#70d8c8",
+                "background": "#f8f9ff",
+                "on-tertiary-fixed-variant": "#65394b",
+                "surface-bright": "#f8f9ff",
+                "surface-dim": "#cbdbf5",
+                "secondary-fixed": "#d6e5ef",
+                "on-error-container": "#93000a",
+                "primary-fixed": "#8df5e4",
+                "inverse-surface": "#213145",
+                "tertiary-fixed-dim": "#f2b6cb",
+                "on-secondary-container": "#56656e",
+                "outline": "#6d7a77",
+                "on-secondary-fixed": "#0f1d25",
+                "surface-container-highest": "#d3e4fe",
+                "tertiary": "#7d4e60",
+                "surface-tint": "#006b5f",
+                "outline-variant": "#bcc9c5",
+                "secondary-fixed-dim": "#bac9d3",
+                "secondary-container": "#d3e2ed",
+                "surface-variant": "#d3e4fe",
+                "tertiary-container": "#996679",
+                "surface-container-high": "#dce9ff",
+                "surface-container-low": "#eff4ff",
+                "primary-container": "#008376",
+                "on-surface": "#0b1c30",
+                "on-primary-fixed": "#00201c",
+                "error": "#ba1a1a",
+                "on-primary-container": "#f4fffb",
+                "on-tertiary": "#ffffff",
+                "surface-container-lowest": "#ffffff",
+                "surface-container": "#e5eeff",
+                "primary-fixed-dim": "#70d8c8",
+                "secondary": "#526069",
+                "on-secondary-fixed-variant": "#3b4951",
+                "on-primary-fixed-variant": "#005048",
+                "tertiary-fixed": "#ffd9e4",
+                "surface": "#f8f9ff",
+                "primary": "#00685d",
+                "inverse-on-surface": "#eaf1ff",
+                "on-error": "#ffffff",
+                "on-tertiary-container": "#fffbff",
+                "error-container": "#ffdad6",
+                "on-surface-variant": "#3d4946",
+                "on-primary": "#ffffff",
+                "on-tertiary-fixed": "#330f1f",
+                "on-secondary": "#ffffff",
+                "on-background": "#0b1c30"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "lg": "24px",
+                "xs": "4px",
+                "xl": "32px",
+                "gutter": "24px",
+                "sm": "12px",
+                "base": "8px",
+                "md": "16px",
+                "margin-mobile": "16px",
+                "margin-desktop": "40px"
+            },
+            "fontFamily": {
+                "title-lg": ["Inter"],
+                "headline-lg": ["Inter"],
+                "label-lg": ["Inter"],
+                "body-md": ["Inter"],
+                "label-md": ["Inter"],
+                "headline-lg-mobile": ["Inter"],
+                "body-lg": ["Inter"],
+                "display-lg": ["Inter"],
+                "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "label-md": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9ff; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .active-tab { border-bottom: 2px solid #00685d; color: #00685d; font-weight: 600; }
+        .soft-shadow { shadow: 0px 4px 20px rgba(0,0,0,0.05); }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="text-on-background">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-surface border-r border-outline-variant flex flex-col p-lg z-50">
+<div class="mb-xl">
+<h1 class="text-primary font-headline-md text-headline-md font-bold">MotherCare</h1>
+<p class="text-on-surface-variant font-label-md text-label-md">Shakuntala Hospital</p>
+</div>
+<nav class="flex-grow space-y-xs">
+<!-- Mapping JSON SideNavBar: Highlighting 'Patients' as proxy for management or identifying HR intent -->
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low rounded-lg px-md py-sm transition-colors" href="#">
+<span class="material-symbols-outlined">person_heart</span>
+<span class="font-label-lg text-label-lg">Patients</span>
+</a>
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low rounded-lg px-md py-sm transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-lg text-label-lg">Appointments</span>
+</a>
+<a class="flex items-center gap-md bg-secondary-container text-on-secondary-container rounded-lg px-md py-sm mb-xs" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+<span class="font-label-lg text-label-lg">Doctors &amp; Staff</span>
+</a>
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low rounded-lg px-md py-sm transition-colors" href="#">
+<span class="material-symbols-outlined">biotech</span>
+<span class="font-label-lg text-label-lg">Lab</span>
+</a>
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low rounded-lg px-md py-sm transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-lg text-label-lg">Settings</span>
+</a>
+</nav>
+<button class="mt-lg w-full bg-primary text-on-primary py-sm rounded-lg font-label-lg text-label-lg hover:opacity-90 transition-all">
+            New Consultation
+        </button>
+<div class="mt-auto pt-lg border-t border-outline-variant space-y-xs">
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low rounded-lg px-md py-sm transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-lg text-label-lg">Support</span>
+</a>
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low rounded-lg px-md py-sm transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-lg text-label-lg">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-[280px] min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="flex justify-between items-center h-16 w-full px-margin-desktop bg-surface-bright sticky top-0 z-40">
+<div class="flex items-center gap-md w-1/3">
+<div class="relative w-full max-w-sm">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-label-md focus:ring-2 focus:ring-primary" placeholder="Search staff, schedules..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<button class="p-2 hover:bg-secondary-container rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-surface-bright"></span>
+</button>
+<button class="p-2 hover:bg-secondary-container rounded-full transition-colors">
+<span class="material-symbols-outlined">chat_bubble</span>
+</button>
+<div class="flex items-center gap-sm ml-sm">
+<div class="text-right hidden lg:block">
+<p class="font-label-lg text-label-lg text-on-surface">Dr. Sarah Thompson</p>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">HR Director</p>
+</div>
+<img alt="Profile" class="w-10 h-10 rounded-full object-cover border-2 border-primary-container" data-alt="A professional portrait of a female hospital administrator in a clinical setting. She wears a crisp white medical coat and a stethoscope, with a warm, confident expression. The lighting is soft and natural, emphasizing a bright, trustworthy, and modern healthcare environment with teal and white tones." src="https://lh3.googleusercontent.com/aida/AP1WRLtCh_3lT8TfMqswbLfhHGoK7SuouHI4xl7ZMx-aMu1Z5L7pnrBimSlIZsvopxnjw2aG4LwA6xfPS6rHsLS6cSmjYhDGZgLFT2SFv1E4vNNlY30HUEOpD8j4isvzQSB-c1zb6ryClz4S4yIsN6lo4Ux1ztV-yIGw4-HwLVUBA84WwmlUhJeENj1ALsoZydaB51wIgBFKyImuqQ2k7B-ypQB9BLHFhkQ4-9mrI9cGvc4n3xIpbuQfmxOjNhKM"/>
+</div>
+</div>
+</header>
+<div class="p-margin-desktop">
+<!-- Header Section -->
+<div class="flex justify-between items-end mb-lg">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Staff Management</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Manage your clinical and administrative team efficiently.</p>
+</div>
+<div class="flex gap-sm">
+<button class="flex items-center gap-xs px-md py-sm bg-surface-container-high rounded-lg font-label-lg text-label-lg hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined">download</span> Export Report
+                    </button>
+<button class="flex items-center gap-xs px-md py-sm bg-primary text-on-primary rounded-lg font-label-lg text-label-lg hover:opacity-90 transition-all shadow-sm">
+<span class="material-symbols-outlined">person_add</span> Add New Staff
+                    </button>
+</div>
+</div>
+<!-- Statistics Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-xl">
+<!-- Total Staff -->
+<div class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-2 bg-primary-container/20 rounded-lg">
+<span class="material-symbols-outlined text-primary">groups</span>
+</div>
+<span class="text-primary font-label-md text-label-md bg-primary-fixed px-2 py-0.5 rounded-full">+4 this month</span>
+</div>
+<p class="text-on-surface-variant font-label-lg text-label-lg">Total Staff</p>
+<p class="text-on-surface font-headline-lg text-headline-lg mt-xs">248</p>
+</div>
+<!-- Present Today -->
+<div class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-2 bg-secondary-container/20 rounded-lg">
+<span class="material-symbols-outlined text-secondary">how_to_reg</span>
+</div>
+<span class="text-secondary font-label-md text-label-md bg-secondary-fixed px-2 py-0.5 rounded-full">92% attendance</span>
+</div>
+<p class="text-on-surface-variant font-label-lg text-label-lg">Present Today</p>
+<p class="text-on-surface font-headline-lg text-headline-lg mt-xs">226</p>
+</div>
+<!-- On Leave -->
+<div class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-2 bg-tertiary-container/20 rounded-lg">
+<span class="material-symbols-outlined text-tertiary">event_busy</span>
+</div>
+</div>
+<p class="text-on-surface-variant font-label-lg text-label-lg">On Leave</p>
+<p class="text-on-surface font-headline-lg text-headline-lg mt-xs">14</p>
+</div>
+<!-- Payroll Due -->
+<div class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-2 bg-error-container/20 rounded-lg">
+<span class="material-symbols-outlined text-error">payments</span>
+</div>
+<span class="text-error font-label-md text-label-md bg-error-container px-2 py-0.5 rounded-full">Due in 3 days</span>
+</div>
+<p class="text-on-surface-variant font-label-lg text-label-lg">Payroll Due</p>
+<p class="text-on-surface font-headline-lg text-headline-lg mt-xs">$142k</p>
+</div>
+</div>
+<!-- Dynamic Tabs & Table Container -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0px_4px_20px_rgba(0,0,0,0.05)] overflow-hidden">
+<!-- Navigation Tabs -->
+<div class="flex px-lg pt-lg border-b border-outline-variant overflow-x-auto scrollbar-hide">
+<button class="px-md py-sm font-label-lg text-label-lg active-tab whitespace-nowrap transition-all" id="tab-directory" onclick="switchTab('directory')">Staff Directory</button>
+<button class="px-md py-sm font-label-lg text-label-lg text-on-surface-variant hover:text-primary whitespace-nowrap transition-all" id="tab-attendance" onclick="switchTab('attendance')">Attendance</button>
+<button class="px-md py-sm font-label-lg text-label-lg text-on-surface-variant hover:text-primary whitespace-nowrap transition-all" id="tab-payroll" onclick="switchTab('payroll')">Payroll</button>
+<button class="px-md py-sm font-label-lg text-label-lg text-on-surface-variant hover:text-primary whitespace-nowrap transition-all" id="tab-leave" onclick="switchTab('leave')">Leave Management</button>
+<button class="px-md py-sm font-label-lg text-label-lg text-on-surface-variant hover:text-primary whitespace-nowrap transition-all" id="tab-shift" onclick="switchTab('shift')">Shift Scheduling</button>
+</div>
+<!-- Views Container -->
+<div class="p-lg">
+<!-- Staff Directory View (Default) -->
+<div class="view-content block" id="view-directory">
+<div class="flex flex-col sm:flex-row gap-md justify-between items-center mb-md">
+<div class="flex gap-sm overflow-x-auto w-full sm:w-auto">
+<select class="bg-surface-container-low border-outline-variant rounded-lg text-label-md font-label-md">
+<option>All Departments</option>
+<option>Obstetrics</option>
+<option>Pediatrics</option>
+<option>Nursing</option>
+<option>Admin</option>
+</select>
+<select class="bg-surface-container-low border-outline-variant rounded-lg text-label-md font-label-md">
+<option>Active Status</option>
+<option>On Leave</option>
+<option>Resigned</option>
+</select>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="text-on-surface-variant border-b border-outline-variant">
+<tr>
+<th class="py-sm font-label-lg text-label-lg">Employee ID</th>
+<th class="py-sm font-label-lg text-label-lg">Name</th>
+<th class="py-sm font-label-lg text-label-lg">Department</th>
+<th class="py-sm font-label-lg text-label-lg">Role</th>
+<th class="py-sm font-label-lg text-label-lg">Contact Number</th>
+<th class="py-sm font-label-lg text-label-lg">Status</th>
+<th class="py-sm font-label-lg text-label-lg text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-md font-body-md text-body-md">#MC-9082</td>
+<td class="py-md">
+<div class="flex items-center gap-sm">
+<img alt="Dr. Anita" class="w-8 h-8 rounded-full object-cover" data-alt="A close-up portrait of a female pediatrician in her late 30s. She is smiling gently at the camera, wearing professional scrubs and a stethoscope. The background is a brightly lit, modern hospital hallway with soft blue and white hues, reflecting a clean and professional healthcare setting." src="https://lh3.googleusercontent.com/aida/AP1WRLs5qLoYTqb68zAUfLjBMlWnHY08_OC-gulttwexacuNGNjqOWr5Nvi6wDwGLjeZBF2hhDLVx20Oq8ZxDurvpzTnoN3XJmT5KIOyNPNXPXPpo07CslSeo1q58Ulfe2d77aAxpB3tokZMgf6DxVmQAwgrRNmcPr3uA4i_CfDJsAvPhicGu0fYNpJeSB0EaSfMiim4S03oH_RqQcBqK4XkTrcAdP3-iSntrjXAAJv5F1CzxSZFUmffI7ANnefN"/>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Dr. Anita Nair</p>
+<p class="text-[10px] text-on-surface-variant">anita.n@mothercare.com</p>
+</div>
+</div>
+</td>
+<td class="py-md font-body-md text-body-md">Obstetrics</td>
+<td class="py-md font-body-md text-body-md">Sr. Consultant</td>
+<td class="py-md font-body-md text-body-md">+91 98765 43210</td>
+<td class="py-md">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary uppercase">Active</span>
+</td>
+<td class="py-md text-right">
+<button class="p-1 hover:bg-surface-container-highest rounded transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-md font-body-md text-body-md">#MC-8541</td>
+<td class="py-md">
+<div class="flex items-center gap-sm">
+<img alt="James" class="w-8 h-8 rounded-full object-cover" data-alt="A focused male nurse in blue scrubs working in a modern clinical setting. He has a calm and professional demeanor. The environment is high-tech but minimalist, with soft clinical lighting and a primary color palette of white and teal." src="https://lh3.googleusercontent.com/aida/AP1WRLuIOgldlIQTMUJ9RH_WQ4YMi42Oro-y3otaRGBSj8flfMzA8gp4hO35jCnBfdRbYZNS2zmOhGcPhEI2ElVscrqQ4WcQGENw9A78uRqn5G0Uwaf4-kP2NPm84o4EqOKv8gmzyZkL6CtSahUxgM9dMx9iefPAp3r_w5rsUv41MtFL3XFyVuOr7THeCvwhD_F3fyYifZrD8zoGmgXTuwozykyyPJPckVIwl6qwwa2IKOuoGUHlAsO4VulDQSQC"/>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">James Wilson</p>
+<p class="text-[10px] text-on-surface-variant">james.w@mothercare.com</p>
+</div>
+</div>
+</td>
+<td class="py-md font-body-md text-body-md">Nursing</td>
+<td class="py-md font-body-md text-body-md">Head Nurse</td>
+<td class="py-md font-body-md text-body-md">+91 98765 43221</td>
+<td class="py-md">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-tertiary-fixed-dim/20 text-tertiary uppercase">On Leave</span>
+</td>
+<td class="py-md text-right">
+<button class="p-1 hover:bg-surface-container-highest rounded transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-md font-body-md text-body-md">#MC-7210</td>
+<td class="py-md">
+<div class="flex items-center gap-sm">
+<img alt="Sarah" class="w-8 h-8 rounded-full object-cover" data-alt="A young female administrative officer in a bright hospital office. She is smiling and typing on a laptop. The background shows soft-focus medical charts and a clean, minimalist interior with teal accents." src="https://lh3.googleusercontent.com/aida/AP1WRLs-SCbLPq3uq7OofCFBs2h5olxdmJxEIPdoxv2rDEauk29m-pp6ngQ-yB8VEdPclzmPb_eAKqEdkznPpPzdbPfmGWgUlx8D0rCcCanN-g6VJHEVsgcUhQl2AhEU4XXQDNBOjBmWwcAQrfXl4EqiQO0evgrDyTq3oQoTgdt6aK1M5Jc6QIYSMi6XxloZWzJ8OSdjhjD8047YPiirVlZP5IB2BslPVncpPD_O4Jg2ubBkIlANNX5suXbxCjU"/>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Sarah Lee</p>
+<p class="text-[10px] text-on-surface-variant">sarah.l@mothercare.com</p>
+</div>
+</div>
+</td>
+<td class="py-md font-body-md text-body-md">Admin</td>
+<td class="py-md font-body-md text-body-md">Billing Manager</td>
+<td class="py-md font-body-md text-body-md">+91 98765 43232</td>
+<td class="py-md">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary uppercase">Active</span>
+</td>
+<td class="py-md text-right">
+<button class="p-1 hover:bg-surface-container-highest rounded transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-md font-body-md text-body-md">#MC-6923</td>
+<td class="py-md">
+<div class="flex items-center gap-sm">
+<img alt="Doctor" class="w-8 h-8 rounded-full object-cover" data-alt="A senior male doctor with grey hair and glasses, looking professional and empathetic. He is wearing a white medical coat in a consultation room. The scene is bright and clinical, using a palette of soft whites and calm teals." src="https://lh3.googleusercontent.com/aida/AP1WRLvAWAppcVTmrpPwsj00OlcDfk4-CBcuXC-FZV78FkgGWWrPCNWd_ESupniPlw1fKTXC2UUugtNhxQ7fuP6FWJqxHkZh2mC6PSC3WVbhiXp4aHw7R8iK3a0xlq4PCz3kp8H23kCUxj_zuKtvKX3w0i_7JBKPOLFFyFh1XdRGSHAapUbTSNUPrZx-v2mIsqJB9T3Ow7gYxKvK-kHX4N_rnHOnFSt-_NWgGXWx51mGM8PP1-jL57gVsuLghtk"/>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Dr. Rahul Sharma</p>
+<p class="text-[10px] text-on-surface-variant">rahul.s@mothercare.com</p>
+</div>
+</div>
+</td>
+<td class="py-md font-body-md text-body-md">Pediatrics</td>
+<td class="py-md font-body-md text-body-md">Surgeon</td>
+<td class="py-md font-body-md text-body-md">+91 98765 43243</td>
+<td class="py-md">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary uppercase">Active</span>
+</td>
+<td class="py-md text-right">
+<button class="p-1 hover:bg-surface-container-highest rounded transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Attendance View (Hidden by default) -->
+<div class="view-content hidden" id="view-attendance">
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="text-on-surface-variant border-b border-outline-variant">
+<tr>
+<th class="py-sm font-label-lg text-label-lg">Name</th>
+<th class="py-sm font-label-lg text-label-lg">Date</th>
+<th class="py-sm font-label-lg text-label-lg">Check In</th>
+<th class="py-sm font-label-lg text-label-lg">Check Out</th>
+<th class="py-sm font-label-lg text-label-lg">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-md font-label-lg text-label-lg text-on-surface">Dr. Anita Nair</td>
+<td class="py-md font-body-md text-body-md">Oct 24, 2023</td>
+<td class="py-md font-body-md text-body-md">08:52 AM</td>
+<td class="py-md font-body-md text-body-md">05:15 PM</td>
+<td class="py-md"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary uppercase">Present</span></td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-md font-label-lg text-label-lg text-on-surface">Sarah Lee</td>
+<td class="py-md font-body-md text-body-md">Oct 24, 2023</td>
+<td class="py-md font-body-md text-body-md">09:15 AM</td>
+<td class="py-md font-body-md text-body-md">06:05 PM</td>
+<td class="py-md"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-tertiary-fixed/40 text-on-tertiary-fixed-variant uppercase">Late</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Payroll View (Hidden by default) -->
+<div class="view-content hidden" id="view-payroll">
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="text-on-surface-variant border-b border-outline-variant">
+<tr>
+<th class="py-sm font-label-lg text-label-lg">Name</th>
+<th class="py-sm font-label-lg text-label-lg">Month</th>
+<th class="py-sm font-label-lg text-label-lg">Salary</th>
+<th class="py-sm font-label-lg text-label-lg">Bonus</th>
+<th class="py-sm font-label-lg text-label-lg">Deductions</th>
+<th class="py-sm font-label-lg text-label-lg">Net Salary</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-md font-label-lg text-label-lg text-on-surface">Dr. Rahul Sharma</td>
+<td class="py-md font-body-md text-body-md">October 2023</td>
+<td class="py-md font-body-md text-body-md">$8,500.00</td>
+<td class="py-md font-body-md text-body-md">$500.00</td>
+<td class="py-md font-body-md text-body-md">$150.00</td>
+<td class="py-md font-label-lg text-label-lg text-primary">$8,850.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual FAB (Restricted to Management Screens) -->
+<button class="fixed bottom-lg right-lg bg-primary text-on-primary w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<script>
+        function switchTab(tabId) {
+            // Hide all views
+            const views = document.querySelectorAll('.view-content');
+            views.forEach(v => v.classList.add('hidden'));
+            views.forEach(v => v.classList.remove('block'));
+
+            // Deactivate all buttons
+            const tabs = document.querySelectorAll('[id^="tab-"]');
+            tabs.forEach(t => {
+                t.classList.remove('active-tab', 'text-primary', 'font-bold');
+                t.classList.add('text-on-surface-variant');
+            });
+
+            // Show selected view
+            const activeView = document.getElementById('view-' + tabId);
+            if(activeView) {
+                activeView.classList.remove('hidden');
+                activeView.classList.add('block');
+            }
+
+            // Style active tab
+            const activeTab = document.getElementById('tab-' + tabId);
+            if(activeTab) {
+                activeTab.classList.add('active-tab', 'text-primary', 'font-bold');
+                activeTab.classList.remove('text-on-surface-variant');
+            }
+        }
+    </script>
+</body></html>

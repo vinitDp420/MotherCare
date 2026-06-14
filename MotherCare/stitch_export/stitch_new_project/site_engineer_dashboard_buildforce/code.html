@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BuildForce - Site Engineer Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#1b1c1c",
+                        "tertiary-container": "#bfbebe",
+                        "on-surface": "#1a1c1c",
+                        "primary-fixed-dim": "#fdbc13",
+                        "on-background": "#1a1c1c",
+                        "surface-variant": "#e2e2e2",
+                        "surface-bright": "#f9f9f9",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f3f3f3",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "background": "#f9f9f9",
+                        "on-secondary-fixed-variant": "#474746",
+                        "secondary-fixed": "#e5e2e1",
+                        "inverse-on-surface": "#f1f1f1",
+                        "outline-variant": "#d4c4ac",
+                        "on-primary-fixed-variant": "#5d4200",
+                        "inverse-primary": "#fdbc13",
+                        "secondary-container": "#e2dfde",
+                        "primary-container": "#f4b400",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#464747",
+                        "surface-tint": "#7a5900",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "primary": "#7a5900",
+                        "error": "#ba1a1a",
+                        "surface-container": "#eeeeee",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#dadada",
+                        "on-primary-fixed": "#261900",
+                        "outline": "#827560",
+                        "tertiary-fixed": "#e3e2e2",
+                        "tertiary": "#5e5e5e",
+                        "on-secondary-container": "#636262",
+                        "secondary": "#5f5e5e",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "on-primary-container": "#654800",
+                        "on-surface-variant": "#504533",
+                        "on-tertiary-container": "#4d4d4d",
+                        "tertiary-fixed-dim": "#c7c6c6",
+                        "inverse-surface": "#2f3131",
+                        "surface-container-highest": "#e2e2e2",
+                        "surface-container-high": "#e8e8e8",
+                        "on-secondary": "#ffffff",
+                        "surface": "#f9f9f9",
+                        "primary-fixed": "#ffdea3",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "xs": "4px",
+                        "margin-mobile": "16px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "gutter": "16px",
+                        "margin-desktop": "32px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "display-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "table-data": ["Inter"],
+                        "label-md": ["JetBrains Mono"],
+                        "body-sm": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "table-data": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.surface'); color: theme('colors.on-surface'); }
+    </style>
+</head>
+<body class="flex bg-surface text-on-surface h-screen overflow-hidden font-body-md">
+<!-- SideNavBar (Hidden on Mobile, Visible on md+) -->
+<nav class="hidden md:flex flex-col h-full py-lg bg-on-surface dark:bg-inverse-surface border-r border-outline dark:border-on-tertiary-fixed-variant docked fixed-left w-64 z-40 relative flex-shrink-0">
+<div class="px-md mb-xl flex items-center gap-sm">
+<img alt="BuildForce Construction ERP Logo" class="w-8 h-8 rounded bg-primary-container" data-alt="A small, stylized geometric logo reminiscent of a steel I-beam or architectural structure, rendered in sharp industrial yellow and deep charcoal. The logo conveys strength, precision, and structural integrity." src="https://lh3.googleusercontent.com/aida/AP1WRLt5FT6J1heKW8ofL45mjOLuaGr71LbvnoD3-3dSnaa-UP8naswq96JEqeRE0ueSE6RWq8aCJBkjfhORasOJDSEzxOv4VjHDvWh0Md79EvicP5Bhtg0Cwdz-4bVBJUchpCx-ZQhawZBTQNZfXIjcbUroKumB-7gPxvgeBeOYZuYkfNSii5EEqmoz6V1tlHXLfDixPnOE7JpWZB3hVsZbrlwffUNPIsG4Neuzg3gBA_13wHNZWl4CFwwTREMb"/>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary-container m-0 leading-none">BuildForce</h1>
+<span class="font-label-md text-label-md text-secondary-fixed-dim block mt-xs">Enterprise Resource Planning</span>
+</div>
+</div>
+<div class="px-md mb-lg">
+<button class="w-full bg-primary-container text-on-primary-container font-label-md text-label-md uppercase tracking-widest py-sm px-md rounded flex items-center justify-center gap-xs hover:bg-primary hover:text-on-primary transition-colors duration-200 shadow-sm">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                New Project
+            </button>
+</div>
+<ul class="flex-1 px-sm space-y-xs overflow-y-auto">
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded bg-primary-container text-on-primary-container border-l-4 border-primary font-bold duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-label-md text-label-md uppercase tracking-widest">Workforce</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded text-secondary-fixed-dim hover:text-surface-bright hover:bg-secondary-container dark:hover:bg-on-secondary-container transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md text-label-md uppercase tracking-widest">Payroll</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded text-secondary-fixed-dim hover:text-surface-bright hover:bg-secondary-container dark:hover:bg-on-secondary-container transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">construction</span>
+<span class="font-label-md text-label-md uppercase tracking-widest">Projects</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded text-secondary-fixed-dim hover:text-surface-bright hover:bg-secondary-container dark:hover:bg-on-secondary-container transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">precision_manufacturing</span>
+<span class="font-label-md text-label-md uppercase tracking-widest">Equipment</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded text-secondary-fixed-dim hover:text-surface-bright hover:bg-secondary-container dark:hover:bg-on-secondary-container transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-md text-label-md uppercase tracking-widest">Materials</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded text-secondary-fixed-dim hover:text-surface-bright hover:bg-secondary-container dark:hover:bg-on-secondary-container transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">person_add</span>
+<span class="font-label-md text-label-md uppercase tracking-widest">Recruitment</span>
+</a>
+</li>
+</ul>
+<div class="mt-auto px-sm pt-md border-t border-on-secondary-fixed-variant">
+<ul class="space-y-xs">
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded text-secondary-fixed-dim hover:text-surface-bright hover:bg-secondary-container dark:hover:bg-on-secondary-container transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md uppercase tracking-widest">Settings</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded text-secondary-fixed-dim hover:text-surface-bright hover:bg-secondary-container dark:hover:bg-on-secondary-container transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">contact_support</span>
+<span class="font-label-md text-label-md uppercase tracking-widest">Support</span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col h-full overflow-hidden w-full bg-surface-container-low">
+<!-- TopNavBar (Visible on Mobile) -->
+<header class="md:hidden flex justify-between items-center h-16 px-margin-mobile w-full z-50 bg-surface-container-lowest dark:bg-on-tertiary-fixed shadow-sm border-b-2 border-primary-container dark:border-primary docked full-width top-0 shrink-0">
+<div class="flex items-center gap-sm">
+<span class="font-display-lg-mobile text-display-lg-mobile font-black text-on-surface dark:text-surface-bright tracking-tighter">BUILDFORCE</span>
+</div>
+<div class="flex items-center gap-md text-primary dark:text-primary-fixed-dim">
+<button class="cursor-pointer active:opacity-80 hover:bg-surface-container-high dark:hover:bg-on-tertiary-fixed-variant transition-colors p-sm rounded-full"><span class="material-symbols-outlined">notifications</span></button>
+<button class="cursor-pointer active:opacity-80 hover:bg-surface-container-high dark:hover:bg-on-tertiary-fixed-variant transition-colors p-sm rounded-full"><span class="material-symbols-outlined">settings</span></button>
+<button class="cursor-pointer active:opacity-80 hover:bg-surface-container-high dark:hover:bg-on-tertiary-fixed-variant transition-colors p-sm rounded-full"><span class="material-symbols-outlined">help</span></button>
+</div>
+</header>
+<!-- TopNavBar (Desktop Header - Actions Only) -->
+<header class="hidden md:flex justify-end items-center h-16 px-margin-desktop w-full z-30 bg-surface-container-lowest shadow-sm shrink-0 border-b border-surface-variant">
+<div class="flex items-center gap-md text-on-surface-variant">
+<div class="relative mr-md">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-tertiary">search</span>
+<input class="pl-[36px] pr-sm py-sm text-body-sm font-body-sm border border-outline-variant rounded bg-surface focus:border-on-surface focus:ring-0 focus:border-b-2 focus:border-b-primary-container transition-all w-64 placeholder:text-tertiary" placeholder="Search workforce, sites..." type="text"/>
+</div>
+<button class="cursor-pointer hover:bg-surface-container-high transition-colors p-sm rounded-full relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<img alt="User profile photo" class="w-8 h-8 rounded-full border border-surface-variant cursor-pointer ml-sm" data-alt="A professional headshot of a construction site engineer wearing a hard hat, smiling slightly against an industrial background." src="https://lh3.googleusercontent.com/aida/AP1WRLvVw_7jH134aMtOxMbsn11Pk6QXsqnxMI7tNg9TmRZIZ2ZAeUip7VN_dWBlYIav1lSFiYHl4MkWOu3z5wOWP1mwiwljd5RAMDBdec2o2SqEgiz-_D_SzVnzQj8CukjUMMOqmJRVLI6Ai6y_Jqyjmyfqn2hDKlqyxbc0PVelYo4vX8ipOtz5v3q5eNB-OTcoQqWk2RkfS5g9S8BN_VbnwW6Vslp48JxU7FJgIF0M9GNVVZneTfzNC6jCdMMC"/>
+</div>
+</header>
+<!-- Dashboard Canvas -->
+<main class="flex-1 overflow-y-auto p-margin-mobile md:p-margin-desktop">
+<div class="max-w-[1400px] mx-auto">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-lg gap-md">
+<div>
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface m-0">Site 42: Downtown Tower</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Field Operations Dashboard • Tuesday, Oct 24</p>
+</div>
+<button class="bg-primary-container text-on-primary-fixed font-label-md text-label-md uppercase tracking-widest px-md py-sm rounded flex items-center justify-center gap-xs shadow-sm hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">person_add</span>
+                        Add Laborer
+                    </button>
+</div>
+<!-- Main Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- LEFT COLUMN (Wider) -->
+<div class="lg:col-span-8 flex flex-col gap-gutter">
+<!-- KPI Row (Bento Style) -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-sm md:gap-gutter">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest rounded-lg p-md border border-surface-variant shadow-sm relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary-container"></div>
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Active On-Site</span>
+<div class="mt-sm flex items-end gap-sm">
+<span class="font-display-lg-mobile text-display-lg-mobile font-bold text-on-surface">142</span>
+<span class="font-body-sm text-body-sm text-primary font-bold flex items-center mb-1"><span class="material-symbols-outlined text-[16px]">arrow_upward</span> 12</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest rounded-lg p-md border border-surface-variant shadow-sm relative overflow-hidden">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Scheduled</span>
+<div class="mt-sm flex items-end gap-sm">
+<span class="font-display-lg-mobile text-display-lg-mobile font-bold text-on-surface">150</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest rounded-lg p-md border border-surface-variant shadow-sm relative overflow-hidden">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Variances</span>
+<div class="mt-sm flex items-end gap-sm">
+<span class="font-display-lg-mobile text-display-lg-mobile font-bold text-error">8</span>
+<span class="font-body-sm text-body-sm text-error bg-error-container px-1 rounded flex items-center mb-1">No Shows</span>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-surface-container-lowest rounded-lg p-md border border-surface-variant shadow-sm relative overflow-hidden">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Safety Incidents</span>
+<div class="mt-sm flex items-end gap-sm">
+<span class="font-display-lg-mobile text-display-lg-mobile font-bold text-on-surface">0</span>
+</div>
+</div>
+</div>
+<!-- Attendance Approval Requests (High Priority List) -->
+<div class="bg-surface-container-lowest rounded-lg border border-surface-variant shadow-sm flex flex-col">
+<div class="p-md border-b border-surface-variant flex justify-between items-center bg-surface-bright rounded-t-lg">
+<h3 class="font-headline-sm text-headline-sm text-on-surface m-0 flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">fact_check</span>
+                                    Attendance Approvals (Pending)
+                                </h3>
+<span class="bg-primary-container text-on-primary-fixed font-label-md text-label-md px-2 py-1 rounded-full">3</span>
+</div>
+<div class="flex-1 overflow-x-auto">
+<table class="w-full text-left border-collapse min-w-[600px]">
+<thead>
+<tr class="border-b-2 border-primary-container bg-surface-container-low font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">
+<th class="p-sm md:p-md font-medium">Worker</th>
+<th class="p-sm md:p-md font-medium">Trade</th>
+<th class="p-sm md:p-md font-medium">Clock In/Out</th>
+<th class="p-sm md:p-md font-medium">Hours</th>
+<th class="p-sm md:p-md font-medium text-right">Action</th>
+</tr>
+</thead>
+<tbody class="font-table-data text-table-data">
+<tr class="border-b border-surface-variant hover:bg-surface-bright transition-colors">
+<td class="p-sm md:p-md flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold">JD</div>
+<span class="font-medium">John Doe</span>
+</td>
+<td class="p-sm md:p-md text-on-surface-variant">Carpenter</td>
+<td class="p-sm md:p-md text-on-surface-variant">06:05 AM - 14:30 PM</td>
+<td class="p-sm md:p-md font-medium text-primary">8.5h</td>
+<td class="p-sm md:p-md text-right flex justify-end gap-xs">
+<button class="bg-on-surface text-on-primary px-3 py-1 rounded font-label-md text-label-md hover:bg-surface-tint transition-colors">Approve</button>
+<button class="border border-surface-variant text-on-surface px-3 py-1 rounded font-label-md text-label-md hover:bg-surface-container-high transition-colors">Review</button>
+</td>
+</tr>
+<tr class="border-b border-surface-variant bg-[#F9F9F9] hover:bg-surface-bright transition-colors">
+<td class="p-sm md:p-md flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold">MP</div>
+<span class="font-medium">Maria Perez</span>
+</td>
+<td class="p-sm md:p-md text-on-surface-variant">Electrician</td>
+<td class="p-sm md:p-md text-on-surface-variant">06:15 AM - <span class="text-error font-medium">Missing</span></td>
+<td class="p-sm md:p-md text-on-surface-variant">--</td>
+<td class="p-sm md:p-md text-right flex justify-end gap-xs">
+<button class="bg-error text-on-error px-3 py-1 rounded font-label-md text-label-md hover:opacity-90 transition-opacity">Flag</button>
+</td>
+</tr>
+<tr class="border-b border-surface-variant hover:bg-surface-bright transition-colors">
+<td class="p-sm md:p-md flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold">AS</div>
+<span class="font-medium">Alex Smith</span>
+</td>
+<td class="p-sm md:p-md text-on-surface-variant">Plumber</td>
+<td class="p-sm md:p-md text-on-surface-variant">05:50 AM - 15:00 PM <span class="bg-primary-container/20 text-primary-container px-1 rounded text-[10px] ml-1">OT</span></td>
+<td class="p-sm md:p-md font-medium text-primary">9.1h</td>
+<td class="p-sm md:p-md text-right flex justify-end gap-xs">
+<button class="bg-on-surface text-on-primary px-3 py-1 rounded font-label-md text-label-md hover:bg-surface-tint transition-colors">Approve</button>
+<button class="border border-surface-variant text-on-surface px-3 py-1 rounded font-label-md text-label-md hover:bg-surface-container-high transition-colors">Review</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-sm border-t border-surface-variant bg-surface-bright text-center rounded-b-lg">
+<a class="font-label-md text-label-md text-primary hover:underline uppercase tracking-widest" href="#">View All Approvals</a>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN (Narrower) -->
+<div class="lg:col-span-4 flex flex-col gap-gutter">
+<!-- Recently Added Workers -->
+<div class="bg-surface-container-lowest rounded-lg border border-surface-variant shadow-sm p-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface m-0 mb-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-tertiary">group_add</span>
+                                Recent Onboarding
+                            </h3>
+<ul class="space-y-sm">
+<li class="flex items-center justify-between p-sm border border-surface-variant rounded bg-surface-bright">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined">badge</span>
+</div>
+<div>
+<p class="font-body-sm text-body-sm font-bold text-on-surface m-0">David Lee</p>
+<p class="font-label-md text-label-md text-on-surface-variant m-0 mt-1">Welder • Sub: Apex Steel</p>
+</div>
+</div>
+<span class="bg-[#E6F4EA] text-[#137333] px-2 py-1 rounded font-label-md text-[10px] uppercase tracking-widest">Active</span>
+</li>
+<li class="flex items-center justify-between p-sm border border-surface-variant rounded bg-surface-bright">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined">badge</span>
+</div>
+<div>
+<p class="font-body-sm text-body-sm font-bold text-on-surface m-0">Sarah Jenkins</p>
+<p class="font-label-md text-label-md text-on-surface-variant m-0 mt-1">General Laborer</p>
+</div>
+</div>
+<span class="bg-[#FEF7E0] text-[#B06000] px-2 py-1 rounded font-label-md text-[10px] uppercase tracking-widest">Pending Docs</span>
+</li>
+<li class="flex items-center justify-between p-sm border border-surface-variant rounded bg-surface-bright">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined">badge</span>
+</div>
+<div>
+<p class="font-body-sm text-body-sm font-bold text-on-surface m-0">Mike Ronson</p>
+<p class="font-label-md text-label-md text-on-surface-variant m-0 mt-1">Heavy Equip. Op.</p>
+</div>
+</div>
+<span class="bg-[#E6F4EA] text-[#137333] px-2 py-1 rounded font-label-md text-[10px] uppercase tracking-widest">Active</span>
+</li>
+</ul>
+</div>
+<!-- Site Labor Statistics (Mini Chart Placeholder) -->
+<div class="bg-surface-container-lowest rounded-lg border border-surface-variant shadow-sm p-md flex-1 flex flex-col">
+<h3 class="font-headline-sm text-headline-sm text-on-surface m-0 mb-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-tertiary">pie_chart</span>
+                                Labor by Trade
+                            </h3>
+<div class="flex-1 flex flex-col justify-center gap-sm px-sm">
+<!-- Simple CSS Bar Chart -->
+<div class="w-full">
+<div class="flex justify-between font-label-md text-label-md text-on-surface-variant mb-1">
+<span>Carpenters (45)</span>
+<span>31%</span>
+</div>
+<div class="w-full h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 31%"></div>
+</div>
+</div>
+<div class="w-full mt-2">
+<div class="flex justify-between font-label-md text-label-md text-on-surface-variant mb-1">
+<span>General (40)</span>
+<span>28%</span>
+</div>
+<div class="w-full h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-on-surface" style="width: 28%"></div>
+</div>
+</div>
+<div class="w-full mt-2">
+<div class="flex justify-between font-label-md text-label-md text-on-surface-variant mb-1">
+<span>Electricians (25)</span>
+<span>17%</span>
+</div>
+<div class="w-full h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-outline" style="width: 17%"></div>
+</div>
+</div>
+<div class="w-full mt-2">
+<div class="flex justify-between font-label-md text-label-md text-on-surface-variant mb-1">
+<span>Other (32)</span>
+<span>24%</span>
+</div>
+<div class="w-full h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-tertiary-container" style="width: 24%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

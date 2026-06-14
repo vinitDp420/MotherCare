@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admission Management | MotherCare</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Dark mode transition */
+        body { transition: background-color 0.3s ease, color 0.3s ease; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff",
+                        "background": "#f8f9ff",
+                        "on-primary-container": "#f4fffb",
+                        "inverse-primary": "#70d8c8",
+                        "tertiary-container": "#996679",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-secondary-container": "#56656e",
+                        "secondary": "#526069",
+                        "on-background": "#0b1c30",
+                        "surface-bright": "#f8f9ff",
+                        "outline-variant": "#bcc9c5",
+                        "on-tertiary-container": "#fffbff",
+                        "surface-container-highest": "#d3e4fe",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#d6e5ef",
+                        "primary-container": "#008376",
+                        "surface": "#f8f9ff",
+                        "on-primary-fixed-variant": "#005048",
+                        "secondary-container": "#d3e2ed",
+                        "on-primary-fixed": "#00201c",
+                        "on-tertiary": "#ffffff",
+                        "tertiary": "#7d4e60",
+                        "on-surface": "#0b1c30",
+                        "primary": "#00685d",
+                        "primary-fixed": "#8df5e4",
+                        "on-error-container": "#93000a",
+                        "surface-container-high": "#dce9ff",
+                        "inverse-surface": "#213145",
+                        "on-secondary-fixed-variant": "#3b4951",
+                        "secondary-fixed-dim": "#bac9d3",
+                        "outline": "#6d7a77",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed-dim": "#70d8c8",
+                        "surface-dim": "#cbdbf5",
+                        "surface-tint": "#006b5f",
+                        "on-secondary": "#ffffff",
+                        "on-surface-variant": "#3d4946",
+                        "tertiary-fixed-dim": "#f2b6cb",
+                        "on-tertiary-fixed-variant": "#65394b",
+                        "surface-container-low": "#eff4ff",
+                        "on-tertiary-fixed": "#330f1f",
+                        "surface-variant": "#d3e4fe"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "base": "8px",
+                        "lg": "24px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "sm": "12px",
+                        "xl": "32px",
+                        "margin-desktop": "40px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background dark:bg-on-surface text-on-surface dark:text-surface-container-lowest transition-colors duration-300">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-desktop h-16 bg-surface-container-lowest dark:bg-inverse-surface shadow-sm">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">MotherCare</span>
+<div class="ml-xl hidden md:flex items-center bg-surface-container-low dark:bg-surface-variant/10 rounded-full px-md py-xs border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant dark:text-surface-variant mr-xs">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md w-64 dark:text-surface-bright" placeholder="Global Search: patient ID, ward, or staff..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex items-center gap-md text-on-surface-variant dark:text-surface-variant">
+<button class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors" onclick="document.documentElement.classList.toggle('dark')">dark_mode</button>
+<div class="relative group">
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-error rounded-full border-2 border-surface-container-lowest"></span>
+<!-- Notification Center Tooltip Placeholder -->
+<div class="hidden group-hover:block absolute right-0 top-full mt-2 w-64 bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant rounded-xl shadow-xl p-md z-50">
+<p class="font-label-lg border-b border-outline-variant pb-xs mb-xs">Notifications</p>
+<div class="space-y-sm">
+<p class="text-label-md">New Emergency Admission: Ward B</p>
+<p class="text-label-md text-primary">Lab Results Ready: Patient #MC-2934</p>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">help_outline</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">settings</span>
+</div>
+<div class="flex items-center gap-sm pl-md border-l border-outline-variant">
+<div class="text-right hidden sm:block">
+<p class="text-label-md font-bold text-on-surface dark:text-surface-bright leading-none">Dr. Anjali Sharma</p>
+<p class="text-[10px] text-on-surface-variant dark:text-surface-variant uppercase tracking-wider">Chief Resident</p>
+</div>
+<img alt="User profile avatar" class="w-10 h-10 rounded-full object-cover border-2 border-primary-fixed cursor-pointer" src="https://lh3.googleusercontent.com/aida/AP1WRLvCKmG5gEPPFJp9WU88obVVKRjWrgch511C58Wrx4K3l2bm69DZQd7p_j8-a0TD2nDHpSfc6_KVw2j3kGcxz-HrbmoqykWsomT3E2u5TEyCfasLOCPjfFlxByXtxHHcbeAi2VCLWT4OcbE_8q252Wo8opE1vgwuisuxfK4gZYkJScFqA4YU5vbAgVJlkRu5lqR3chJH-qrL6-ZOHt0hO9Q8zYs405HJaS9SYEd0K9KFo8cgxYEvfNuA2V1G"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-surface dark:bg-inverse-surface flex flex-col py-lg px-md z-40 pt-20 border-r border-outline-variant dark:border-outline/30">
+<div class="flex items-center gap-sm px-md mb-xl">
+<div class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined">medical_services</span>
+</div>
+<div>
+<p class="font-label-lg text-label-lg font-bold text-primary dark:text-primary-fixed">MotherCare</p>
+<p class="text-[10px] text-on-surface-variant dark:text-surface-variant uppercase tracking-widest">Shakuntala Hospital</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-surface-variant hover:bg-secondary-fixed-dim/20 hover:text-on-secondary-fixed rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-lg text-label-lg">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm bg-secondary-container dark:bg-primary-container text-on-secondary-container dark:text-on-primary-container rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">how_to_reg</span>
+<span class="font-label-lg text-label-lg">Admissions</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-surface-variant hover:bg-secondary-fixed-dim/20 hover:text-on-secondary-fixed rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">folder_shared</span>
+<span class="font-label-lg text-label-lg">Patient Records</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-surface-variant hover:bg-secondary-fixed-dim/20 hover:text-on-secondary-fixed rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">bed</span>
+<span class="font-label-lg text-label-lg">Bed Management</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-surface-variant hover:bg-secondary-fixed-dim/20 hover:text-on-secondary-fixed rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-lg text-label-lg">Reports</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-outline-variant dark:border-outline/30 pt-lg space-y-1">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-surface-variant hover:bg-secondary-fixed-dim/20 hover:text-on-secondary-fixed rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">contact_support</span>
+<span class="font-label-lg text-label-lg">Support</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-error hover:bg-error-container rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-lg text-label-lg">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-[280px] pt-24 px-margin-desktop pb-xl min-h-screen transition-colors duration-300">
+<!-- Header Section -->
+<div class="flex justify-between items-end mb-lg">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface dark:text-surface-bright">Admission Management</h1>
+<p class="text-on-surface-variant dark:text-surface-variant font-body-md">Manage maternal patient intake and ward assignments</p>
+</div>
+<div class="flex gap-md">
+<button class="flex items-center gap-xs px-lg py-md bg-primary text-on-primary rounded-lg font-label-lg hover:shadow-lg transition-all active:opacity-80">
+<span class="material-symbols-outlined">add</span>
+                    New Admission
+                </button>
+</div>
+</div>
+<!-- Dashboard Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-xl">
+<div class="bg-surface-container-lowest dark:bg-inverse-surface p-md rounded-xl border border-outline-variant dark:border-outline/30 shadow-sm hover:shadow-md transition-all">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-xs bg-primary-container/10 rounded-lg text-primary dark:text-primary-fixed">
+<span class="material-symbols-outlined">person_add</span>
+</div>
+<span class="text-label-md font-bold text-primary dark:text-primary-fixed">+12%</span>
+</div>
+<p class="text-on-surface-variant dark:text-surface-variant font-label-md uppercase tracking-wider">Active Admissions</p>
+<h2 class="text-headline-lg font-headline-lg mt-xs dark:text-surface-bright">142</h2>
+</div>
+<div class="bg-surface-container-lowest dark:bg-inverse-surface p-md rounded-xl border border-outline-variant dark:border-outline/30 shadow-sm hover:shadow-md transition-all">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-xs bg-secondary-container/20 rounded-lg text-secondary dark:text-secondary-fixed">
+<span class="material-symbols-outlined">today</span>
+</div>
+<span class="text-label-md font-bold text-secondary dark:text-secondary-fixed">Today</span>
+</div>
+<p class="text-on-surface-variant dark:text-surface-variant font-label-md uppercase tracking-wider">Today's Admissions</p>
+<h2 class="text-headline-lg font-headline-lg mt-xs dark:text-surface-bright">28</h2>
+</div>
+<div class="bg-surface-container-lowest dark:bg-inverse-surface p-md rounded-xl border border-outline-variant dark:border-outline/30 shadow-sm hover:shadow-md transition-all">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-xs bg-tertiary-container/10 rounded-lg text-tertiary dark:text-tertiary-fixed">
+<span class="material-symbols-outlined">logout</span>
+</div>
+<span class="text-label-md font-bold text-tertiary dark:text-tertiary-fixed">8 Pending</span>
+</div>
+<p class="text-on-surface-variant dark:text-surface-variant font-label-md uppercase tracking-wider">Pending Discharges</p>
+<h2 class="text-headline-lg font-headline-lg mt-xs dark:text-surface-bright">14</h2>
+</div>
+<div class="bg-surface-container-lowest dark:bg-inverse-surface p-md rounded-xl border border-outline-variant dark:border-outline/30 shadow-sm hover:shadow-md transition-all">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-xs bg-error-container/20 rounded-lg text-error">
+<span class="material-symbols-outlined">e911_emergency</span>
+</div>
+<span class="text-label-md font-bold text-error">Critical</span>
+</div>
+<p class="text-on-surface-variant dark:text-surface-variant font-label-md uppercase tracking-wider">Emergency Admissions</p>
+<h2 class="text-headline-lg font-headline-lg mt-xs dark:text-surface-bright">05</h2>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Admission Form Sidebar -->
+<div class="col-span-12 lg:col-span-4">
+<div class="bg-surface-container-lowest dark:bg-inverse-surface rounded-xl border border-outline-variant dark:border-outline/30 shadow-sm overflow-hidden sticky top-24 transition-all">
+<div class="p-md bg-surface-container-low dark:bg-on-surface-variant/10 border-b border-outline-variant dark:border-outline/30">
+<h3 class="font-title-lg text-title-lg flex items-center gap-xs dark:text-surface-bright">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">edit_note</span>
+                            Admission Intake
+                        </h3>
+</div>
+<form class="p-md space-y-md">
+<div>
+<label class="block text-label-md font-semibold text-on-surface-variant dark:text-surface-variant mb-xs">Patient Search</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-surface-variant">search</span>
+<input class="w-full pl-xl pr-md py-sm bg-surface-container-low dark:bg-on-surface-variant/5 border border-outline-variant dark:border-outline/50 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-body-md dark:text-surface-bright" placeholder="Enter Patient Name or ID" type="text"/>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-sm">
+<div>
+<label class="block text-label-md font-semibold text-on-surface-variant dark:text-surface-variant mb-xs">Assigned Doctor</label>
+<select class="w-full py-sm px-sm bg-surface-container-low dark:bg-on-surface-variant/5 border border-outline-variant dark:border-outline/50 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary text-body-md dark:text-surface-bright">
+<option>Dr. Anjali Sharma</option>
+<option>Dr. Sarah Miller</option>
+<option>Dr. Robert Chen</option>
+</select>
+</div>
+<div>
+<label class="block text-label-md font-semibold text-on-surface-variant dark:text-surface-variant mb-xs">Admission Type</label>
+<select class="w-full py-sm px-sm bg-surface-container-low dark:bg-on-surface-variant/5 border border-outline-variant dark:border-outline/50 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary text-body-md dark:text-surface-bright">
+<option>Maternity</option>
+<option>Post-Natal</option>
+<option>Emergency</option>
+<option>Surgery</option>
+</select>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-sm">
+<div>
+<label class="block text-label-md font-semibold text-on-surface-variant dark:text-surface-variant mb-xs">Room Type</label>
+<select class="w-full py-sm px-sm bg-surface-container-low dark:bg-on-surface-variant/5 border border-outline-variant dark:border-outline/50 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary text-body-md dark:text-surface-bright">
+<option>Deluxe Suite</option>
+<option>Private</option>
+<option>Semi-Private</option>
+<option>General Ward</option>
+</select>
+</div>
+<div>
+<label class="block text-label-md font-semibold text-on-surface-variant dark:text-surface-variant mb-xs">Bed Selection</label>
+<select class="w-full py-sm px-sm bg-surface-container-low dark:bg-on-surface-variant/5 border border-outline-variant dark:border-outline/50 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary text-body-md dark:text-surface-bright">
+<option>A-102</option>
+<option>A-105</option>
+<option>B-201</option>
+</select>
+</div>
+</div>
+<div>
+<label class="block text-label-md font-semibold text-on-surface-variant dark:text-surface-variant mb-xs">Reason for Admission</label>
+<textarea class="w-full p-sm bg-surface-container-low dark:bg-on-surface-variant/5 border border-outline-variant dark:border-outline/50 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary text-body-md dark:text-surface-bright" placeholder="Clinical notes and reasons..." rows="3"></textarea>
+</div>
+<div>
+<label class="block text-label-md font-semibold text-on-surface-variant dark:text-surface-variant mb-xs">Expected Discharge Date</label>
+<input class="w-full p-sm bg-surface-container-low dark:bg-on-surface-variant/5 border border-outline-variant dark:border-outline/50 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary text-body-md dark:text-surface-bright" type="date"/>
+</div>
+<button class="w-full py-md bg-primary text-on-primary rounded-lg font-bold hover:shadow-lg transition-all active:scale-[0.98]" type="submit">
+                            Complete Admission
+                        </button>
+</form>
+</div>
+</div>
+<!-- Admission Table Section -->
+<div class="col-span-12 lg:col-span-8">
+<div class="bg-surface-container-lowest dark:bg-inverse-surface rounded-xl border border-outline-variant dark:border-outline/30 shadow-sm overflow-hidden transition-all">
+<div class="p-md flex justify-between items-center border-b border-outline-variant dark:border-outline/30">
+<h3 class="font-title-lg text-title-lg dark:text-surface-bright">Active Admissions List</h3>
+<div class="flex gap-sm">
+<button class="p-xs hover:bg-surface-container-low dark:hover:bg-on-surface-variant/10 rounded-lg transition-colors border border-outline-variant dark:border-outline/50">
+<span class="material-symbols-outlined dark:text-surface-variant">filter_list</span>
+</button>
+<button class="p-xs hover:bg-surface-container-low dark:hover:bg-on-surface-variant/10 rounded-lg transition-colors border border-outline-variant dark:border-outline/50">
+<span class="material-symbols-outlined dark:text-surface-variant">file_download</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low dark:bg-on-surface-variant/10 text-on-surface-variant dark:text-surface-variant font-label-lg uppercase tracking-wider text-[11px]">
+<tr>
+<th class="px-md py-sm">Patient</th>
+<th class="px-md py-sm">Room/Bed</th>
+<th class="px-md py-sm">Primary Doctor</th>
+<th class="px-md py-sm">Admission Date</th>
+<th class="px-md py-sm">Status</th>
+<th class="px-md py-sm text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant dark:divide-outline/30">
+<!-- Row 1 - Active with Emergency Badge -->
+<tr class="hover:bg-primary-container/5 transition-colors group">
+<td class="px-md py-md">
+<div class="flex items-center gap-sm">
+<div class="relative">
+<img alt="Patient" class="w-10 h-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLuaSIzoZIkMw-By-cxpnBXe-Ouxsqky8hn09LshQhUYVswx3vNiFqH-uWCzP4ORkMK7NYOekHMYy8FC_iyJLBV5AnCzAczu2cQTbHveeYPD0qOYV4h3yuSgN6T--uC9c_ZkeZV3T8B4yUWZJqn3ZWVOsEt-OK3pcfeeMJ723v78Gm1vmBFxpoxPHNG0dBAiNUXgXguouCdOqrU8tOGTAe71C_7l65Xq82ldpKAEXTIE7A4slQphDREo2HH2"/>
+<span class="absolute -top-1 -right-1 flex h-4 w-4" title="Emergency Admission">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+<span class="relative inline-flex rounded-full h-4 w-4 bg-error text-[10px] text-white items-center justify-center font-bold">!</span>
+</span>
+</div>
+<div>
+<p class="font-label-lg text-on-surface dark:text-surface-bright">Elena Rodriguez</p>
+<p class="text-label-md text-on-surface-variant dark:text-surface-variant">ID: #MC-2934</p>
+</div>
+</div>
+</td>
+<td class="px-md py-md">
+<p class="font-label-lg text-on-surface dark:text-surface-bright">Suite 402</p>
+<p class="text-label-md text-on-surface-variant dark:text-surface-variant">Bed A</p>
+</td>
+<td class="px-md py-md text-on-surface dark:text-surface-bright font-body-md">Dr. Anjali Sharma</td>
+<td class="px-md py-md">
+<p class="text-body-md text-on-surface dark:text-surface-bright">Oct 24, 2023</p>
+<p class="text-label-md text-on-surface-variant dark:text-surface-variant">09:15 AM</p>
+</td>
+<td class="px-md py-md">
+<span class="px-sm py-xs bg-primary-container/10 text-primary dark:text-primary-fixed rounded-full text-label-md font-bold">Active</span>
+</td>
+<td class="px-md py-md text-right">
+<div class="flex justify-end gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:bg-surface-container-high dark:hover:bg-on-surface-variant/20 rounded text-secondary-fixed-dim hover:text-primary transition-colors" title="Transfer Patient">
+<span class="material-symbols-outlined text-[20px]">move_up</span>
+</button>
+<button class="p-1 hover:bg-surface-container-high dark:hover:bg-on-surface-variant/20 rounded text-secondary-fixed-dim hover:text-tertiary transition-colors" title="Discharge">
+<span class="material-symbols-outlined text-[20px]">door_open</span>
+</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer">more_vert</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 - Discharge Pending -->
+<tr class="bg-secondary-container/5 hover:bg-primary-container/5 transition-colors group">
+<td class="px-md py-md">
+<div class="flex items-center gap-sm">
+<img alt="Patient" class="w-10 h-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLsBMK8CsicJqIzO-xw9gBCIVV8SEcJtlqYH6-seSkRuxWKV7UVQKxFSoPPkJdFRH6CXMiVjQYCX6lbH1TiP2d9Qo1Nl3NHI_O_diWgLm4H4s1JSOUq53VVjq-I_ZDzsOJZFdYN7jzjJhdT8LIO4oA68Rp8Xi0GL-amDeZjuaFBAyO0KTA4W6CxvbHs5OblXbH4g0p2WZYMbX9P0GKDx951uabFa3PWUt0uBe1ZJv4nonMh7lCc9Pc4BEWHB"/>
+<div>
+<p class="font-label-lg text-on-surface dark:text-surface-bright">Sarah Jenkins</p>
+<p class="text-label-md text-on-surface-variant dark:text-surface-variant">ID: #MC-2182</p>
+</div>
+</div>
+</td>
+<td class="px-md py-md">
+<p class="font-label-lg text-on-surface dark:text-surface-bright">Private 201</p>
+<p class="text-label-md text-on-surface-variant dark:text-surface-variant">Bed B</p>
+</td>
+<td class="px-md py-md text-on-surface dark:text-surface-bright font-body-md">Dr. Sarah Miller</td>
+<td class="px-md py-md">
+<p class="text-body-md text-on-surface dark:text-surface-bright">Oct 22, 2023</p>
+<p class="text-label-md text-on-surface-variant dark:text-surface-variant">11:45 PM</p>
+</td>
+<td class="px-md py-md">
+<span class="px-sm py-xs bg-tertiary-container/10 text-tertiary dark:text-tertiary-fixed rounded-full text-label-md font-bold">Discharge Pending</span>
+</td>
+<td class="px-md py-md text-right">
+<div class="flex justify-end gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="flex items-center gap-xs px-sm py-xs bg-tertiary text-on-tertiary rounded font-label-md hover:bg-tertiary-container transition-all" title="Complete Discharge">
+                                                Discharge
+                                            </button>
+</div>
+</td>
+</tr>
+<!-- Row 3 - Transferred -->
+<tr class="hover:bg-primary-container/5 transition-colors group">
+<td class="px-md py-md">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-high dark:bg-on-surface-variant/20 flex items-center justify-center text-on-surface-variant dark:text-surface-variant">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<p class="font-label-lg text-on-surface dark:text-surface-bright">Meera Kapoor</p>
+<p class="text-label-md text-on-surface-variant dark:text-surface-variant">ID: #MC-3041</p>
+</div>
+</div>
+</td>
+<td class="px-md py-md">
+<p class="font-label-lg text-on-surface dark:text-surface-bright">General 12</p>
+<p class="text-label-md text-on-surface-variant dark:text-surface-variant">Bed 4</p>
+</td>
+<td class="px-md py-md text-on-surface dark:text-surface-bright font-body-md">Dr. Robert Chen</td>
+<td class="px-md py-md">
+<p class="text-body-md text-on-surface dark:text-surface-bright">Oct 24, 2023</p>
+<p class="text-label-md text-on-surface-variant dark:text-surface-variant">02:30 AM</p>
+</td>
+<td class="px-md py-md">
+<span class="px-sm py-xs bg-error-container/20 text-error rounded-full text-label-md font-bold">Transferred</span>
+</td>
+<td class="px-md py-md text-right">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer">more_vert</button>
+</td>
+</tr>
+<!-- Row 4 - Discharged -->
+<tr class="bg-secondary-container/5 hover:bg-primary-container/5 transition-colors group">
+<td class="px-md py-md">
+<div class="flex items-center gap-sm">
+<img alt="Patient" class="w-10 h-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLsPUGjRjEMXWMYc8CK9Hha9-GReLbgTuQSBsOFXQLxvKOOLzrtCN3annENn1s98o7pX-m7YG22wOgYhIdtwFR40uHYWdOcaBnL5_7A_SoK2Exm6uAyeu6Brs7gjR5pVE_voPB-U5Ct8aUMzONeCtens0AZVbyyKBCq2YfBgwozhwynfIO9YC1gDl1GthpTWhm8CE7fa86DuYsYmKbsJvuSDzyxCgGfvdBUjy4BF9POIKAwJosZpEAyH7VPS"/>
+<div>
+<p class="font-label-lg text-on-surface dark:text-surface-bright">Jessica Thompson</p>
+<p class="text-label-md text-on-surface-variant dark:text-surface-variant">ID: #MC-2884</p>
+</div>
+</div>
+</td>
+<td class="px-md py-md">
+<p class="font-label-lg text-on-surface dark:text-surface-bright">Deluxe 505</p>
+<p class="text-label-md text-on-surface-variant dark:text-surface-variant">Bed A</p>
+</td>
+<td class="px-md py-md text-on-surface dark:text-surface-bright font-body-md">Dr. Anjali Sharma</td>
+<td class="px-md py-md">
+<p class="text-body-md text-on-surface dark:text-surface-bright">Oct 20, 2023</p>
+<p class="text-label-md text-on-surface-variant dark:text-surface-variant">10:00 AM</p>
+</td>
+<td class="px-md py-md">
+<span class="px-sm py-xs bg-secondary-container/50 text-on-secondary-container dark:text-secondary-fixed-dim rounded-full text-label-md font-bold">Discharged</span>
+</td>
+<td class="px-md py-md text-right">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer">more_vert</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-md flex justify-between items-center bg-surface-container-low dark:bg-on-surface-variant/10 border-t border-outline-variant dark:border-outline/30">
+<p class="text-label-md text-on-surface-variant dark:text-surface-variant">Showing 4 of 142 admissions</p>
+<div class="flex gap-xs">
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant dark:border-outline/50 hover:bg-surface-container-high dark:hover:bg-on-surface-variant/20 transition-colors">
+<span class="material-symbols-outlined text-[18px] dark:text-surface-variant">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-on-primary font-bold text-label-md">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant dark:border-outline/50 hover:bg-surface-container-high dark:hover:bg-on-surface-variant/20 transition-colors text-label-md dark:text-surface-variant">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant dark:border-outline/50 hover:bg-surface-container-high dark:hover:bg-on-surface-variant/20 transition-colors text-label-md dark:text-surface-variant">3</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant dark:border-outline/50 hover:bg-surface-container-high dark:hover:bg-on-surface-variant/20 transition-colors">
+<span class="material-symbols-outlined text-[18px] dark:text-surface-variant">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Form simulation
+        document.querySelectorAll('form button[type="submit"]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<span class="material-symbols-outlined animate-spin mr-2">progress_activity</span> Processing...';
+                btn.classList.add('opacity-80');
+                
+                setTimeout(() => {
+                    btn.innerHTML = '<span class="material-symbols-outlined mr-2">check_circle</span> Admission Confirmed';
+                    btn.classList.replace('bg-primary', 'bg-green-600');
+                    
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.classList.replace('bg-green-600', 'bg-primary');
+                        btn.classList.remove('opacity-80');
+                    }, 2000);
+                }, 1500);
+            });
+        });
+
+        // Dynamic icon hover state
+        const rows = document.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            const icons = row.querySelectorAll('.material-symbols-outlined');
+            row.addEventListener('mouseenter', () => {
+                icons.forEach(icon => icon.style.fontVariationSettings = "'FILL' 1");
+            });
+            row.addEventListener('mouseleave', () => {
+                icons.forEach(icon => icon.style.fontVariationSettings = "'FILL' 0");
+            });
+        });
+
+        // Simple dark mode toggle listener (already handled via inline onclick)
+        // This is just a placeholder for more complex state management if needed.
+    </script>
+</body></html>

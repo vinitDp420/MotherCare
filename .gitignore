@@ -1,0 +1,101 @@
+# ────────────────────────────────────────────────
+# Python / Django
+# ────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+.installed.cfg
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# uv
+.uv/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+backend/media/
+backend/staticfiles/
+backend/.env
+
+# ────────────────────────────────────────────────
+# Testing / Coverage
+# ────────────────────────────────────────────────
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# ────────────────────────────────────────────────
+# Node / Frontend
+# ────────────────────────────────────────────────
+node_modules/
+frontend/dist/
+frontend/build/
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.tsbuildinfo
+
+# ────────────────────────────────────────────────
+# IDEs & OS
+# ────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*.DS_Store
+Thumbs.db
+.env.local
+
+# ────────────────────────────────────────────────
+# Docker
+# ────────────────────────────────────────────────
+.dockerignore
+
+# ────────────────────────────────────────────────
+# Secrets (never commit)
+# ────────────────────────────────────────────────
+*.pem
+*.key
+*.cert
+secrets/

@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MotherCare - Pregnancy Tracking</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#d3e2ed",
+                        "inverse-surface": "#213145",
+                        "secondary-fixed-dim": "#bac9d3",
+                        "tertiary-container": "#996679",
+                        "on-surface-variant": "#3d4946",
+                        "on-tertiary-fixed-variant": "#65394b",
+                        "inverse-on-surface": "#eaf1ff",
+                        "error": "#ba1a1a",
+                        "outline": "#6d7a77",
+                        "on-primary-container": "#f4fffb",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#3b4951",
+                        "tertiary-fixed-dim": "#f2b6cb",
+                        "surface-container": "#e5eeff",
+                        "error-container": "#ffdad6",
+                        "tertiary": "#7d4e60",
+                        "primary-container": "#008376",
+                        "on-background": "#0b1c30",
+                        "outline-variant": "#bcc9c5",
+                        "surface-tint": "#006b5f",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-secondary-fixed": "#0f1d25",
+                        "surface": "#f8f9ff",
+                        "tertiary-fixed": "#ffd9e4",
+                        "surface-container-low": "#eff4ff",
+                        "on-surface": "#0b1c30",
+                        "on-secondary-container": "#56656e",
+                        "primary-fixed-dim": "#70d8c8",
+                        "on-tertiary-container": "#fffbff",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#cbdbf5",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f8f9ff",
+                        "on-tertiary-fixed": "#330f1f",
+                        "primary": "#00685d",
+                        "inverse-primary": "#70d8c8",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#d6e5ef",
+                        "on-primary-fixed-variant": "#005048",
+                        "on-primary-fixed": "#00201c",
+                        "background": "#f8f9ff",
+                        "primary-fixed": "#8df5e4",
+                        "surface-container-high": "#dce9ff",
+                        "secondary": "#526069",
+                        "surface-variant": "#d3e4fe"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "40px",
+                        "md": "16px",
+                        "base": "8px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "sm": "12px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "label-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+        
+        /* Dark mode overrides for background and surface */
+        .dark body { background-color: #0b1c30; color: #f8f9ff; }
+        .dark .bg-surface { background-color: #1a2a3a; }
+        .dark .bg-surface-container-lowest { background-color: #1e2e3e; }
+        .dark .text-on-surface { color: #f8f9ff; }
+        .dark .text-secondary { color: #bac9d3; }
+        .dark .border-outline-variant\/20 { border-color: rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col md:flex-row overflow-x-hidden transition-colors duration-300">
+<!-- Mobile TopAppBar -->
+<header class="md:hidden sticky top-0 z-40 flex justify-between items-center w-full px-margin-mobile bg-surface h-16 shadow-sm border-b border-outline-variant/30">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined fill text-primary">pregnant_woman</span>
+<span class="text-title-lg font-title-lg text-primary">MotherCare</span>
+</div>
+<div class="flex items-center gap-xs">
+<button class="p-2 text-on-surface-variant hover:bg-secondary-container/20 rounded-full transition-colors" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-secondary-container/20 rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-secondary-container/20 rounded-full transition-colors">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Desktop SideNavBar -->
+<nav class="hidden md:flex flex-col fixed left-0 top-0 h-full w-[280px] bg-surface p-lg border-r border-outline-variant/30 z-50 transition-colors duration-300">
+<div class="flex items-center gap-sm mb-xl">
+<img alt="Shakuntala Hospital Logo" class="w-10 h-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLsSMwfjuV9zg-oFWh5GUHbDmPKFBv6jajk9rNVbll5wkA_-wIOYyENJlOhr4Mvw8edDobBDBaJWvLmo_VPamw8PRgKvx4Fs_kEo4EiNA6nUhHp1ujl35tuEItP6l8QVgB0dexennDZXIjygTpXvzsH4CovoyyMsqd1P7vD3ec_-7HMtQw_PSNMo25BcD2IjuvC3tnOXuhfbSI_e4Kqpn6wn4AZUIAr1dMpIMKcr1UgK4ulZAgTDRYZ7SB4"/>
+<div>
+<h1 class="text-headline-md font-headline-md font-bold text-primary">MotherCare</h1>
+<p class="text-label-md font-label-md text-secondary">Shakuntala Hospital</p>
+</div>
+</div>
+<!-- New Admission & Dark Mode Toggle -->
+<div class="flex flex-col gap-sm mb-xl">
+<button class="w-full bg-primary text-on-primary py-sm px-md rounded-lg font-label-lg text-label-lg hover:bg-surface-tint transition-colors flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-[20px]">add</span>
+            New Admission
+        </button>
+<button class="w-full border border-outline-variant/50 text-on-surface py-sm px-md rounded-lg font-label-lg text-label-lg hover:bg-secondary-container/20 transition-colors flex items-center justify-center gap-xs" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-symbols-outlined text-[20px]">dark_mode</span>
+            Toggle Theme
+        </button>
+</div>
+<ul class="flex flex-col gap-xs flex-grow">
+<li>
+<a class="flex items-center gap-sm p-md text-secondary hover:text-primary hover:bg-secondary-container/30 transition-all rounded-lg text-label-lg font-label-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+</li>
+<li>
+<a class="flex items-center gap-sm p-md bg-primary-container text-on-primary-container rounded-lg font-bold text-label-lg font-label-lg transition-all" href="#">
+<span class="material-symbols-outlined fill">pregnant_woman</span>
+                Patient Records
+            </a>
+</li>
+<li>
+<a class="flex items-center gap-sm p-md text-secondary hover:text-primary hover:bg-secondary-container/30 transition-all rounded-lg text-label-lg font-label-lg" href="#">
+<span class="material-symbols-outlined">baby_changing_station</span>
+                L&amp;D Ward
+            </a>
+</li>
+<li>
+<a class="flex items-center gap-sm p-md text-secondary hover:text-primary hover:bg-secondary-container/30 transition-all rounded-lg text-label-lg font-label-lg" href="#">
+<span class="material-symbols-outlined">event</span>
+                Appointments
+            </a>
+</li>
+<li>
+<a class="flex items-center gap-sm p-md text-secondary hover:text-primary hover:bg-secondary-container/30 transition-all rounded-lg text-label-lg font-label-lg" href="#">
+<span class="material-symbols-outlined">groups</span>
+                Staff Directory
+            </a>
+</li>
+<li>
+<a class="flex items-center gap-sm p-md text-secondary hover:text-primary hover:bg-secondary-container/30 transition-all rounded-lg text-label-lg font-label-lg" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+                Analytics
+            </a>
+</li>
+</ul>
+<div class="mt-auto pt-lg border-t border-outline-variant/30">
+<ul class="flex flex-col gap-xs">
+<li>
+<a class="flex items-center gap-sm p-md text-secondary hover:text-primary hover:bg-secondary-container/30 transition-all rounded-lg text-label-lg font-label-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+                    Settings
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-sm p-md text-secondary hover:text-primary hover:bg-secondary-container/30 transition-all rounded-lg text-label-lg font-label-lg" href="#">
+<span class="material-symbols-outlined">logout</span>
+                    Log Out
+                </a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-[280px] p-margin-mobile md:p-margin-desktop w-full max-w-[1440px] mx-auto flex flex-col gap-lg">
+<!-- Top Action Bar: Global Search & Profile -->
+<div class="flex flex-col md:flex-row justify-between items-center gap-md bg-surface-container-lowest p-sm px-md rounded-xl border border-outline-variant/20 shadow-sm transition-colors duration-300">
+<div class="relative w-full md:w-96">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full py-2 pl-10 pr-4 text-body-md focus:ring-2 focus:ring-primary transition-all dark:bg-surface-dim" placeholder="Search patients, records, or symptoms..." type="text"/>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-sm pr-md border-r border-outline-variant/30">
+<button class="relative p-2 text-on-surface-variant hover:bg-secondary-container/20 rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-secondary-container/20 rounded-full">
+<span class="material-symbols-outlined">chat_bubble</span>
+</button>
+</div>
+<div class="flex items-center gap-sm cursor-pointer hover:bg-secondary-container/10 p-1 rounded-full pr-3 transition-colors">
+<img alt="Dr. Sharma" class="w-8 h-8 rounded-full border border-primary/20" src="https://lh3.googleusercontent.com/a/ACg8ocL8j7H8B-pD1_Y9gG6Z-Q1m-T-vL0Z-W_g=s96-c"/>
+<div class="hidden sm:block">
+<p class="text-label-md font-bold leading-tight">Dr. A. Sharma</p>
+<p class="text-[10px] text-secondary">Obstetrician</p>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Header Section -->
+<header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-md">
+<div>
+<div class="flex items-center gap-sm mb-xs text-secondary text-label-md font-label-md uppercase tracking-wider">
+<a class="hover:text-primary transition-colors" href="#">Patient Records</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-bold">Sarah Jenkins</span>
+</div>
+<h2 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg-mobile md:font-headline-lg text-on-background">Pregnancy Tracking</h2>
+</div>
+<div class="flex items-center flex-wrap gap-sm">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed px-sm py-xs rounded-full text-label-md font-label-md flex items-center gap-xs border border-tertiary-fixed-dim/30">
+<span class="material-symbols-outlined text-[16px]">warning</span>
+                High Risk: Gestational Diabetes
+            </span>
+<span class="bg-surface-container-high text-on-surface px-sm py-xs rounded-full text-label-md font-label-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+                Active Patient
+            </span>
+</div>
+</header>
+<!-- Upload Quick Actions -->
+<div class="flex flex-wrap gap-md">
+<button class="flex items-center gap-2 bg-surface-container-lowest border border-primary/30 text-primary px-md py-sm rounded-lg text-label-lg font-bold hover:bg-primary hover:text-on-primary transition-all shadow-sm">
+<span class="material-symbols-outlined">mfg_print</span>
+            Upload Ultrasound
+        </button>
+<button class="flex items-center gap-2 bg-surface-container-lowest border border-primary/30 text-primary px-md py-sm rounded-lg text-label-lg font-bold hover:bg-primary hover:text-on-primary transition-all shadow-sm">
+<span class="material-symbols-outlined">scan</span>
+            Upload Scan
+        </button>
+<button class="flex items-center gap-2 bg-surface-container-lowest border border-primary/30 text-primary px-md py-sm rounded-lg text-label-lg font-bold hover:bg-primary hover:text-on-primary transition-all shadow-sm">
+<span class="material-symbols-outlined">lab_profile</span>
+            Upload Lab Report
+        </button>
+</div>
+<!-- Top Bento Grid: Progress & Vitals -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<div class="lg:col-span-2 bg-surface-container-lowest rounded-[16px] border border-outline-variant/20 shadow-[0px_4px_20px_rgba(0,0,0,0.02)] p-lg flex flex-col justify-between overflow-hidden relative transition-colors duration-300">
+<div class="absolute -right-20 -top-20 w-64 h-64 bg-surface-container rounded-full blur-3xl opacity-50 z-0 pointer-events-none"></div>
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-xl">
+<div>
+<h3 class="text-title-lg font-title-lg text-on-surface mb-xs">Pregnancy Progress</h3>
+<p class="text-body-md font-body-md text-secondary">EDD: Oct 14, 2024 (Dr. A. Sharma)</p>
+</div>
+<div class="text-right">
+<span class="text-headline-lg font-headline-lg text-primary block">Week 24</span>
+<span class="text-label-md font-label-md text-secondary uppercase tracking-wider">Trimester 2</span>
+</div>
+</div>
+<div class="w-full relative mt-auto">
+<div class="flex justify-between text-label-md font-label-md text-secondary mb-xs px-2">
+<span>M1</span><span>M2</span><span>M3</span><span>M4</span><span>M5</span><span class="text-primary font-bold">M6</span><span>M7</span><span>M8</span><span>M9</span>
+</div>
+<div class="h-3 w-full bg-surface-container-high rounded-full overflow-hidden relative">
+<div class="absolute top-0 left-0 h-full bg-primary rounded-full transition-all duration-1000 ease-out w-[66%]"></div>
+</div>
+<div class="flex justify-between mt-xs text-[10px] text-outline px-2">
+<span>Conception</span><span>Trimester 1</span><span>Trimester 2</span><span>Trimester 3</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-[16px] border border-outline-variant/20 shadow-[0px_4px_20px_rgba(0,0,0,0.02)] p-lg flex flex-col gap-md transition-colors duration-300">
+<h3 class="text-title-lg font-title-lg text-on-surface">Latest Vitals</h3>
+<div class="grid grid-cols-2 gap-sm flex-grow">
+<div class="bg-surface-container-low p-sm rounded-lg flex flex-col justify-center dark:bg-surface-dim">
+<span class="text-label-md font-label-md text-secondary mb-xs flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">monitor_heart</span> BP</span>
+<span class="text-headline-md font-headline-md text-on-surface">120/80</span>
+</div>
+<div class="bg-surface-container-low p-sm rounded-lg flex flex-col justify-center dark:bg-surface-dim">
+<span class="text-label-md font-label-md text-secondary mb-xs flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">scale</span> Weight</span>
+<span class="text-headline-md font-headline-md text-on-surface">68kg</span>
+</div>
+<div class="bg-surface-container-low p-sm rounded-lg flex flex-col justify-center dark:bg-surface-dim">
+<span class="text-label-md font-label-md text-secondary mb-xs flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">favorite</span> FHR</span>
+<span class="text-headline-md font-headline-md text-on-surface">145</span>
+</div>
+<div class="bg-surface-container-low p-sm rounded-lg flex flex-col justify-center dark:bg-surface-dim">
+<span class="text-label-md font-label-md text-secondary mb-xs flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">bloodtype</span> Gluc.</span>
+<span class="text-headline-md font-headline-md text-tertiary-container font-bold">140</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Pregnancy Risk Timeline -->
+<div class="bg-surface-container-lowest rounded-[16px] border border-outline-variant/20 shadow-[0px_4px_20px_rgba(0,0,0,0.02)] p-lg flex flex-col transition-colors duration-300">
+<div class="flex justify-between items-center mb-md">
+<h3 class="text-title-lg font-title-lg text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary">timeline</span>
+                Pregnancy Risk Timeline
+            </h3>
+<span class="text-label-md font-label-md text-secondary">Risk Level: Moderate</span>
+</div>
+<div class="relative pt-8 pb-4">
+<!-- Background Line -->
+<div class="absolute top-1/2 left-0 w-full h-1 bg-surface-container-high rounded-full -translate-y-1/2"></div>
+<!-- Interactive Markers -->
+<div class="relative flex justify-between">
+<div class="flex flex-col items-center gap-2">
+<div class="w-4 h-4 bg-primary rounded-full ring-4 ring-primary/20 z-10"></div>
+<span class="text-[10px] text-outline font-bold">Week 4</span>
+<span class="text-[10px] text-primary">Normal</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-4 h-4 bg-primary rounded-full ring-4 ring-primary/20 z-10"></div>
+<span class="text-[10px] text-outline font-bold">Week 12</span>
+<span class="text-[10px] text-primary">Stable</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-6 h-6 bg-tertiary rounded-full ring-8 ring-tertiary/20 z-20 flex items-center justify-center -mt-1">
+<span class="material-symbols-outlined text-[14px] text-white">warning</span>
+</div>
+<span class="text-[10px] text-on-surface font-bold">Week 24</span>
+<span class="text-[10px] text-tertiary font-bold">GDM Detected</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-4 h-4 bg-surface-container-high border-2 border-outline-variant rounded-full z-10"></div>
+<span class="text-[10px] text-outline font-bold">Week 28</span>
+<span class="text-[10px] text-outline">Projected</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-4 h-4 bg-surface-container-high border-2 border-outline-variant rounded-full z-10"></div>
+<span class="text-[10px] text-outline font-bold">Week 36</span>
+<span class="text-[10px] text-outline">Term</span>
+</div>
+</div>
+</div>
+<div class="mt-4 p-md bg-tertiary-container/10 border border-tertiary/20 rounded-lg">
+<p class="text-label-md text-on-surface-variant"><strong class="text-tertiary">Current Focus:</strong> Glycemic control and bi-weekly fetal monitoring initiated starting Week 24. Next assessment in 4 days.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-gutter">
+<!-- ANC Timeline -->
+<div class="bg-surface-container-lowest rounded-[16px] border border-outline-variant/20 shadow-[0px_4px_20px_rgba(0,0,0,0.02)] p-lg flex flex-col transition-colors duration-300">
+<h3 class="text-title-lg font-title-lg text-on-surface mb-md">ANC Visit Timeline</h3>
+<div class="relative pl-6 border-l-2 border-surface-container-high flex flex-col gap-lg mt-sm flex-grow">
+<div class="relative">
+<span class="absolute -left-[31px] top-1 w-3 h-3 bg-primary rounded-full ring-4 ring-surface-container-lowest"></span>
+<p class="text-label-md font-label-md text-secondary mb-1">June 12 (Week 20)</p>
+<h4 class="text-body-md font-body-md font-medium text-on-surface">Anatomy Scan Routine</h4>
+</div>
+<div class="relative">
+<span class="absolute -left-[31px] top-1 w-3 h-3 bg-surface-container-lowest border-2 border-primary rounded-full ring-4 ring-surface-container-lowest flex items-center justify-center">
+<span class="w-1.5 h-1.5 bg-primary rounded-full"></span>
+</span>
+<p class="text-label-md font-label-md text-primary font-bold mb-1">Today (Week 24)</p>
+<h4 class="text-body-md font-body-md font-medium text-on-surface">GTT &amp; Routine Checkup</h4>
+</div>
+<div class="relative">
+<span class="absolute -left-[31px] top-1 w-3 h-3 bg-surface-container rounded-full ring-4 ring-surface-container-lowest"></span>
+<p class="text-label-md font-label-md text-secondary mb-1">Aug 5 (Week 28)</p>
+<h4 class="text-body-md font-body-md font-medium text-on-surface">Third Trimester Prep</h4>
+</div>
+</div>
+<button class="w-full mt-lg text-primary text-label-md font-label-md py-2 hover:bg-surface-container-low rounded-lg transition-colors border border-outline-variant/30">View Full Timeline</button>
+</div>
+<!-- Clinical Logs -->
+<div class="xl:col-span-2 bg-surface-container-lowest rounded-[16px] border border-outline-variant/20 shadow-[0px_4px_20px_rgba(0,0,0,0.02)] p-lg flex flex-col transition-colors duration-300">
+<div class="flex justify-between items-center mb-md border-b border-outline-variant/20 pb-sm">
+<h3 class="text-title-lg font-title-lg text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">folder_open</span>
+                    Clinical Logs
+                </h3>
+<div class="flex gap-2">
+<button class="text-label-md font-label-md bg-surface-container-low text-secondary px-3 py-1 rounded-full hover:bg-surface-container transition-colors dark:bg-surface-dim">USG</button>
+<button class="text-label-md font-label-md bg-surface-container-low text-secondary px-3 py-1 rounded-full hover:bg-surface-container transition-colors dark:bg-surface-dim">Labs</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="text-label-md font-label-md text-secondary border-b border-outline-variant/20">
+<th class="py-sm px-2 font-medium">Date / Week</th>
+<th class="py-sm px-2 font-medium">Report Type</th>
+<th class="py-sm px-2 font-medium">Key Finding</th>
+<th class="py-sm px-2 font-medium text-right">Action</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-outline-variant/10 hover:bg-surface-container-low/50 transition-colors">
+<td class="py-md px-2">
+<div class="text-body-md font-body-md text-on-surface">Jun 12, 2024</div>
+<div class="text-[12px] text-outline">Week 20</div>
+</td>
+<td class="py-md px-2">
+<span class="inline-flex items-center gap-1 bg-secondary-container/30 text-on-secondary-container px-2 py-0.5 rounded text-[12px] font-medium">
+<span class="material-symbols-outlined text-[14px]">ear_sound</span> Anatomy Scan
+                                </span>
+</td>
+<td class="py-md px-2 text-body-md font-body-md text-on-surface">Normal morphology. EFW: 320g.</td>
+<td class="py-md px-2 text-right">
+<button class="text-primary hover:bg-primary-container/20 p-1.5 rounded transition-colors"><span class="material-symbols-outlined text-[20px]">visibility</span></button>
+</td>
+</tr>
+<tr class="border-b border-outline-variant/10 hover:bg-surface-container-low/50 transition-colors">
+<td class="py-md px-2">
+<div class="text-body-md font-body-md text-on-surface">May 15, 2024</div>
+<div class="text-[12px] text-outline">Week 16</div>
+</td>
+<td class="py-md px-2">
+<span class="inline-flex items-center gap-1 bg-secondary-container/30 text-on-secondary-container px-2 py-0.5 rounded text-[12px] font-medium">
+<span class="material-symbols-outlined text-[14px]">science</span> Quad Marker
+                                </span>
+</td>
+<td class="py-md px-2 text-body-md font-body-md text-on-surface">Low risk for aneuploidy.</td>
+<td class="py-md px-2 text-right">
+<button class="text-primary hover:bg-primary-container/20 p-1.5 rounded transition-colors"><span class="material-symbols-outlined text-[20px]">visibility</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Previous Pregnancy Summary -->
+<section class="bg-surface-container-lowest rounded-[16px] border border-outline-variant/20 shadow-[0px_4px_20px_rgba(0,0,0,0.02)] p-lg flex flex-col transition-colors duration-300">
+<h3 class="text-title-lg font-title-lg text-on-surface flex items-center gap-2 mb-md">
+<span class="material-symbols-outlined text-primary">history_edu</span>
+            Previous Pregnancy Summary
+        </h3>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-md">
+<div class="p-md bg-surface-container-low rounded-xl dark:bg-surface-dim">
+<p class="text-label-md text-secondary">Gravida/Para</p>
+<p class="text-headline-md font-bold text-on-surface">G2 P1</p>
+</div>
+<div class="p-md bg-surface-container-low rounded-xl dark:bg-surface-dim">
+<p class="text-label-md text-secondary">Last Birth</p>
+<p class="text-headline-md font-bold text-on-surface">2021</p>
+<p class="text-[10px] text-outline">Full term, Vaginal delivery</p>
+</div>
+<div class="p-md bg-surface-container-low rounded-xl dark:bg-surface-dim">
+<p class="text-label-md text-secondary">Past Complications</p>
+<p class="text-headline-md font-bold text-tertiary">None</p>
+<p class="text-[10px] text-outline">No history of GDM in P1</p>
+</div>
+<div class="p-md bg-surface-container-low rounded-xl dark:bg-surface-dim">
+<p class="text-label-md text-secondary">Neonatal Outcome</p>
+<p class="text-headline-md font-bold text-on-surface">3.2 kg</p>
+<p class="text-[10px] text-outline">Healthy male infant</p>
+</div>
+</div>
+</section>
+<!-- Wellness & Safety Section -->
+<h3 class="text-headline-md font-headline-md text-on-background mt-md">Wellness &amp; Safety Plan</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Diet -->
+<div class="bg-surface-container-lowest rounded-[16px] border border-outline-variant/20 shadow-[0px_4px_20px_rgba(0,0,0,0.02)] p-md flex flex-col gap-sm hover:-translate-y-1 transition-all duration-300 transition-colors">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container mb-xs">
+<span class="material-symbols-outlined">restaurant</span>
+</div>
+<h4 class="text-title-lg font-title-lg text-on-surface">Dietary Guidance</h4>
+<p class="text-label-md font-label-md text-error bg-error-container/30 px-2 py-1 rounded inline-block w-max mb-2 border border-error-container">GDM Protocol Active</p>
+<ul class="text-body-md font-body-md text-secondary space-y-2 flex-grow">
+<li class="flex items-start gap-2"><span class="material-symbols-outlined text-[18px] text-primary mt-0.5">check</span> Focus on complex carbs.</li>
+<li class="flex items-start gap-2"><span class="material-symbols-outlined text-[18px] text-primary mt-0.5">check</span> Lean protein at every meal.</li>
+</ul>
+</div>
+<!-- Precautions -->
+<div class="bg-surface-container-lowest rounded-[16px] border border-outline-variant/20 shadow-[0px_4px_20px_rgba(0,0,0,0.02)] p-md flex flex-col gap-sm hover:-translate-y-1 transition-all duration-300 transition-colors">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container mb-xs">
+<span class="material-symbols-outlined">health_and_safety</span>
+</div>
+<h4 class="text-title-lg font-title-lg text-on-surface">Daily Precautions</h4>
+<ul class="text-body-md font-body-md text-secondary space-y-3 mt-2 flex-grow">
+<li class="flex items-start gap-3">
+<div class="bg-surface-container p-1.5 rounded-md dark:bg-surface-dim"><span class="material-symbols-outlined text-[16px] text-primary">directions_walk</span></div>
+<span>30 mins moderate walking daily.</span>
+</li>
+<li class="flex items-start gap-3">
+<div class="bg-surface-container p-1.5 rounded-md dark:bg-surface-dim"><span class="material-symbols-outlined text-[16px] text-tertiary">airline_seat_flat</span></div>
+<span>Sleep strictly on left side.</span>
+</li>
+</ul>
+</div>
+<!-- Vaccinations -->
+<div class="bg-surface-container-lowest rounded-[16px] border border-outline-variant/20 shadow-[0px_4px_20px_rgba(0,0,0,0.02)] p-md flex flex-col gap-sm hover:-translate-y-1 transition-all duration-300 transition-colors">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container mb-xs">
+<span class="material-symbols-outlined">vaccines</span>
+</div>
+<h4 class="text-title-lg font-title-lg text-on-surface">Vaccination Tracker</h4>
+<div class="flex flex-col gap-3 mt-2 flex-grow">
+<div class="flex justify-between items-center bg-surface-container-low p-2 rounded-lg dark:bg-surface-dim">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary fill">check_circle</span>
+<div><p class="text-label-md font-label-md text-on-surface">Flu Shot</p></div>
+</div>
+</div>
+<div class="flex justify-between items-center bg-surface-container-highest p-2 rounded-lg border border-primary-container/30 dark:bg-surface-dim">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline">radio_button_unchecked</span>
+<div><p class="text-label-md font-label-md text-on-surface">Tdap Booster</p></div>
+</div>
+<button class="text-[10px] bg-primary text-on-primary px-2 py-1 rounded">Schedule</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

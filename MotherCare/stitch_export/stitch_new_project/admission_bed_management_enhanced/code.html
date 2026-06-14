@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+
+<html class="" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bed Management - MotherCare</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#213145",
+                    "on-secondary-container": "#56656e",
+                    "error": "#ba1a1a",
+                    "primary-fixed-dim": "#70d8c8",
+                    "on-secondary": "#ffffff",
+                    "secondary": "#526069",
+                    "on-tertiary-container": "#fffbff",
+                    "on-primary": "#ffffff",
+                    "on-primary-fixed": "#00201c",
+                    "inverse-primary": "#70d8c8",
+                    "on-background": "#0b1c30",
+                    "outline": "#6d7a77",
+                    "on-tertiary-fixed": "#330f1f",
+                    "surface-dim": "#cbdbf5",
+                    "secondary-fixed": "#d6e5ef",
+                    "surface-container": "#e5eeff",
+                    "on-secondary-fixed-variant": "#3b4951",
+                    "tertiary-fixed": "#ffd9e4",
+                    "surface-container-high": "#dce9ff",
+                    "secondary-fixed-dim": "#bac9d3",
+                    "surface-tint": "#006b5f",
+                    "outline-variant": "#bcc9c5",
+                    "error-container": "#ffdad6",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-container": "#996679",
+                    "on-error": "#ffffff",
+                    "on-surface": "#0b1c30",
+                    "on-tertiary-fixed-variant": "#65394b",
+                    "inverse-on-surface": "#eaf1ff",
+                    "primary": "#00685d",
+                    "background": "#f8f9ff",
+                    "surface-bright": "#f8f9ff",
+                    "on-surface-variant": "#3d4946",
+                    "on-primary-fixed-variant": "#005048",
+                    "on-primary-container": "#f4fffb",
+                    "surface": "#f8f9ff",
+                    "on-error-container": "#93000a",
+                    "surface-container-low": "#eff4ff",
+                    "on-secondary-fixed": "#0f1d25",
+                    "tertiary-fixed-dim": "#f2b6cb",
+                    "surface-container-highest": "#d3e4fe",
+                    "secondary-container": "#d3e2ed",
+                    "tertiary": "#7d4e60",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-container": "#008376",
+                    "surface-variant": "#d3e4fe",
+                    "primary-fixed": "#8df5e4"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "12px",
+                    "margin-desktop": "40px",
+                    "lg": "24px",
+                    "md": "16px",
+                    "margin-mobile": "16px",
+                    "gutter": "24px",
+                    "xl": "32px",
+                    "base": "8px",
+                    "xs": "4px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "title-lg": ["Inter"],
+                    "label-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "label-md": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+            }
+          }
+        }
+      }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300">
+<!-- TopNavBar (Always visible for Global Search & Theme) -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-surface dark:bg-inverse-surface h-16 shadow-sm border-b border-outline-variant flex justify-between items-center px-margin-mobile md:px-margin-desktop">
+<div class="flex items-center gap-md">
+<span class="md:hidden material-symbols-outlined text-primary cursor-pointer">menu</span>
+<span class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim font-bold tracking-tight">MotherCare</span>
+</div>
+<!-- Global Search -->
+<div class="hidden md:flex items-center bg-surface-container-low dark:bg-surface-dim rounded-full px-md py-xs border border-outline-variant w-1/3 group focus-within:border-primary transition-all">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md w-full placeholder:text-on-surface-variant/60" placeholder="Global search for patients, staff, or beds..." type="text"/>
+<span class="text-label-md text-on-surface-variant/40 px-xs border border-outline-variant rounded-md">/</span>
+</div>
+<div class="flex items-center gap-md text-primary dark:text-primary-fixed-dim">
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors" onclick="document.documentElement.classList.toggle('dark')" title="Toggle Dark Mode">
+<span class="material-symbols-outlined dark:hidden">dark_mode</span>
+<span class="material-symbols-outlined hidden dark:inline">light_mode</span>
+</button>
+<div class="relative cursor-pointer group">
+<span class="material-symbols-outlined p-2 hover:bg-primary/10 rounded-full transition-colors">notifications</span>
+<span class="absolute top-1 right-1 w-2.5 h-2.5 bg-error rounded-full border-2 border-surface"></span>
+</div>
+<img alt="User profile avatar" class="w-9 h-9 rounded-full border-2 border-primary/20 cursor-pointer object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLtP2NM7CALzM9oFxJpxoM6UyiCQu6fvaItURSR8Ru9SiriNVztXv_--1NP4IPuL4a2NHEAAxOUH6eQE_KHg7QDbzOdx6WYmGbHYwaS78Go73QWy-Ipb64cX0ymsv1IyMc1Q-4P4drwW4QZX9VO7OzDBWlsSTPN6gvRtPGUkvJFQBlBbXVOAhwjg5F3hZUpry7XySYb_FlVA5A1vQ54DHIBOX9X2jAsZHd9gtfkyqnYFnr_Hqz8yh_o9PH3v"/>
+</div>
+</nav>
+<!-- SideNavBar (Desktop Only) -->
+<aside class="hidden md:flex bg-surface-container-low dark:bg-inverse-surface h-screen w-[280px] fixed left-0 top-16 flex-col py-lg border-r border-outline-variant z-40">
+<!-- Header (Now sub-header in sidebar) -->
+<div class="px-lg pb-lg border-b border-outline-variant/50 flex flex-col items-start gap-sm">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-lg bg-primary text-on-primary flex items-center justify-center font-bold text-title-lg shadow-sm">
+                    SH
+                </div>
+<div>
+<h1 class="font-title-lg text-title-lg text-on-surface dark:text-surface-bright leading-tight">Shakuntala Hospital</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">Maternity Care Unit</p>
+</div>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<nav class="flex-1 overflow-y-auto py-md flex flex-col gap-xs px-sm">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-secondary-container hover:bg-secondary-container/50 hover:text-primary transition-all duration-200 ease-in-out font-label-lg text-label-lg dark:text-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-primary font-bold border-r-4 border-primary bg-primary-container/10 transition-all duration-200 ease-in-out font-label-lg text-label-lg" href="#">
+<span class="material-symbols-outlined" data-icon="bed" style="font-variation-settings: 'FILL' 1;">bed</span>
+                Bed Management
+            </a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-secondary-container hover:bg-secondary-container/50 hover:text-primary transition-all duration-200 ease-in-out font-label-lg text-label-lg dark:text-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="person_add">person_add</span>
+                Admissions
+            </a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-secondary-container hover:bg-secondary-container/50 hover:text-primary transition-all duration-200 ease-in-out font-label-lg text-label-lg dark:text-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="clinical_notes">clinical_notes</span>
+                Patient Records
+            </a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-secondary-container hover:bg-secondary-container/50 hover:text-primary transition-all duration-200 ease-in-out font-label-lg text-label-lg dark:text-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+                Staff Rota
+            </a>
+</nav>
+<!-- Footer Actions -->
+<div class="px-lg pt-md border-t border-outline-variant/50 flex flex-col gap-sm">
+<button class="w-full bg-error text-on-error hover:bg-error/90 rounded-lg py-sm font-label-lg text-label-lg flex items-center justify-center gap-sm transition-colors shadow-sm active:scale-95">
+<span class="material-symbols-outlined text-[20px]">local_hospital</span>
+                Emergency Admission
+            </button>
+<div class="flex flex-col gap-xs mt-sm">
+<a class="flex items-center gap-md px-sm py-xs rounded-lg text-on-secondary-container hover:bg-secondary-container/50 hover:text-primary transition-all duration-200 ease-in-out font-label-lg text-label-lg dark:text-surface-variant" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="contact_support">contact_support</span>
+                    Support
+                </a>
+<a class="flex items-center gap-md px-sm py-xs rounded-lg text-on-secondary-container hover:bg-secondary-container/50 hover:text-primary transition-all duration-200 ease-in-out font-label-lg text-label-lg dark:text-surface-variant" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="logout">logout</span>
+                    Logout
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-[280px] pt-24 min-h-screen px-margin-mobile md:px-margin-desktop pb-xl flex flex-col gap-lg dark:bg-background">
+<!-- Page Header -->
+<header class="flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-background dark:text-surface-bright tracking-tight">Bed &amp; Admission Management</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant dark:text-surface-variant/80 mt-xs">Real-time facility occupancy and allocation.</p>
+</div>
+<div class="flex items-center gap-sm">
+<div class="bg-surface dark:bg-inverse-surface rounded-lg px-md py-sm border border-outline-variant shadow-sm flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim text-[20px]">calendar_today</span>
+<span class="font-label-lg text-label-lg text-on-surface dark:text-surface-bright">Oct 24, 2023</span>
+</div>
+</div>
+</header>
+<!-- Bed Stats & Availability -->
+<section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-md">
+<!-- Occupancy Summary (New Stat) -->
+<div class="bg-primary text-on-primary rounded-xl p-md border border-primary-container shadow-md flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<span class="font-label-lg">Global Occupancy</span>
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<div class="mt-xs">
+<span class="font-display-lg text-on-primary">74%</span>
+<p class="font-label-md opacity-80">53 / 78 Beds</p>
+</div>
+</div>
+<!-- Emergency Ready (New Stat) -->
+<div class="bg-error text-on-error rounded-xl p-md border border-error-container shadow-md flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<span class="font-label-lg">Emergency Avail</span>
+<span class="material-symbols-outlined">e911_emergency</span>
+</div>
+<div class="mt-xs">
+<span class="font-display-lg">03</span>
+<p class="font-label-md opacity-80">Reserved for trauma</p>
+</div>
+</div>
+<!-- Bed Cleaning Status (New Stat) -->
+<div class="bg-surface dark:bg-inverse-surface rounded-xl p-md border border-outline-variant shadow-sm flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<span class="font-label-lg text-on-surface dark:text-surface-bright">Cleaning</span>
+<span class="material-symbols-outlined text-secondary">cleaning_services</span>
+</div>
+<div class="mt-xs">
+<span class="font-display-lg text-primary dark:text-primary-fixed-dim">05</span>
+<p class="font-label-md text-on-surface-variant">Maintenance in progress</p>
+</div>
+</div>
+<!-- Labor Stats -->
+<div class="bg-surface dark:bg-inverse-surface rounded-xl p-md border border-outline-variant shadow-sm flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<span class="font-label-lg text-on-surface dark:text-surface-bright">Labor</span>
+<span class="material-symbols-outlined text-tertiary">pregnant_woman</span>
+</div>
+<div class="mt-xs">
+<span class="font-display-lg text-tertiary">01</span>
+<p class="font-label-md text-on-surface-variant">/ 8 Available (87%)</p>
+</div>
+</div>
+<!-- NICU Stats -->
+<div class="bg-surface dark:bg-inverse-surface rounded-xl p-md border border-outline-variant shadow-sm flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<span class="font-label-lg text-on-surface dark:text-surface-bright">NICU</span>
+<span class="material-symbols-outlined text-secondary">crib</span>
+</div>
+<div class="mt-xs">
+<span class="font-display-lg text-primary dark:text-primary-fixed-dim">04</span>
+<p class="font-label-md text-on-surface-variant">/ 10 Available (60%)</p>
+</div>
+</div>
+<!-- Private Stats -->
+<div class="bg-surface dark:bg-inverse-surface rounded-xl p-md border border-outline-variant shadow-sm flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<span class="font-label-lg text-on-surface dark:text-surface-bright">Private</span>
+<span class="material-symbols-outlined text-secondary">single_bed</span>
+</div>
+<div class="mt-xs">
+<span class="font-display-lg text-primary dark:text-primary-fixed-dim">05</span>
+<p class="font-label-md text-on-surface-variant">/ 15 Available (66%)</p>
+</div>
+</div>
+</section>
+<!-- Filters & Tools -->
+<section class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md mt-sm border-b border-outline-variant/30 pb-md">
+<div class="flex flex-wrap gap-sm">
+<button class="px-md py-sm bg-primary text-on-primary rounded-lg font-label-lg text-label-lg shadow-sm transition-transform active:scale-95">All Beds</button>
+<button class="px-md py-sm bg-surface dark:bg-inverse-surface text-on-surface dark:text-surface-bright border border-outline-variant hover:bg-surface-container rounded-lg font-label-lg text-label-lg transition-colors">General</button>
+<button class="px-md py-sm bg-surface dark:bg-inverse-surface text-on-surface dark:text-surface-bright border border-outline-variant hover:bg-surface-container rounded-lg font-label-lg text-label-lg transition-colors">Private</button>
+<button class="px-md py-sm bg-surface dark:bg-inverse-surface text-on-surface dark:text-surface-bright border border-outline-variant hover:bg-surface-container rounded-lg font-label-lg text-label-lg transition-colors">Labor</button>
+<button class="px-md py-sm bg-surface dark:bg-inverse-surface text-on-surface dark:text-surface-bright border border-outline-variant hover:bg-surface-container rounded-lg font-label-lg text-label-lg transition-colors">NICU/ICU</button>
+</div>
+<div class="flex items-center gap-sm w-full md:w-auto">
+<div class="relative w-full md:w-64">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">filter_list</span>
+<input class="w-full pl-xl pr-sm py-sm bg-surface dark:bg-inverse-surface border border-outline-variant rounded-lg font-body-md text-body-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow dark:text-surface-bright" placeholder="Search bed ID..." type="text"/>
+</div>
+<button class="p-sm bg-surface dark:bg-inverse-surface border border-outline-variant rounded-lg text-on-surface dark:text-surface-bright hover:bg-surface-container transition-colors" title="Filter options">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+</button>
+</div>
+</section>
+<!-- Bed Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-md">
+<!-- Occupied Bed with Emergency Badge -->
+<article class="bg-surface dark:bg-inverse-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden flex flex-col relative group transition-all hover:shadow-md">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary"></div>
+<div class="p-md flex flex-col gap-sm flex-1 pl-lg">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface-variant">General Ward</span>
+<span class="font-headline-md text-headline-md text-on-surface dark:text-surface-bright font-bold">GW-101</span>
+</div>
+<div class="flex flex-col items-end gap-xs">
+<span class="px-xs py-[2px] bg-secondary-container text-on-secondary-container rounded font-label-md text-label-md">Occupied</span>
+<span class="flex items-center gap-1 text-[10px] uppercase font-bold text-error bg-error-container/20 px-1.5 rounded-full border border-error/20">
+<span class="material-symbols-outlined text-[12px]">emergency</span> Emergency Admission
+    </span>
+</div>
+</div>
+<div class="mt-sm bg-surface-container-low dark:bg-surface-container/5 rounded-lg p-sm border border-outline-variant/30">
+<div class="flex items-center gap-sm mb-xs">
+<div class="w-8 h-8 rounded-full bg-primary/10 text-primary dark:text-primary-fixed-dim flex items-center justify-center font-bold text-label-md border border-primary/20">
+                                SP
+                            </div>
+<div>
+<h4 class="font-title-lg text-title-lg text-on-surface dark:text-surface-bright text-[16px]">Sarah Palmer</h4>
+<p class="font-label-md text-label-md text-on-surface-variant">Status: <span class="text-primary font-medium">Active</span></p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-xs mt-sm font-label-md text-label-md">
+<div class="flex flex-col">
+<span class="text-on-surface-variant">Admitted</span>
+<span class="text-on-surface dark:text-surface-bright font-medium">Oct 22, 14:30</span>
+</div>
+<div class="flex flex-col">
+<span class="text-on-surface-variant">Est. Discharge</span>
+<span class="text-on-surface dark:text-surface-bright font-medium">Oct 25, 10:00</span>
+</div>
+</div>
+</div>
+</div>
+<div class="px-md py-sm border-t border-outline-variant/30 bg-surface-bright dark:bg-surface-container-low/20 flex flex-wrap gap-md pl-lg">
+<button class="font-label-lg text-primary dark:text-primary-fixed-dim hover:underline transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">move_item</span> Transfer
+    </button>
+<button class="font-label-lg text-secondary dark:text-surface-variant hover:underline transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">logout</span> Discharge
+    </button>
+<button class="font-label-lg text-on-surface-variant ml-auto hover:text-primary transition-all">View Chart</button>
+</div>
+</article>
+<!-- Available Bed -->
+<article class="bg-surface dark:bg-inverse-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden flex flex-col relative transition-all hover:shadow-md hover:border-primary/50">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="p-md flex flex-col gap-sm flex-1 pl-lg">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface-variant">Private Room</span>
+<span class="font-headline-md text-headline-md text-on-surface dark:text-surface-bright font-bold">PR-204</span>
+</div>
+<span class="px-xs py-[2px] bg-primary-container text-on-primary-container rounded font-label-md text-label-md flex items-center gap-[4px]">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                            Available
+                        </span>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center py-xl opacity-60">
+<span class="material-symbols-outlined text-[48px] text-primary dark:text-primary-fixed-dim mb-sm">single_bed</span>
+<p class="font-body-md text-body-md text-on-surface-variant text-center">Ready for admission.</p>
+</div>
+</div>
+<div class="p-sm bg-surface-bright dark:bg-surface-container-low/20 pl-lg">
+<button class="w-full py-sm bg-primary/10 text-primary dark:text-primary-fixed-dim hover:bg-primary hover:text-on-primary rounded-lg font-label-lg text-label-lg transition-colors flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined text-[20px]">person_add</span>
+                        Assign Patient
+                    </button>
+</div>
+</article>
+<!-- Occupied - Discharge Pending -->
+<article class="bg-surface dark:bg-inverse-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden flex flex-col relative transition-all">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary-fixed"></div>
+<div class="p-md flex flex-col gap-sm flex-1 pl-lg">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface-variant">General Ward</span>
+<span class="font-headline-md text-headline-md text-on-surface dark:text-surface-bright font-bold">GW-108</span>
+</div>
+<span class="px-xs py-[2px] bg-secondary-fixed text-on-secondary-fixed-variant rounded font-label-md text-label-md">Occupied</span>
+</div>
+<div class="mt-sm bg-surface-container-low dark:bg-surface-container/5 rounded-lg p-sm border border-outline-variant/30">
+<div class="flex items-center gap-sm mb-xs">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-bold text-label-md">
+                                JL
+                            </div>
+<div>
+<h4 class="font-title-lg text-title-lg text-on-surface dark:text-surface-bright text-[16px]">Jane Lewis</h4>
+<p class="font-label-md text-label-md text-on-surface-variant">Status: <span class="text-tertiary font-bold">Discharge Pending</span></p>
+</div>
+</div>
+<p class="text-label-md text-on-surface-variant mt-xs italic">Awaiting pharmacy clearance.</p>
+</div>
+</div>
+<div class="px-md py-sm border-t border-outline-variant/30 bg-surface-bright dark:bg-surface-container-low/20 flex justify-end gap-sm pl-lg">
+<button class="font-label-lg text-label-lg text-primary hover:underline">Complete Discharge</button>
+</div>
+</article>
+<!-- Cleaning Status Bed -->
+<article class="bg-surface-container dark:bg-surface-container-low rounded-xl border border-outline-variant border-dashed overflow-hidden flex flex-col relative opacity-90 transition-all">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-outline"></div>
+<div class="p-md flex flex-col gap-sm flex-1 pl-lg">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface-variant">General Ward</span>
+<span class="font-headline-md text-headline-md text-on-surface-variant font-bold">GW-105</span>
+</div>
+<span class="px-xs py-[2px] bg-surface-variant text-on-surface-variant rounded font-label-md text-label-md flex items-center gap-[4px]">
+<span class="material-symbols-outlined text-[14px]">cleaning_services</span>
+                            Cleaning
+                        </span>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center py-xl">
+<div class="w-full bg-surface-container-highest rounded-full h-2 mt-xs mb-sm overflow-hidden">
+<div class="bg-outline h-2 rounded-full transition-all duration-1000" style="width: 45%"></div>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant text-center">Deep clean in progress. <br/> Est. 20 mins left.</p>
+</div>
+</div>
+</article>
+<!-- Reserved Bed (New Status) -->
+<article class="bg-surface dark:bg-inverse-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden flex flex-col relative group transition-all">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-tertiary"></div>
+<div class="p-md flex flex-col gap-sm flex-1 pl-lg">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface-variant">NICU</span>
+<span class="font-headline-md text-headline-md text-on-surface dark:text-surface-bright font-bold">NC-06</span>
+</div>
+<span class="px-xs py-[2px] bg-tertiary-container text-on-tertiary-container rounded font-label-md text-label-md flex items-center gap-[4px]">
+<span class="material-symbols-outlined text-[14px]">event_seat</span>
+                            Reserved
+                        </span>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center py-xl opacity-60">
+<span class="material-symbols-outlined text-[48px] text-tertiary mb-sm">crib</span>
+<p class="font-body-md text-body-md text-on-surface-variant text-center">Reserved for incoming <br/> transfer from OT.</p>
+</div>
+</div>
+<div class="p-sm bg-surface-bright dark:bg-surface-container-low/20 pl-lg">
+<button class="w-full py-sm border border-tertiary text-tertiary hover:bg-tertiary hover:text-on-tertiary rounded-lg font-label-lg text-label-lg transition-colors flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined text-[20px]">assignment_turned_in</span>
+                        View Booking
+                    </button>
+</div>
+</article>
+<!-- Active Labor - High Visibility -->
+<article class="bg-surface dark:bg-inverse-surface rounded-xl border border-tertiary-container shadow-md overflow-hidden flex flex-col relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-tertiary"></div>
+<div class="p-md flex flex-col gap-sm flex-1 pl-lg">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-tertiary font-bold">Labor Room</span>
+<span class="font-headline-md text-headline-md text-on-surface dark:text-surface-bright font-bold">LR-02</span>
+</div>
+<span class="px-xs py-[2px] bg-error-container text-on-error-container rounded font-label-md text-label-md flex items-center gap-[4px] animate-pulse">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+                            Active Labor
+                        </span>
+</div>
+<div class="mt-sm bg-tertiary-fixed/30 rounded-lg p-sm border border-tertiary-fixed-dim/50">
+<div class="flex items-center gap-sm mb-xs">
+<div class="w-8 h-8 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center font-bold text-label-md">
+                                MR
+                            </div>
+<div>
+<h4 class="font-title-lg text-title-lg text-on-surface dark:text-surface-bright text-[16px]">Maria Rodriguez</h4>
+<p class="font-label-md text-label-md text-on-surface-variant">Status: <span class="text-tertiary font-bold">Transferred</span> (from OT)</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-xs mt-sm font-label-md text-label-md">
+<div class="flex flex-col">
+<span class="text-on-surface-variant">Update</span>
+<span class="text-on-surface dark:text-surface-bright font-medium">8cm (09:00)</span>
+</div>
+<div class="flex flex-col">
+<span class="text-on-surface-variant">Staff</span>
+<span class="text-on-surface dark:text-surface-bright font-medium">Dr. Emily Chen</span>
+</div>
+</div>
+</div>
+</div>
+<div class="px-md py-sm border-t border-outline-variant/30 bg-surface-bright dark:bg-surface-container-low/20 flex justify-end gap-sm pl-lg">
+<button class="font-label-lg text-tertiary hover:underline transition-all">Update Vitals</button>
+<button class="font-label-lg text-primary dark:text-primary-fixed-dim hover:underline transition-all">View Chart</button>
+</div>
+</article>
+</section>
+</main>
+</body></html>
