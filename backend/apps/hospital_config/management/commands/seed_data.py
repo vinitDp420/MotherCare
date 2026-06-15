@@ -193,6 +193,12 @@ class Command(BaseCommand):
                 "password": "viraj@#123",
                 "role": "Lab Tech",
             },
+            {
+                "username": "chinmay",
+                "email": "chinmay@gmail.com",
+                "password": "chinmay@#123",
+                "role": "Pharmacist",
+            },
         ]
 
         for user_data in default_users:

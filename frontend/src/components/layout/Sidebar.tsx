@@ -26,10 +26,18 @@ const NAV_ITEMS: NavItem[] = [
 ]
 
 const LAB_NAV_ITEMS: NavItem[] = [
-  { path: '/laboratory?tab=dashboard', label: 'Dashboard', icon: 'dashboard', tab: 'dashboard' },
-  { path: '/laboratory?tab=pending', label: 'Pending Tests', icon: 'pending_actions', tab: 'pending' },
-  { path: '/laboratory?tab=completed', label: 'Completed Tests', icon: 'biotech', tab: 'completed' },
-  { path: '/laboratory?tab=history', label: 'Patient History', icon: 'history', tab: 'history' },
+  { path: '/laboratory?tab=dashboard',  label: 'Dashboard',      icon: 'dashboard',       tab: 'dashboard'  },
+  { path: '/laboratory?tab=pending',    label: 'Pending Tests',  icon: 'pending_actions', tab: 'pending'    },
+  { path: '/laboratory?tab=completed',  label: 'Completed Tests',icon: 'biotech',         tab: 'completed'  },
+  { path: '/laboratory?tab=history',    label: 'Patient History',icon: 'history',         tab: 'history'    },
+]
+
+const PHARMACY_NAV_ITEMS: NavItem[] = [
+  { path: '/pharmacy?tab=overview',      label: 'Overview',       icon: 'dashboard',       tab: 'overview'      },
+  { path: '/pharmacy?tab=inventory',     label: 'Inventory',      icon: 'inventory_2',     tab: 'inventory'     },
+  { path: '/pharmacy?tab=prescriptions', label: 'Prescriptions',  icon: 'prescriptions',   tab: 'prescriptions' },
+  { path: '/pharmacy?tab=billing',       label: 'Billing',        icon: 'payments',        tab: 'billing'       },
+  { path: '/pharmacy?tab=reports',       label: 'Reports',        icon: 'analytics',       tab: 'reports'       },
 ]
 
 export default function Sidebar() {
@@ -39,8 +47,9 @@ export default function Sidebar() {
   const navigate = useNavigate()
   
   const isLabTech = user?.roles.includes('Lab Tech')
+  const isPharmacist = user?.roles.includes('Pharmacist')
   const queryParams = new URLSearchParams(location.search)
-  const activeTab = queryParams.get('tab') || 'pending' // pending is active in the mockup
+  const activeTab = queryParams.get('tab') || 'pending'
 
   const handleLogout = async () => {
     try {
@@ -130,6 +139,70 @@ export default function Sidebar() {
     )
   }
 
+  if (isPharmacist) {
+    return (
+      <nav className="sidebar-root">
+        {/* ── Brand Header (Pharmacy) ──────────────────────── */}
+        <div className="sidebar-brand">
+          <div className="sidebar-logo-icon" style={{ backgroundColor: '#5b4fcf' }}>
+            <span className="material-symbols-outlined"
+              style={{ fontVariationSettings: "'FILL' 1", fontSize: '20px', color: '#ffffff' }}>medication</span>
+          </div>
+          <div>
+            <span className="sidebar-brand-name">Pharmacy</span>
+            <span className="sidebar-brand-sub">Maternity Care Unit</span>
+          </div>
+        </div>
+        {/* ── New Prescription Button ─────────────────────── */}
+        <div className="px-3 pt-3 pb-2">
+          <button onClick={() => navigate('/pharmacy?tab=prescriptions')}
+            className="w-full text-white py-2 px-3 rounded-lg flex items-center justify-center gap-2 font-semibold hover:opacity-90 transition-all duration-150 shadow-sm text-xs cursor-pointer"
+            style={{ background: '#5b4fcf' }}>
+            <span className="material-symbols-outlined text-[16px]">add</span>
+            New Prescription
+          </button>
+        </div>
+        {/* ── Navigation (Pharmacist) ─────────────────────── */}
+        <div className="sidebar-nav-scroll">
+          <ul className="sidebar-nav-list">
+            {PHARMACY_NAV_ITEMS.map((item) => {
+              const isItemActive = activeTab === item.tab ||
+                (item.tab === 'overview' && !activeTab && location.pathname === '/pharmacy')
+              return (
+                <li key={item.path}>
+                  <NavLink to={item.path}
+                    className={`sidebar-nav-item${isItemActive ? ' sidebar-nav-item-active' : ''}`}>
+                    <span className="material-symbols-outlined sidebar-nav-icon">{item.icon}</span>
+                    <span className="sidebar-nav-label">{item.label}</span>
+                  </NavLink>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+        {/* ── Footer (Pharmacist) ────────────────────────── */}
+        <div className="sidebar-footer flex flex-col gap-1">
+          <NavLink to="/settings"
+            className={({ isActive }) => `sidebar-nav-item${isActive ? ' sidebar-nav-item-active' : ''}`}>
+            <span className="material-symbols-outlined sidebar-nav-icon">settings</span>
+            <span className="sidebar-nav-label">Settings</span>
+          </NavLink>
+          <NavLink to="/pharmacy?tab=support"
+            className={`sidebar-nav-item${activeTab === 'support' ? ' sidebar-nav-item-active' : ''}`}>
+            <span className="material-symbols-outlined sidebar-nav-icon">help</span>
+            <span className="sidebar-nav-label">Support</span>
+          </NavLink>
+          <button onClick={handleLogout}
+            className="sidebar-nav-item w-full text-left bg-transparent border-none"
+            style={{ display: 'flex', alignItems: 'center' }}>
+            <span className="material-symbols-outlined sidebar-nav-icon">logout</span>
+            <span className="sidebar-nav-label">Logout</span>
+          </button>
+        </div>
+      </nav>
+    )
+  }
+
   return (
     <nav className="sidebar-root">
       {/* ── Brand Header ─────────────────────────────────────── */}
@@ -137,8 +210,7 @@ export default function Sidebar() {
         <div className="sidebar-logo-icon">
           <span
             className="material-symbols-outlined"
-            style={{ fontVariationSettings: "'FILL' 1", fontSize: '20px', color: '#ffffff' }}
-          >
+            style={{ fontVariationSettings: "'FILL' 1", fontSize: '20px', color: '#ffffff' }}>
             favorite
           </span>
         </div>
