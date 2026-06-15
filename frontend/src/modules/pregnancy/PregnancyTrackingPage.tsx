@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { 
-  usePregnancyDetail, 
+  usePregnancyList,
   usePregnancyAncVisits, 
   useRecordAncVisit, 
   usePregnancyRiskEvents, 
@@ -45,32 +45,46 @@ const wellnessSchema = z.object({
 })
 
 export default function PregnancyTrackingPage() {
-  const { id } = useParams<{ id: string }>()
+  const { id: patientId } = useParams<{ id: string }>()
   const navigate = useNavigate()
 
   const [showAncModal, setShowAncModal] = useState(false)
   const [showRiskModal, setShowRiskModal] = useState(false)
   const [showWellnessModal, setShowWellnessModal] = useState(false)
 
-  // Queries
-  const { data: pregnancy, isLoading: isPregLoading } = usePregnancyDetail(id)
-  const { data: ancData } = usePregnancyAncVisits(id)
-  const { data: riskEvents } = usePregnancyRiskEvents(id)
-  const { data: vaccinations } = usePregnancyVaccinations(id)
-  const { data: wellness } = usePregnancyWellnessPlan(id)
+  // Step 1: Look up the active pregnancy by patient ID
+  const { data: pregnancyList, isLoading: isPregListLoading } = usePregnancyList({
+    patient: patientId,
+    is_active: true,
+  })
+  const pregnancy = pregnancyList?.results?.[0]
+  const pregnancyId = pregnancy?.id
+
+  // Step 2: Use the resolved pregnancy ID for all sub-resource queries
+  const { data: ancData } = usePregnancyAncVisits(pregnancyId)
+  const { data: riskEvents } = usePregnancyRiskEvents(pregnancyId)
+  const { data: vaccinations } = usePregnancyVaccinations(pregnancyId)
+  const { data: wellness } = usePregnancyWellnessPlan(pregnancyId)
   const { data: doctorsData } = useDoctorsList()
 
-  // Mutations
-  const recordAnc = useRecordAncVisit(id!)
-  const recordRisk = useRecordRiskEvent(id!)
-  const updateVacc = useUpdateVaccinationStatus(id!)
-  const updateWellness = useUpdateWellnessPlan(id!)
+  const isPregLoading = isPregListLoading
+
+  // Mutations — safe to initialize with pregnancyId (guards below prevent use when undefined)
+  const recordAnc = useRecordAncVisit(pregnancyId ?? '')
+  const recordRisk = useRecordRiskEvent(pregnancyId ?? '')
+  const updateVacc = useUpdateVaccinationStatus(pregnancyId ?? '')
+  const updateWellness = useUpdateWellnessPlan(pregnancyId ?? '')
   const syncWeek = useSyncPregnancyWeek()
 
   // Forms
   const ancForm = useForm<z.infer<typeof ancSchema>>({
     resolver: zodResolver(ancSchema) as any,
-    defaultValues: { visit_type: 'routine', visit_date: new Date().toISOString().split('T')[0] }
+    defaultValues: {
+      visit_type: 'routine',
+      visit_date: new Date().toISOString().split('T')[0],
+      week_at_visit: pregnancy?.current_week ?? undefined,
+      doctor: doctorsData?.results?.[0]?.id ?? '',
+    }
   })
 
   const riskForm = useForm<z.infer<typeof riskSchema>>({
@@ -148,14 +162,13 @@ export default function PregnancyTrackingPage() {
   }
 
   const openWellnessEdit = () => {
-    if (wellness) {
-      wellnessForm.reset({
-        dietary_protocol: wellness.dietary_protocol,
-        dietary_items_raw: wellness.dietary_items?.join('\n') || '',
-        daily_precautions_raw: wellness.daily_precautions?.join('\n') || '',
-      })
-      setShowWellnessModal(true)
-    }
+    // Always open the modal; pre-fill if wellness data exists
+    wellnessForm.reset({
+      dietary_protocol: wellness?.dietary_protocol || '',
+      dietary_items_raw: wellness?.dietary_items?.join('\n') || '',
+      daily_precautions_raw: wellness?.daily_precautions?.join('\n') || '',
+    })
+    setShowWellnessModal(true)
   }
 
   // Calculate progress bar percent from gestational week
@@ -287,7 +300,14 @@ export default function PregnancyTrackingPage() {
             Pregnancy Risk Timeline
           </h3>
           <button 
-            onClick={() => setShowRiskModal(true)}
+            onClick={() => {
+              riskForm.reset({
+                risk_level: 'low',
+                event_date: new Date().toISOString().split('T')[0],
+                week_number: pregnancy.current_week,
+              })
+              setShowRiskModal(true)
+            }}
             className="text-tertiary hover:underline font-label-lg flex items-center gap-xs"
           >
             <span className="material-symbols-outlined text-[18px]">add_task</span> Log Risk Milestone
@@ -346,7 +366,15 @@ export default function PregnancyTrackingPage() {
             <div className="flex justify-between items-center border-b border-outline-variant/10 pb-sm mb-md">
               <h3 className="text-title-lg font-bold text-on-surface">ANC Visit Logs</h3>
               <button 
-                onClick={() => setShowAncModal(true)}
+                onClick={() => {
+                  ancForm.reset({
+                    visit_type: 'routine',
+                    visit_date: new Date().toISOString().split('T')[0],
+                    week_at_visit: pregnancy.current_week,
+                    doctor: doctorsData?.results?.[0]?.id ?? '',
+                  })
+                  setShowAncModal(true)
+                }}
                 className="text-primary hover:underline font-label-lg flex items-center gap-xs"
               >
                 <span className="material-symbols-outlined text-[18px]">add</span> Log Visit

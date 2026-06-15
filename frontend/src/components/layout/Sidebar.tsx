@@ -47,12 +47,9 @@ export default function Sidebar() {
           {NAV_ITEMS.map((item) => (
             <li key={item.path}>
               <NavLink
-                to={item.path === '/doctors' ? '#' : item.path}
-                onClick={(e) => {
-                  if (item.path === '/doctors') e.preventDefault()
-                }}
+                to={item.path}
                 className={({ isActive }) =>
-                  `sidebar-nav-item${isActive && item.path !== '/doctors' ? ' sidebar-nav-item-active' : ''}`
+                  `sidebar-nav-item${isActive ? ' sidebar-nav-item-active' : ''}`
                 }
               >
                 <span className="material-symbols-outlined sidebar-nav-icon">{item.icon}</span>

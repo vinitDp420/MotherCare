@@ -17,6 +17,7 @@ const RegisterPatientPage = lazy(() => import('@/modules/patients/RegisterPatien
 const PatientDetailPage = lazy(() => import('@/modules/patients/PatientDetailPage'))
 const PregnancyTrackingPage = lazy(() => import('@/modules/pregnancy/PregnancyTrackingPage'))
 const AppointmentsPage = lazy(() => import('@/modules/appointments/AppointmentsPage'))
+const DoctorsPage = lazy(() => import('@/modules/doctors/DoctorsPage'))
 const LaboratoryPage = lazy(() => import('@/modules/laboratory/LaboratoryPage'))
 const PharmacyPage = lazy(() => import('@/modules/pharmacy/PharmacyPage'))
 const AdmissionsPage = lazy(() => import('@/modules/admissions/AdmissionsPage'))
@@ -27,11 +28,14 @@ const BillingPage = lazy(() => import('@/modules/billing/BillingPage'))
 const HRPage = lazy(() => import('@/modules/hr/HRPage'))
 const ReportsPage = lazy(() => import('@/modules/reports/ReportsPage'))
 const SettingsPage = lazy(() => import('@/modules/settings/SettingsPage'))
+const ConsultationPage = lazy(() => import('@/modules/consultations/ConsultationPage'))
 
 // ── Guards ───────────────────────────────────────────────────────────────────
 function RequireAuth({ children }: { children: ReactNode }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
-  return isAuthenticated ? children : <Navigate to="/login" replace />
+  // Fast-path: check localStorage token to survive async rehydration
+  const hasPersistedToken = !!localStorage.getItem('mc_token')
+  return (isAuthenticated || hasPersistedToken) ? children : <Navigate to="/login" replace />
 }
 
 // ── Router ───────────────────────────────────────────────────────────────────
@@ -55,7 +59,8 @@ export const router = createBrowserRouter([
       { path: '/patients/:id', element: <PatientDetailPage /> },
       { path: '/patients/:id/pregnancy', element: <PregnancyTrackingPage /> },
       { path: '/appointments', element: <AppointmentsPage /> },
-      { path: '/consultations/:id', element: <DashboardPage /> }, // Placeholder
+      { path: '/doctors', element: <DoctorsPage /> },
+      { path: '/consultations/:id', element: <ConsultationPage /> },
       { path: '/laboratory', element: <LaboratoryPage /> },
       { path: '/pharmacy', element: <PharmacyPage /> },
       { path: '/admissions', element: <AdmissionsPage /> },

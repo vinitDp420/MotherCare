@@ -17,13 +17,16 @@ import sys
 TESTING = "test" in sys.argv or "pytest" in sys.modules
 
 if not TESTING:
-    INSTALLED_APPS += [  # noqa: F405
-        "debug_toolbar",
-    ]
-
-    MIDDLEWARE += [  # noqa: F405
-        "debug_toolbar.middleware.DebugToolbarMiddleware",
-    ]
+    try:
+        import debug_toolbar  # noqa: F401
+        INSTALLED_APPS += [  # noqa: F405
+            "debug_toolbar",
+        ]
+        MIDDLEWARE += [  # noqa: F405
+            "debug_toolbar.middleware.DebugToolbarMiddleware",
+        ]
+    except ImportError:
+        pass
 
 INTERNAL_IPS = ["127.0.0.1", "localhost"]
 

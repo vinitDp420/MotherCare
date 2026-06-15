@@ -110,6 +110,7 @@ export interface Staff {
 
 export interface Doctor {
   id: string
+  staff: string
   full_name: string
   specialisation: string
   registration_no: string

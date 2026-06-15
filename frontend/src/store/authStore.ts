@@ -55,6 +55,14 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'mc-auth',
       partialize: (state) => ({ token: state.token, user: state.user }),
+      onRehydrateStorage: () => (state) => {
+        // After rehydrating persisted token/user, derive isAuthenticated
+        if (state && state.token && state.user) {
+          state.isAuthenticated = true
+          // Ensure localStorage token stays in sync for the axios interceptor
+          localStorage.setItem('mc_token', state.token)
+        }
+      },
     }
   )
 )

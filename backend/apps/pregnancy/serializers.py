@@ -151,7 +151,7 @@ class RiskEventSerializer(serializers.ModelSerializer):
 
     def get_recorded_by_name(self, obj: PregnancyRiskEvent) -> str:
         if obj.recorded_by:
-            return obj.recorded_by.get_full_name() or obj.recorded_by.username
+            return getattr(obj.recorded_by, 'full_name', None) or obj.recorded_by.username
         return ""
 
 

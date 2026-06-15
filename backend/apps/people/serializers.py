@@ -302,8 +302,10 @@ class StaffListSerializer(serializers.ModelSerializer):
             "id",
             "full_name",
             "designation",
+            "department",
             "department_name",
             "phone",
+            "email",
             "is_active",
             "join_date",
             "has_doctor_profile",
@@ -397,6 +399,7 @@ class DoctorListSerializer(serializers.ModelSerializer):
         model = Doctor
         fields = [
             "id",
+            "staff",
             "full_name",
             "specialisation",
             "registration_no",
