@@ -9,7 +9,7 @@ import { useAuthStore } from '@/store/authStore'
 import { useUIStore } from '@/store/uiStore'
 
 // ─── Brand color ──────────────────────────────────────────────────────────────
-const BRAND = '#5b4fcf'
+const BRAND = '#00685d'
 
 // ─── Translations ─────────────────────────────────────────────────────────────
 const T = {

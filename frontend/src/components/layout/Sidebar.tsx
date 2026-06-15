@@ -144,7 +144,7 @@ export default function Sidebar() {
       <nav className="sidebar-root">
         {/* ── Brand Header (Pharmacy) ──────────────────────── */}
         <div className="sidebar-brand">
-          <div className="sidebar-logo-icon" style={{ backgroundColor: '#5b4fcf' }}>
+          <div className="sidebar-logo-icon" style={{ backgroundColor: '#00685d' }}>
             <span className="material-symbols-outlined"
               style={{ fontVariationSettings: "'FILL' 1", fontSize: '20px', color: '#ffffff' }}>medication</span>
           </div>
@@ -157,7 +157,7 @@ export default function Sidebar() {
         <div className="px-3 pt-3 pb-2">
           <button onClick={() => navigate('/pharmacy?tab=prescriptions')}
             className="w-full text-white py-2 px-3 rounded-lg flex items-center justify-center gap-2 font-semibold hover:opacity-90 transition-all duration-150 shadow-sm text-xs cursor-pointer"
-            style={{ background: '#5b4fcf' }}>
+            style={{ background: '#00685d' }}>
             <span className="material-symbols-outlined text-[16px]">add</span>
             New Prescription
           </button>
