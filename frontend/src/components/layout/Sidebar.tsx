@@ -1,9 +1,12 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { useAuthStore } from '@/store/authStore'
+import { authApi } from '@/api/endpoints/auth.api'
 
 interface NavItem {
   path: string
   label: string
   icon: string
+  tab?: string
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -22,7 +25,111 @@ const NAV_ITEMS: NavItem[] = [
   { path: '/reports',      label: 'Reports',             icon: 'analytics' },
 ]
 
+const LAB_NAV_ITEMS: NavItem[] = [
+  { path: '/laboratory?tab=dashboard', label: 'Dashboard', icon: 'dashboard', tab: 'dashboard' },
+  { path: '/laboratory?tab=pending', label: 'Pending Tests', icon: 'pending_actions', tab: 'pending' },
+  { path: '/laboratory?tab=completed', label: 'Completed Tests', icon: 'biotech', tab: 'completed' },
+  { path: '/laboratory?tab=history', label: 'Patient History', icon: 'history', tab: 'history' },
+]
+
 export default function Sidebar() {
+  const user = useAuthStore((s) => s.user)
+  const clearAuth = useAuthStore((s) => s.clearAuth)
+  const location = useLocation()
+  const navigate = useNavigate()
+  
+  const isLabTech = user?.roles.includes('Lab Tech')
+  const queryParams = new URLSearchParams(location.search)
+  const activeTab = queryParams.get('tab') || 'pending' // pending is active in the mockup
+
+  const handleLogout = async () => {
+    try {
+      await authApi.logout()
+    } catch {
+      /* ignore */
+    }
+    clearAuth()
+    navigate('/login')
+  }
+
+  if (isLabTech) {
+    return (
+      <nav className="sidebar-root">
+        {/* ── Brand Header (Lab Division) ───────────────────────── */}
+        <div className="sidebar-brand">
+          <div className="sidebar-logo-icon" style={{ backgroundColor: '#00685d' }}>
+            <span
+              className="material-symbols-outlined"
+              style={{ fontVariationSettings: "'FILL' 1", fontSize: '20px', color: '#ffffff' }}
+            >
+              salinity
+            </span>
+          </div>
+          <div>
+            <span className="sidebar-brand-name">Lab Division</span>
+            <span className="sidebar-brand-sub">Maternity Care Unit</span>
+          </div>
+        </div>
+
+        {/* ── Quick Scan Button ─────────────────────────────────── */}
+        <div className="px-3 pt-3 pb-2">
+          <button className="w-full bg-[#00685d] text-white py-2 px-3 rounded-lg flex items-center justify-center gap-2 font-semibold hover:bg-[#005a50] transition-all duration-150 shadow-sm text-xs cursor-pointer">
+            <span className="material-symbols-outlined text-[16px]">qr_code_scanner</span>
+            Quick Scan
+          </button>
+        </div>
+
+        {/* ── Navigation (Lab Tech) ─────────────────────────────── */}
+        <div className="sidebar-nav-scroll">
+          <ul className="sidebar-nav-list">
+            {LAB_NAV_ITEMS.map((item) => {
+              const isItemActive = activeTab === item.tab
+              return (
+                <li key={item.path}>
+                  <NavLink
+                    to={item.path}
+                    className={`sidebar-nav-item${isItemActive ? ' sidebar-nav-item-active' : ''}`}
+                  >
+                    <span className="material-symbols-outlined sidebar-nav-icon">{item.icon}</span>
+                    <span className="sidebar-nav-label">{item.label}</span>
+                  </NavLink>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+
+        {/* ── Footer (Lab Tech) ─────────────────────────────────── */}
+        <div className="sidebar-footer flex flex-col gap-1">
+          <NavLink
+            to="/settings"
+            className={({ isActive }) =>
+              `sidebar-nav-item${isActive ? ' sidebar-nav-item-active' : ''}`
+            }
+          >
+            <span className="material-symbols-outlined sidebar-nav-icon">settings</span>
+            <span className="sidebar-nav-label">Settings</span>
+          </NavLink>
+          <NavLink
+            to="/laboratory?tab=support"
+            className={`sidebar-nav-item${activeTab === 'support' ? ' sidebar-nav-item-active' : ''}`}
+          >
+            <span className="material-symbols-outlined sidebar-nav-icon">help</span>
+            <span className="sidebar-nav-label">Support</span>
+          </NavLink>
+          <button
+            onClick={handleLogout}
+            className="sidebar-nav-item w-full text-left bg-transparent border-none"
+            style={{ display: 'flex', alignItems: 'center' }}
+          >
+            <span className="material-symbols-outlined sidebar-nav-icon">logout</span>
+            <span className="sidebar-nav-label">Logout</span>
+          </button>
+        </div>
+      </nav>
+    )
+  }
+
   return (
     <nav className="sidebar-root">
       {/* ── Brand Header ─────────────────────────────────────── */}

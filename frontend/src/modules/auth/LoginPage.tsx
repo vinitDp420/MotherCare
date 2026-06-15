@@ -30,6 +30,7 @@ const translations = {
     hindi: 'Hindi',
     lightMode: 'Light Mode',
     nightMode: 'Night Mode',
+
   },
   mr: {
     appName: 'मदरकेअर',
@@ -53,6 +54,7 @@ const translations = {
     hindi: 'हिंदी',
     lightMode: 'दिवस मोड',
     nightMode: 'रात्र मोड',
+
   },
   hi: {
     appName: 'मदरकेअर',
@@ -76,6 +78,7 @@ const translations = {
     hindi: 'हिंदी',
     lightMode: 'दिन मोड',
     nightMode: 'रात मोड',
+
   },
 } as const
 
@@ -116,6 +119,8 @@ export default function LoginPage() {
       setServerError(err?.detail ?? 'Login failed. Please check your credentials.')
     }
   }
+
+
 
   const toggleDarkMode = () => {
     const html = document.documentElement
@@ -279,6 +284,8 @@ export default function LoginPage() {
               )}
             </button>
           </form>
+
+
 
           {/* Utilities */}
           <div className="login-utilities">

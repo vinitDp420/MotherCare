@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
+from django.contrib.auth import get_user_model
 from apps.hospital_config.models import Hospital, Department
-from apps.auth_rbac.models import Role, Permission, RolePermission
+from apps.auth_rbac.models import Role, Permission, RolePermission, UserRole
 
 class Command(BaseCommand):
     """Seed initial hospital config, departments, roles, and permissions."""
@@ -166,4 +167,57 @@ class Command(BaseCommand):
                     permission=perm
                 )
         
-        self.stdout.write(self.style.SUCCESS("All roles and role permissions mapped successfully! Seeding complete."))
+        self.stdout.write(self.style.SUCCESS("All roles and role permissions mapped successfully!"))
+
+        # 5. Default Users ─────────────────────────────────────────────────
+        User = get_user_model()
+
+        default_users = [
+            {
+                "username": "admin",
+                "email": "admin@mothercare.local",
+                "password": "admin@#123",
+                "role": "System Admin",
+                "is_superuser": True,
+                "is_staff": True,
+            },
+            {
+                "username": "vinit",
+                "email": "vinit@gmail.com",
+                "password": "vinit@#123",
+                "role": "Doctor",
+            },
+            {
+                "username": "viraj",
+                "email": "viraj@gmail.com",
+                "password": "viraj@#123",
+                "role": "Lab Tech",
+            },
+        ]
+
+        for user_data in default_users:
+            user, created = User.objects.get_or_create(
+                username=user_data["username"],
+                defaults={
+                    "email": user_data["email"],
+                    "is_active": True,
+                    "is_superuser": user_data.get("is_superuser", False),
+                    "is_staff": user_data.get("is_staff", False),
+                }
+            )
+            # Always reset the password to the defined default
+            user.set_password(user_data["password"])
+            user.save()
+
+            # Assign role (idempotent)
+            role_obj = Role.objects.get(name=user_data["role"])
+            UserRole.objects.get_or_create(user=user, role=role_obj)
+
+            status = "Created" if created else "Exists"
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"  [{status}] {user_data['username']} | password: {user_data['password']} | role: {user_data['role']}"
+                )
+            )
+
+        self.stdout.write(self.style.SUCCESS("Seeding complete!"))

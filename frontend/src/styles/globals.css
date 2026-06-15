@@ -1954,3 +1954,101 @@
   color: var(--color-primary-fixed-dim) !important;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   QUICK DEV LOGIN PANEL
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.login-quick-dev {
+  margin-top: 0.5rem;
+  border: 1.5px dashed var(--color-brand-300);
+  border-radius: 12px;
+  padding: 0.875rem;
+  background-color: var(--color-brand-50);
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  transition: all 0.2s ease;
+}
+
+.dark .login-quick-dev {
+  border-color: rgba(112, 216, 200, 0.2);
+  background-color: rgba(112, 216, 200, 0.03);
+}
+
+.login-quick-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-brand-700);
+  text-align: center;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.dark .login-quick-title {
+  color: #70d8c8;
+}
+
+.login-quick-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.login-quick-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.25rem;
+  background-color: #ffffff;
+  border: 1.5px solid var(--color-outline);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.dark .login-quick-btn {
+  background-color: #1a2740;
+  border-color: #2e4a62;
+}
+
+.login-quick-btn:hover {
+  border-color: var(--color-brand-500);
+  background-color: var(--color-brand-50);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 104, 93, 0.08);
+}
+
+.dark .login-quick-btn:hover {
+  border-color: #70d8c8;
+  background-color: rgba(112, 216, 200, 0.06);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.login-quick-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.login-quick-icon {
+  font-size: 18px !important;
+  color: var(--color-brand-600);
+}
+
+.dark .login-quick-icon {
+  color: #70d8c8;
+}
+
+.login-quick-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-on-background);
+}
+
+.login-quick-sub {
+  font-size: 9px;
+  color: var(--color-secondary);
+}
+
+
