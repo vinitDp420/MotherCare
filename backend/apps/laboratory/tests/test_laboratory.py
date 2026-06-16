@@ -437,13 +437,14 @@ class TestLaboratoryAPI:
         assert response.data["status"] == "in_progress"
 
     def test_upload_report(self, auth_client: APIClient) -> None:
+        from django.core.files.uploadedfile import SimpleUploadedFile
         lab = LabTestFactory(status="in_progress")
+        mock_file = SimpleUploadedFile("res.pdf", b"pdf_data", content_type="application/pdf")
         data = {
-            "file_url": "https://media.mothercare.local/reports/res.pdf",
-            "file_type": "pdf",
+            "file": mock_file,
             "notes": "Done",
         }
-        response = auth_client.post(f"/api/v1/laboratory/lab-tests/{lab.id}/upload-report/", data, format="json")
+        response = auth_client.post(f"/api/v1/laboratory/lab-tests/{lab.id}/upload-report/", data, format="multipart")
         assert response.status_code == 201
 
     def test_flag_lab_test(self, auth_client: APIClient) -> None:

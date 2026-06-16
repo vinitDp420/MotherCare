@@ -114,7 +114,11 @@ export default function LoginPage() {
     try {
       const response = await authApi.login(data)
       setAuth(response.token, response.user)
-      navigate('/dashboard')
+      if (response.user.roles.includes('Patient') && response.user.patient_profile_id) {
+        navigate(`/patients/${response.user.patient_profile_id}`)
+      } else {
+        navigate('/dashboard')
+      }
     } catch (err: any) {
       setServerError(err?.detail ?? 'Login failed. Please check your credentials.')
     }

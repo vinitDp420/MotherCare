@@ -66,12 +66,22 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     http_method_names = ["get", "post", "patch", "head", "options"]
 
     def get_queryset(self) -> QuerySet:
-        return Appointment.objects.select_related(
+        qs = Appointment.objects.select_related(
             "patient",
             "doctor",
             "doctor__staff",
             "booked_by",
         ).all()
+        user = self.request.user
+        if user and user.is_authenticated:
+            try:
+                if hasattr(user, "staff") and hasattr(user.staff, "doctor_profile"):
+                    qs = qs.filter(doctor=user.staff.doctor_profile)
+                elif hasattr(user, "patient_profile") and user.patient_profile:
+                    qs = qs.filter(patient=user.patient_profile)
+            except Exception:
+                pass
+        return qs
 
     def get_serializer_class(self) -> type[serializers.Serializer]:
         if self.action == "list":

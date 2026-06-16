@@ -59,6 +59,14 @@ class Patient(SoftDeleteModel):
     objects = SoftDeleteManager()
     all_objects = models.Manager()
 
+    user = models.OneToOneField(
+        "auth_rbac.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="patient_profile",
+        help_text="System user account for patient login."
+    )
     mrn = models.CharField(
         max_length=MAX_MRN_LENGTH,
         unique=True,

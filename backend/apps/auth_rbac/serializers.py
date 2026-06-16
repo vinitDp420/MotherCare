@@ -11,6 +11,7 @@ class AuthUserSerializer(serializers.ModelSerializer):
     """Serializer for serialized User with roles and module:action permissions."""
     roles = serializers.SerializerMethodField()
     permissions = serializers.SerializerMethodField()
+    patient_profile_id = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -21,12 +22,18 @@ class AuthUserSerializer(serializers.ModelSerializer):
             "is_active",
             "roles",
             "permissions",
+            "patient_profile_id",
             "last_login",
         ]
 
     def get_roles(self, obj: User) -> list[str]:
         # Fetch the list of role names associated with the user
         return list(obj.user_roles.values_list("role__name", flat=True).distinct())
+
+    def get_patient_profile_id(self, obj: User) -> str | None:
+        if hasattr(obj, "patient_profile") and obj.patient_profile:
+            return str(obj.patient_profile.id)
+        return None
 
     def get_permissions(self, obj: User) -> list[str]:
         # Fetch permission module + action combinations for the user

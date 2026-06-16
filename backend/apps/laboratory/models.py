@@ -188,3 +188,194 @@ class LabReportFile(BaseModel):
 
     def __str__(self) -> str:
         return f"LabFile({self.lab_test_id}, {self.file_type}, {self.uploaded_at:%Y-%m-%d})"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TestMaster (Catalog of laboratory tests)
+# ─────────────────────────────────────────────────────────────────────────────
+
+class TestMaster(BaseModel):
+    """
+    Master catalog of lab tests available in the hospital.
+    """
+    name = models.CharField(max_length=255, help_text="Name of the laboratory test.")
+    code = models.CharField(max_length=50, unique=True, help_text="Unique test code (e.g. CBC, BG).")
+    category = models.CharField(max_length=100, help_text="Category of the test (e.g. Hematology, Biochemistry).")
+    normal_range = models.CharField(max_length=255, blank=True, help_text="Reference/normal range.")
+    unit = models.CharField(max_length=50, blank=True, help_text="Unit of measurement (e.g. g/dL, mg/dL).")
+    price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Standard cost of the test.")
+    turnaround_hours = models.PositiveIntegerField(default=24, help_text="Standard turnaround time in hours.")
+    is_active = models.BooleanField(default=True, db_index=True, help_text="Whether this test type is currently active.")
+
+    class Meta:
+        db_table = "lab_test_master"
+        verbose_name = "Test Master"
+        verbose_name_plural = "Test Masters"
+        ordering = ["name"]
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.code})"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# LabOrder (Grouping of lab tests per consultation/patient)
+# ─────────────────────────────────────────────────────────────────────────────
+
+class LabOrder(BaseModel):
+    """
+    Clinical lab order containing one or more ordered tests.
+    """
+    STATUS_PENDING = "pending"
+    STATUS_RECEIVED = "received"
+    STATUS_IN_PROGRESS = "in_progress"
+    STATUS_COMPLETED = "completed"
+    
+    STATUS_CHOICES = [
+        (STATUS_PENDING, "Pending"),
+        (STATUS_RECEIVED, "Received"),
+        (STATUS_IN_PROGRESS, "In Progress"),
+        (STATUS_COMPLETED, "Completed"),
+    ]
+
+    consultation = models.ForeignKey(
+        "consultations.Consultation",
+        on_delete=models.RESTRICT,
+        null=True,
+        blank=True,
+        related_name="lab_orders",
+        help_text="Consultation from which this order originated."
+    )
+    patient = models.ForeignKey(
+        "people.Patient",
+        on_delete=models.RESTRICT,
+        related_name="lab_orders",
+        help_text="Patient this lab order belongs to."
+    )
+    doctor = models.ForeignKey(
+        "people.Doctor",
+        on_delete=models.RESTRICT,
+        related_name="lab_orders",
+        help_text="Doctor who ordered these tests."
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_PENDING,
+        db_index=True,
+        help_text="Status of the overall lab order."
+    )
+    clinical_note = models.TextField(
+        blank=True,
+        help_text="Clinical indications/notes provided by ordering doctor."
+    )
+    ordered_at = models.DateTimeField(
+        default=timezone.now,
+        help_text="Timestamp when the lab order was placed."
+    )
+    completed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp when the last result was completed."
+    )
+
+    class Meta:
+        db_table = "lab_order"
+        verbose_name = "Lab Order"
+        verbose_name_plural = "Lab Orders"
+        ordering = ["-ordered_at"]
+
+    def __str__(self) -> str:
+        return f"LabOrder({self.id}, patient={self.patient_id}, status={self.status})"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# LabOrderItem (Individual test result line items)
+# ─────────────────────────────────────────────────────────────────────────────
+
+class LabOrderItem(BaseModel):
+    """
+    Individual lab test within an order.
+    """
+    lab_order = models.ForeignKey(
+        LabOrder,
+        on_delete=models.CASCADE,
+        related_name="items",
+        help_text="Parent lab order."
+    )
+    test = models.ForeignKey(
+        TestMaster,
+        on_delete=models.RESTRICT,
+        related_name="order_items",
+        help_text="The specific test type."
+    )
+    result_value = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Recorded test result value."
+    )
+    result_note = models.TextField(
+        blank=True,
+        help_text="Additional observations, notes or findings from technician."
+    )
+    is_abnormal = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text="True if result value falls outside normal range or is flagged abnormal."
+    )
+
+    class Meta:
+        db_table = "lab_order_item"
+        verbose_name = "Lab Order Item"
+        verbose_name_plural = "Lab Order Items"
+
+    def __str__(self) -> str:
+        return f"LabOrderItem({self.test.code}, abnormal={self.is_abnormal})"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# LabReport (PDF reports attached to a LabOrder)
+# ─────────────────────────────────────────────────────────────────────────────
+
+class LabReport(BaseModel):
+    """
+    Technician uploaded PDF report file for a lab order.
+    """
+    lab_order = models.ForeignKey(
+        LabOrder,
+        on_delete=models.CASCADE,
+        related_name="reports",
+        help_text="Related lab order."
+    )
+    report_file = models.FileField(
+        upload_to="lab_reports/",
+        help_text="Uploaded PDF report document."
+    )
+    uploaded_by = models.ForeignKey(
+        "auth_rbac.User",
+        on_delete=models.RESTRICT,
+        related_name="+",
+        help_text="Staff user who uploaded this report."
+    )
+    uploaded_at = models.DateTimeField(
+        default=timezone.now,
+        help_text="Timestamp when the report file was uploaded."
+    )
+    doctor_comment = models.TextField(
+        blank=True,
+        help_text="Annotation or feedback comment added by doctor."
+    )
+    reviewed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp when reviewed by doctor."
+    )
+
+    class Meta:
+        db_table = "lab_report"
+        verbose_name = "Lab Report"
+        verbose_name_plural = "Lab Reports"
+        ordering = ["-uploaded_at"]
+
+    def __str__(self) -> str:
+        return f"LabReport({self.id}, order={self.lab_order_id})"
+

@@ -17,6 +17,9 @@ export interface PrescriptionItem {
   frequency: string
   frequency_display: string
   duration: string
+  duration_days?: number
+  route?: string
+  quantity_to_dispense?: number
   instructions: string
   sort_order: number
   created_at: string
@@ -29,10 +32,14 @@ export interface Prescription {
   patient_name: string
   patient_mrn: string
   patient_blood_group?: string
+  patient_age?: number
+  doctor_name?: string
+  doctor_registration_no?: string
   issued_at: string
   notes: string
   item_count: number
   items?: PrescriptionItem[]
+  is_dispensed: boolean
   created_at: string
   updated_at?: string
 }
@@ -42,6 +49,9 @@ export interface PrescriptionItemWritePayload {
   dosage: string
   frequency: string
   duration: string
+  duration_days?: number
+  route?: string
+  quantity_to_dispense?: number
   instructions?: string
   sort_order?: number
 }

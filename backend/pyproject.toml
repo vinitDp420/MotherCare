@@ -8,6 +8,7 @@ dependencies = [
     # Core framework
     "django>=4.2,<5.0",
     "djangorestframework>=3.14,<4.0",
+    "reportlab>=4.0.0",
 
     # Database
     "psycopg2-binary>=2.9.9",

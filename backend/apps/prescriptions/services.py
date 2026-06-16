@@ -62,6 +62,8 @@ def _write_audit(
 def create_prescription(
     consultation: object,
     patient: object,
+    doctor: object = None,
+    status: str = "saved",
     notes: str = "",
     created_by: object = None,
 ) -> Prescription:
@@ -76,6 +78,8 @@ def create_prescription(
     Args:
         consultation: Source Consultation instance.
         patient: Patient instance (denormalised from consultation).
+        doctor: Doctor instance who wrote the prescription.
+        status: Status of the prescription (draft/saved/dispensed).
         notes: Optional prescription notes.
         created_by: User creating the prescription.
 
@@ -96,6 +100,8 @@ def create_prescription(
     prescription = Prescription.objects.create(
         consultation=consultation,
         patient=patient,
+        doctor=doctor,
+        status=status,
         notes=notes,
         created_by=created_by,
     )
@@ -108,12 +114,13 @@ def create_prescription(
         new_value={
             "consultation_id": str(consultation.id),
             "patient_id": str(patient.id),
+            "status": status,
         },
     )
 
     logger.info(
-        "Prescription created: id=%s consultation=%s patient=%s",
-        prescription.id, consultation.id, patient.id,
+        "Prescription created: id=%s consultation=%s patient=%s status=%s",
+        prescription.id, consultation.id, patient.id, status,
     )
     return prescription
 
@@ -132,7 +139,7 @@ def create_prescription_item(
 
     Args:
         prescription: Parent Prescription instance.
-        validated_data: Dict with medicine, dosage, frequency, duration, instructions, sort_order.
+        validated_data: Dict with medicine, dosage, frequency, duration, duration_days, route, quantity_to_dispense, instructions, sort_order.
         created_by: User creating the item.
 
     Returns:
@@ -150,6 +157,8 @@ def create_prescription_item(
 def create_full_prescription(
     consultation: object,
     patient: object,
+    doctor: object = None,
+    status: str = "saved",
     notes: str = "",
     items_data: list[dict[str, Any]] | None = None,
     created_by: object = None,
@@ -164,8 +173,10 @@ def create_full_prescription(
     Args:
         consultation: Source Consultation instance.
         patient: Patient instance.
+        doctor: Doctor instance.
+        status: Status of the prescription.
         notes: Optional prescription notes.
-        items_data: List of item dicts: [{medicine, dosage, frequency, duration, instructions, sort_order}].
+        items_data: List of item dicts: [{medicine, dosage, frequency, duration, duration_days, route, quantity_to_dispense, instructions, sort_order}].
         created_by: User issuing the prescription.
 
     Returns:
@@ -174,6 +185,8 @@ def create_full_prescription(
     prescription = create_prescription(
         consultation=consultation,
         patient=patient,
+        doctor=doctor,
+        status=status,
         notes=notes,
         created_by=created_by,
     )
@@ -273,6 +286,9 @@ def duplicate_previous_prescription(
                 "dosage": item.dosage,
                 "frequency": item.frequency,
                 "duration": item.duration,
+                "duration_days": item.duration_days,
+                "route": item.route,
+                "quantity_to_dispense": item.quantity_to_dispense,
                 "instructions": item.instructions,
                 "sort_order": item.sort_order,
             },

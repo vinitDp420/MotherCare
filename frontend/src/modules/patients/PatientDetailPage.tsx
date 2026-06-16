@@ -14,6 +14,7 @@ import {
   useDoctorsList
 } from '@/hooks/usePatients'
 import { usePregnancyList, useCreatePregnancy } from '@/hooks/usePregnancy'
+import StitchFileEditor from './StitchFileEditor'
 
 // ─── Validation Schemas ───────────────────────────────────────────────────────
 
@@ -345,6 +346,9 @@ export default function PatientDetailPage() {
             </div>
           </div>
         </div>
+
+        {/* Persistent Referral Stitch Section */}
+        <StitchFileEditor patientId={id!} />
 
       </div>
 

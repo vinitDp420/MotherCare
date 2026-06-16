@@ -1,11 +1,26 @@
 /**
  * LaboratoryPage — Full Lab Management Module
- * Features: Working buttons, modals, state management, EN/MR/HI translations
+ * Integrated with Django REST APIs via React Query hooks.
+ * Features: Queue ordering (STAT > Urgent > Routine), report uploads, flagging, translations.
  */
 import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useUIStore } from '@/store/uiStore'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+
+import {
+  useLabTestsList,
+  useLabTestDetail,
+  useCreateLabTest,
+  useUpdateLabStatus,
+  useUploadLabReport,
+  useFlagLabTest,
+} from '@/hooks/useLaboratory'
+import { usePatientsList, useDoctorsList } from '@/hooks/usePatients'
+import type { LabTest, LabStatus, LabUrgency, FileType } from '@/types/laboratory.types'
 
 // ─── Translations ─────────────────────────────────────────────────────────────
 const T = {
@@ -17,56 +32,48 @@ const T = {
     newLabOrder: 'New Lab Order',
     lastSync: 'Last Sync',
     tabs: { dashboard: 'Dashboard', pending: 'Pending Tests', completed: 'Completed', history: 'Patient History' },
-    // Stats
     criticalResults: 'Critical Results', pendingTests: 'Pending Tests',
     inProgress: 'In Progress', completedToday: 'Completed Today',
     immediateAction: 'immediate action', inQueue: 'in queue',
     processing: 'processing', finalized: 'finalized',
-    // Dashboard
     todaysWorklist: "Today's Worklist", live: 'Live', byCategory: 'By Category',
     criticalAlerts: 'Critical Alerts', noCritical: 'No critical alerts',
-    // Table headers
     patient: 'Patient', testType: 'Test', category: 'Category',
     priority: 'Priority', status: 'Status', requested: 'Requested',
     requestedBy: 'Requested By', ward: 'Ward', result: 'Result',
     refRange: 'Ref. Range', completedAt: 'Completed At', actions: 'Actions', id: 'ID',
-    // Buttons
     start: 'Start', enterResult: 'Enter Result', reviewNow: 'Review Now',
     view: 'View', print: 'Print', dispatch: 'Dispatch', exportAll: 'Export All',
     fullReport: 'Full Report', markInProgress: 'Mark as In Progress',
     submitResult: 'Submit Result', printRequisition: 'Print Requisition',
     close: 'Close', save: 'Save', cancel: 'Cancel',
-    // Filters
     allCategories: 'All Categories', allStatuses: 'All Statuses',
     allPriorities: 'All Priorities', searchPatient: 'Search patient name or ID…',
     searchCompleted: 'Search completed tests…', showing: 'orders',
     reports: 'reports',
-    // Modals
     newOrderTitle: 'New Lab Order', patientName: 'Patient Name',
     patientId: 'Patient ID', testName: 'Test Name', orderPriority: 'Priority',
     orderCategory: 'Category', orderedBy: 'Ordered By', notes: 'Notes',
     addOrder: 'Add Order',
-    enterResultTitle: 'Enter Test Result', resultValue: 'Result Value',
+    enterResultTitle: 'Enter Test Result & Upload Report', resultValue: 'Result Value / Key Findings',
     referenceRange: 'Reference Range', markCritical: 'Mark as Critical',
     resultNotes: 'Notes / Remarks',
     viewReportTitle: 'Lab Report',
     dispatchTitle: 'Dispatch Report', dispatchTo: 'Send to Doctor',
     dispatchMethod: 'Method', dispatchBtn: 'Send Report',
     orderId: 'Order ID', orderedAt: 'Ordered At', collectedAt: 'Collected At',
-    // Status labels
     sCritical: 'Critical', sPending: 'Pending', sInProgress: 'In Progress',
     sCompleted: 'Completed', sCancelled: 'Cancelled',
-    // Empty states
     noOrders: 'No orders match your filters', noCompleted: 'No completed tests found',
     selectPatient: 'Select a patient', selectPatientSub: 'Choose a patient to view their lab history',
     labHistory: 'Lab History', tests: 'test',
     physicianNotified: 'Critical — Physician Notified',
-    // Export
     exportedMsg: 'CSV exported successfully!',
     printedMsg: 'Sent to printer!',
     dispatchedMsg: 'Report dispatched!',
     orderAdded: 'Lab order added!',
     resultSaved: 'Result saved!',
+    uploadFile: 'Upload Report File (PDF/Image)',
   },
   mr: {
     title: 'प्रयोगशाळा व्यवस्थापन',
@@ -97,7 +104,7 @@ const T = {
     patientId: 'रुग्ण आयडी', testName: 'चाचणीचे नाव', orderPriority: 'प्राधान्य',
     orderCategory: 'श्रेणी', orderedBy: 'कोणाकडून ऑर्डर', notes: 'टिपा',
     addOrder: 'ऑर्डर जोडा',
-    enterResultTitle: 'चाचणी परिणाम प्रविष्ट करा', resultValue: 'परिणाम मूल्य',
+    enterResultTitle: 'चाचणी परिणाम प्रविष्ट करा आणि अहवाल अपलोड करा', resultValue: 'परिणाम मूल्य / मुख्य निष्कर्ष',
     referenceRange: 'संदर्भ श्रेणी', markCritical: 'गंभीर म्हणून चिन्हांकित करा',
     resultNotes: 'टिपा / शेरे',
     viewReportTitle: 'लॅब अहवाल',
@@ -115,6 +122,7 @@ const T = {
     dispatchedMsg: 'अहवाल पाठवला!',
     orderAdded: 'लॅब ऑर्डर जोडली!',
     resultSaved: 'परिणाम जतन केला!',
+    uploadFile: 'अहवाल फाइल अपलोड करा (PDF/Image)',
   },
   hi: {
     title: 'प्रयोगशाला प्रबंधन',
@@ -139,13 +147,13 @@ const T = {
     submitResult: 'परिणाम सबमिट करें', printRequisition: 'अनुरोध प्रिंट करें',
     close: 'बंद करें', save: 'सहेजें', cancel: 'रद्द करें',
     allCategories: 'सभी श्रेणियां', allStatuses: 'सभी स्थितियां',
-    allPriorities: 'सभी प्राथमिकताएं', searchPatient: 'रोगी का नाम या आईडी खोजें…',
+    allPriorities: 'सभी प्राथमिकताएं', searchPatient: 'रोगी का नाम या आदि खोजें…',
     searchCompleted: 'पूर्ण परीक्षण खोजें…', showing: 'ऑर्डर', reports: 'रिपोर्ट',
     newOrderTitle: 'नया लैब ऑर्डर', patientName: 'रोगी का नाम',
     patientId: 'रोगी आईडी', testName: 'परीक्षण नाम', orderPriority: 'प्राथमिकता',
     orderCategory: 'श्रेणी', orderedBy: 'ऑर्डर किसने दिया', notes: 'नोट्स',
     addOrder: 'ऑर्डर जोड़ें',
-    enterResultTitle: 'परीक्षण परिणाम दर्ज करें', resultValue: 'परिणाम मूल्य',
+    enterResultTitle: 'परीक्षण परिणाम दर्ज करें और रिपोर्ट अपलोड करें', resultValue: 'परिणाम मूल्य / मुख्य निष्कर्ष',
     referenceRange: 'संदर्भ श्रेणी', markCritical: 'गंभीर चिह्नित करें',
     resultNotes: 'नोट्स / टिप्पणियां',
     viewReportTitle: 'लैब रिपोर्ट',
@@ -163,34 +171,68 @@ const T = {
     dispatchedMsg: 'रिपोर्ट भेजी गई!',
     orderAdded: 'लैब ऑर्डर जोड़ा गया!',
     resultSaved: 'परिणाम सहेजा गया!',
+    uploadFile: 'रिपोर्ट फाइल अपलोड करें (PDF/Image)',
   },
 } as const
-type Lang = keyof typeof T
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
-type LabStatus = 'pending' | 'in_progress' | 'completed' | 'critical' | 'cancelled'
-type TestCategory = 'Hematology' | 'Biochemistry' | 'Radiology' | 'Microbiology' | 'Serology' | 'Urinalysis' | 'Hormones'
+type Lang = keyof typeof T
 type Priority = 'STAT' | 'Urgent' | 'Routine'
+type TestCategory = 'Hematology' | 'Biochemistry' | 'Radiology' | 'Microbiology' | 'Serology' | 'Urinalysis' | 'Hormones'
 
 interface LabOrder {
   id: string; patientName: string; patientId: string; age: number; ward: string
   testName: string; category: TestCategory; status: LabStatus; priority: Priority
   requestedBy: string; requestedAt: string; collectedAt?: string; completedAt?: string
   result?: string; referenceRange?: string; isCritical?: boolean; notes?: string
+  reportFiles?: any[]
 }
 
-const INITIAL_ORDERS: LabOrder[] = [
-  { id: 'LB-5001', patientName: 'Anya Sharma',  patientId: 'MC-4921', age: 28, ward: 'Maternity - B2',    testName: 'Complete Blood Count',       category: 'Hematology',   status: 'critical',     priority: 'STAT',    requestedBy: 'Dr. Patel',  requestedAt: '08:15 AM', collectedAt: '08:30 AM', result: 'Hb: 6.2 g/dL',               referenceRange: '12-16 g/dL',     isCritical: true,  notes: 'Severe anemia. Doctor notified.' },
-  { id: 'LB-5002', patientName: 'Priya Rajan',   patientId: 'MC-4877', age: 32, ward: 'OPD - Antenatal',  testName: 'Obstetric Ultrasound',        category: 'Radiology',    status: 'in_progress',  priority: 'Urgent',  requestedBy: 'Dr. Singh',  requestedAt: '09:00 AM', collectedAt: '09:15 AM',                                                                     notes: 'Fetal growth monitoring at 28 weeks.' },
-  { id: 'LB-5003', patientName: 'Meera Kapoor',  patientId: 'MC-5012', age: 25, ward: 'Maternity - A1',   testName: 'Glucose Tolerance Test (75g)', category: 'Biochemistry', status: 'pending',      priority: 'Routine', requestedBy: 'Dr. Sharma', requestedAt: 'Yesterday' },
-  { id: 'LB-5004', patientName: 'Sunita Rao',    patientId: 'MC-4803', age: 30, ward: 'Labor Room',        testName: 'Urine Culture & Sensitivity', category: 'Microbiology', status: 'pending',      priority: 'Urgent',  requestedBy: 'Dr. Mehta',  requestedAt: '07:45 AM' },
-  { id: 'LB-5005', patientName: 'Linda Chen',    patientId: 'MC-5099', age: 27, ward: 'Post-natal - C3',  testName: 'Urinalysis (Routine)',         category: 'Urinalysis',   status: 'critical',     priority: 'STAT',    requestedBy: 'Dr. Patel',  requestedAt: '45m ago',  collectedAt: '55m ago',  result: 'Protein: 4+, RBC: Many',      referenceRange: 'Protein: Neg',   isCritical: true,  notes: 'Pre-eclampsia screen. Alert sent.' },
-  { id: 'LB-5006', patientName: 'Sarah Jenkins', patientId: 'MC-4755', age: 34, ward: 'OPD - Endocrine',  testName: 'Thyroid Panel (TSH,T3,T4)',   category: 'Hormones',     status: 'completed',    priority: 'Routine', requestedBy: 'Dr. Joshi',  requestedAt: '06:00 AM', completedAt: '08:45 AM', result: 'TSH: 2.4 mIU/L, T3/T4 Normal', referenceRange: 'TSH 0.5–5.0',    isCritical: false },
-  { id: 'LB-5007', patientName: 'Kavya Nair',    patientId: 'MC-4901', age: 29, ward: 'Maternity - A3',   testName: 'Blood Group & Rh Factor',     category: 'Serology',     status: 'completed',    priority: 'Routine', requestedBy: 'Dr. Singh',  requestedAt: '07:00 AM', completedAt: '09:20 AM', result: 'O+, Rh Positive',             referenceRange: 'N/A',            isCritical: false },
-  { id: 'LB-5008', patientName: 'Anita Bose',    patientId: 'MC-5034', age: 26, ward: 'OPD - Antenatal',  testName: 'Serum Iron & TIBC',           category: 'Biochemistry', status: 'pending',      priority: 'Routine', requestedBy: 'Dr. Sharma', requestedAt: '09:30 AM' },
-  { id: 'LB-5009', patientName: 'Deepa Pillai',  patientId: 'MC-4988', age: 31, ward: 'Maternity - B4',   testName: 'HbA1c',                       category: 'Biochemistry', status: 'completed',    priority: 'Urgent',  requestedBy: 'Dr. Mehta',  requestedAt: '05:30 AM', completedAt: '08:00 AM', result: 'HbA1c: 7.2%',                 referenceRange: '< 6.5%',         isCritical: false, notes: 'Gestational diabetes monitoring.' },
-  { id: 'LB-5010', patientName: 'Rekha Verma',   patientId: 'MC-5120', age: 33, ward: 'Labor Room',        testName: 'Coagulation Profile (PT/INR)','category': 'Hematology', status: 'in_progress',  priority: 'STAT',    requestedBy: 'Dr. Patel',  requestedAt: '10:00 AM', collectedAt: '10:05 AM',                                                                     notes: 'Pre-op check for C-section.' },
-]
+// ─── Mapping Helpers ─────────────────────────────────────────────────────────
+const getCategoryFromTestType = (type: string): TestCategory => {
+  if (['cbc', 'blood_group', 'serum_ferritin'].includes(type)) return 'Hematology'
+  if (['hba1c', 'glucose_fasting', 'glucose_pp', 'ogtt', 'liver_function', 'kidney_function', 'vitamin_d'].includes(type)) return 'Biochemistry'
+  if (['anomaly_scan', 'nt_scan', 'growth_scan', 'doppler'].includes(type)) return 'Radiology'
+  if (['urine_routine', 'urine_culture'].includes(type)) return 'Urinalysis'
+  if (['thyroid'].includes(type)) return 'Hormones'
+  if (['vdrl', 'hiv', 'hbsag', 'hcv', 'torch'].includes(type)) return 'Serology'
+  return 'Biochemistry'
+}
+
+const mapStatus = (status: string): LabStatus => {
+  if (status === 'critical') return 'critical'
+  if (status === 'in_progress') return 'in_progress'
+  if (status === 'completed') return 'completed'
+  if (status === 'cancelled') return 'cancelled'
+  return 'pending'
+}
+
+const mapPriority = (urgency: string): Priority => {
+  if (urgency === 'stat') return 'STAT'
+  if (urgency === 'urgent') return 'Urgent'
+  return 'Routine'
+}
+
+const mapBackendToFrontend = (item: LabTest): LabOrder => {
+  return {
+    id: item.id,
+    patientName: item.patient_name,
+    patientId: item.patient_mrn,
+    age: 0,
+    ward: item.consultation ? 'Consultation' : 'OPD / Standalone',
+    testName: item.test_type_display,
+    category: getCategoryFromTestType(item.test_type),
+    status: mapStatus(item.status),
+    priority: mapPriority(item.urgency),
+    requestedBy: `Dr. ${item.doctor_name}`,
+    requestedAt: new Date(item.requested_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    completedAt: item.completed_at ? new Date(item.completed_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : undefined,
+    result: item.key_findings,
+    referenceRange: 'Standard',
+    isCritical: item.flagged || item.status === 'critical',
+    notes: item.report_files && item.report_files.length > 0 ? item.report_files[0].notes : '',
+    reportFiles: item.report_files,
+  }
+}
 
 // ─── Toast ─────────────────────────────────────────────────────────────────────
 function Toast({ message, onClose }: { message: string; onClose: () => void }) {
@@ -248,7 +290,7 @@ function PriorityBadge({ priority }: { priority: Priority }) {
 }
 
 function Avatar({ name, critical }: { name: string; critical?: boolean }) {
-  const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2)
+  const initials = name ? name.split(' ').map(n => n[0]).join('').slice(0, 2) : 'PT'
   return (
     <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${critical ? 'bg-error text-white' : 'bg-primary-container text-on-primary-container'}`}>
       {initials}
@@ -257,21 +299,42 @@ function Avatar({ name, critical }: { name: string; critical?: boolean }) {
 }
 
 // ─── New Order Modal ───────────────────────────────────────────────────────────
-function NewOrderModal({ t, onClose, onAdd }: { t: typeof T['en']; onClose: () => void; onAdd: (o: LabOrder) => void }) {
-  const [form, setForm] = useState({ patientName: '', patientId: '', testName: '', category: 'Hematology' as TestCategory, priority: 'Routine' as Priority, requestedBy: '', notes: '', ward: '' })
-  const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setForm(p => ({ ...p, [k]: e.target.value }))
+const testTypeChoices = [
+  { value: 'cbc', label: 'Complete Blood Count (CBC)' },
+  { value: 'blood_group', label: 'Blood Group & Rh Typing' },
+  { value: 'hba1c', label: 'HbA1c' },
+  { value: 'glucose_fasting', label: 'Fasting Glucose' },
+  { value: 'glucose_pp', label: 'Post-Prandial Glucose' },
+  { value: 'ogtt', label: 'OGTT (Oral Glucose Tolerance)' },
+  { value: 'urine_routine', label: 'Urine Routine' },
+  { value: 'urine_culture', label: 'Urine Culture' },
+  { value: 'thyroid', label: 'Thyroid Function (TSH)' },
+  { value: 'liver_function', label: 'Liver Function Test (LFT)' },
+  { value: 'kidney_function', label: 'Kidney Function Test (KFT)' },
+  { value: 'serum_ferritin', label: 'Serum Ferritin' },
+  { value: 'vdrl', label: 'VDRL/RPR' },
+  { value: 'hiv', label: 'HIV Screening' },
+  { value: 'hbsag', label: 'HBsAg' },
+  { value: 'hcv', label: 'HCV Antibody' },
+  { value: 'anomaly_scan', label: 'Anomaly Scan (USG)' },
+  { value: 'nt_scan', label: 'NT Scan' },
+  { value: 'growth_scan', label: 'Growth Scan (USG)' },
+  { value: 'other', label: 'Other' },
+]
+
+function NewOrderModal({ t, onClose, onAdd }: { t: typeof T['en']; onClose: () => void; onAdd: (payload: any) => void }) {
+  const [form, setForm] = useState({ patient: '', test_type: 'cbc', urgency: 'routine' as LabUrgency, ordered_by: '', notes: '' })
+  const { data: patientsData } = usePatientsList()
+  const { data: doctorsData } = useDoctorsList()
 
   const submit = () => {
-    if (!form.patientName || !form.testName) return
-    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    if (!form.patient || !form.ordered_by) return
     onAdd({
-      id: `LB-${5100 + Math.floor(Math.random() * 900)}`,
-      patientName: form.patientName, patientId: form.patientId || 'MC-????',
-      age: 0, ward: form.ward || 'OPD',
-      testName: form.testName, category: form.category,
-      status: 'pending', priority: form.priority,
-      requestedBy: form.requestedBy || 'Dr. Unknown',
-      requestedAt: now, notes: form.notes,
+      patient: form.patient,
+      ordered_by: form.ordered_by,
+      test_type: form.test_type,
+      urgency: form.urgency,
+      notes: form.notes,
     })
     onClose()
   }
@@ -282,30 +345,48 @@ function NewOrderModal({ t, onClose, onAdd }: { t: typeof T['en']; onClose: () =
   return (
     <Modal title={t.newOrderTitle} onClose={onClose}>
       <div className="flex flex-col gap-md">
-        <div className="grid grid-cols-2 gap-md">
-          <div><label className={labelCls}>{t.patientName} *</label><input className={inputCls} value={form.patientName} onChange={f('patientName')} /></div>
-          <div><label className={labelCls}>{t.patientId}</label><input className={inputCls} value={form.patientId} onChange={f('patientId')} placeholder="MC-XXXX" /></div>
+        <div>
+          <label className={labelCls}>{t.patient}</label>
+          <select className={inputCls} value={form.patient} onChange={e => setForm(p => ({ ...p, patient: e.target.value }))}>
+            <option value="">Select Patient</option>
+            {patientsData?.results?.map(p => (
+              <option key={p.id} value={p.id}>{p.full_name} ({p.mrn})</option>
+            ))}
+          </select>
         </div>
-        <div><label className={labelCls}>{t.testName} *</label><input className={inputCls} value={form.testName} onChange={f('testName')} /></div>
+
         <div className="grid grid-cols-2 gap-md">
           <div>
-            <label className={labelCls}>{t.orderCategory}</label>
-            <select className={inputCls} value={form.category} onChange={f('category')}>
-              {['Hematology','Biochemistry','Radiology','Microbiology','Serology','Urinalysis','Hormones'].map(c => <option key={c}>{c}</option>)}
+            <label className={labelCls}>{t.testType}</label>
+            <select className={inputCls} value={form.test_type} onChange={e => setForm(p => ({ ...p, test_type: e.target.value }))}>
+              {testTypeChoices.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>
           </div>
           <div>
             <label className={labelCls}>{t.orderPriority}</label>
-            <select className={inputCls} value={form.priority} onChange={f('priority')}>
-              <option>STAT</option><option>Urgent</option><option>Routine</option>
+            <select className={inputCls} value={form.urgency} onChange={e => setForm(p => ({ ...p, urgency: e.target.value as LabUrgency }))}>
+              <option value="routine">Routine</option>
+              <option value="urgent">Urgent</option>
+              <option value="stat">STAT</option>
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-md">
-          <div><label className={labelCls}>{t.ward}</label><input className={inputCls} value={form.ward} onChange={f('ward')} placeholder="Maternity - A1" /></div>
-          <div><label className={labelCls}>{t.orderedBy}</label><input className={inputCls} value={form.requestedBy} onChange={f('requestedBy')} placeholder="Dr. Name" /></div>
+
+        <div>
+          <label className={labelCls}>{t.orderedBy}</label>
+          <select className={inputCls} value={form.ordered_by} onChange={e => setForm(p => ({ ...p, ordered_by: e.target.value }))}>
+            <option value="">Select Ordering Physician</option>
+            {doctorsData?.results?.map((d: any) => (
+              <option key={d.id} value={d.id}>Dr. {d.full_name} ({d.specialisation})</option>
+            ))}
+          </select>
         </div>
-        <div><label className={labelCls}>{t.notes}</label><textarea className={`${inputCls} resize-none`} rows={2} value={form.notes} onChange={f('notes')} /></div>
+
+        <div>
+          <label className={labelCls}>{t.notes}</label>
+          <textarea className={`${inputCls} resize-none`} rows={2} value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} />
+        </div>
+
         <div className="flex gap-sm pt-sm">
           <button onClick={onClose} className="flex-1 py-sm rounded-lg border border-outline-variant text-on-surface-variant font-label-lg hover:bg-surface-container transition-colors">{t.cancel}</button>
           <button onClick={submit} className="flex-1 py-sm rounded-lg bg-primary text-on-primary font-label-lg hover:opacity-90 transition-opacity shadow-sm" style={{ background: '#00685d' }}>{t.addOrder}</button>
@@ -315,20 +396,19 @@ function NewOrderModal({ t, onClose, onAdd }: { t: typeof T['en']; onClose: () =
   )
 }
 
-// ─── Enter Result Modal ────────────────────────────────────────────────────────
-function EnterResultModal({ order, t, onClose, onSave }: { order: LabOrder; t: typeof T['en']; onClose: () => void; onSave: (id: string, result: string, ref: string, critical: boolean, notes: string) => void }) {
+// ─── Enter Result & Upload Modal ──────────────────────────────────────────────
+function EnterResultModal({ order, t, onClose, onSave }: { order: LabOrder; t: typeof T['en']; onClose: () => void; onSave: (id: string, result: string, file: File | null, critical: boolean, notes: string) => void }) {
   const [resultVal, setResultVal] = useState(order.result || '')
-  const [refRange, setRefRange] = useState(order.referenceRange || '')
   const [isCrit, setIsCrit] = useState(order.isCritical || false)
   const [notes, setNotes] = useState(order.notes || '')
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
-  const inputCls = "w-full px-sm py-xs rounded-lg border border-outline-variant bg-surface-container-lowest dark:bg-surface-variant text-body-sm focus:outline-none focus:ring-2 focus:ring-primary"
+  const inputCls = "w-full px-sm py-xs rounded-lg border border-outline-variant bg-surface-container-lowest dark:bg-surface-variant text-body-sm focus:outline-none"
   const labelCls = "font-label-md text-label-md text-on-surface-variant block mb-xs"
 
   return (
-    <Modal title={`${t.enterResultTitle} — ${order.id}`} onClose={onClose}>
+    <Modal title={`${t.enterResultTitle} — ${order.id.slice(0, 8)}`} onClose={onClose}>
       <div className="flex flex-col gap-md">
-        {/* Patient info */}
         <div className="flex items-center gap-sm p-sm rounded-lg bg-surface-container">
           <Avatar name={order.patientName} critical={order.isCritical} />
           <div>
@@ -336,16 +416,35 @@ function EnterResultModal({ order, t, onClose, onSave }: { order: LabOrder; t: t
             <p className="font-label-sm text-label-sm text-on-surface-variant">{order.patientId} · {order.testName}</p>
           </div>
         </div>
-        <div><label className={labelCls}>{t.resultValue} *</label><input className={inputCls} value={resultVal} onChange={e => setResultVal(e.target.value)} placeholder="e.g. Hb: 12.4 g/dL" /></div>
-        <div><label className={labelCls}>{t.referenceRange}</label><input className={inputCls} value={refRange} onChange={e => setRefRange(e.target.value)} placeholder="e.g. 12-16 g/dL" /></div>
-        <div><label className={labelCls}>{t.resultNotes}</label><textarea className={`${inputCls} resize-none`} rows={2} value={notes} onChange={e => setNotes(e.target.value)} /></div>
-        <label className="flex items-center gap-sm cursor-pointer">
+
+        <div>
+          <label className={labelCls}>{t.resultValue} *</label>
+          <input className={inputCls} value={resultVal} onChange={e => setResultVal(e.target.value)} placeholder="e.g. Hb: 12.4 g/dL" />
+        </div>
+
+        <div>
+          <label className={labelCls}>{t.uploadFile}</label>
+          <input
+            type="file"
+            accept=".pdf,.png,.jpg,.jpeg"
+            onChange={e => setSelectedFile(e.target.files?.[0] || null)}
+            className="w-full text-body-sm"
+          />
+        </div>
+
+        <div>
+          <label className={labelCls}>{t.resultNotes}</label>
+          <textarea className={`${inputCls} resize-none`} rows={2} value={notes} onChange={e => setNotes(e.target.value)} />
+        </div>
+
+        <label className="flex items-center gap-sm cursor-pointer select-none">
           <input type="checkbox" checked={isCrit} onChange={e => setIsCrit(e.target.checked)} className="w-4 h-4 rounded accent-error" />
           <span className={`font-label-md text-label-md ${isCrit ? 'text-error font-semibold' : 'text-on-surface-variant'}`}>{t.markCritical}</span>
         </label>
+
         <div className="flex gap-sm pt-sm">
           <button onClick={onClose} className="flex-1 py-sm rounded-lg border border-outline-variant text-on-surface-variant font-label-lg hover:bg-surface-container transition-colors">{t.cancel}</button>
-          <button onClick={() => { onSave(order.id, resultVal, refRange, isCrit, notes); onClose() }} className="flex-1 py-sm rounded-lg bg-primary text-on-primary font-label-lg hover:opacity-90 shadow-sm" style={{ background: '#00685d' }}>{t.submitResult}</button>
+          <button onClick={() => { onSave(order.id, resultVal, selectedFile, isCrit, notes); onClose() }} className="flex-1 py-sm rounded-lg bg-primary text-on-primary font-label-lg hover:opacity-90 shadow-sm" style={{ background: '#00685d' }}>{t.submitResult}</button>
         </div>
       </div>
     </Modal>
@@ -360,11 +459,8 @@ function ViewReportModal({ order, t, onClose, onPrint }: { order: LabOrder; t: t
     [t.testType, order.testName], [t.category, order.category],
     [t.priority, order.priority], [t.status, order.status],
     [t.requestedBy, order.requestedBy], [t.orderedAt, order.requestedAt],
-    ...(order.collectedAt ? [[t.collectedAt, order.collectedAt]] : []),
     ...(order.completedAt ? [[t.completedAt, order.completedAt]] : []),
     ...(order.result ? [[t.result, order.result]] : []),
-    ...(order.referenceRange ? [[t.refRange, order.referenceRange]] : []),
-    ...(order.notes ? [[t.notes, order.notes]] : []),
   ]
   return (
     <Modal title={t.viewReportTitle} onClose={onClose}>
@@ -372,16 +468,34 @@ function ViewReportModal({ order, t, onClose, onPrint }: { order: LabOrder; t: t
         {order.isCritical && (
           <div className="flex items-center gap-sm p-sm rounded-lg bg-error-container">
             <span className="material-symbols-outlined text-error" style={{ fontVariationSettings: "'FILL' 1" }}>warning</span>
-            <span className="font-label-md text-label-md text-error font-semibold">{t.physicianNotified}</span>
+            <span className="font-label-md text-error font-semibold">{t.physicianNotified}</span>
           </div>
         )}
         <div className="flex flex-col gap-xs">
           {rows.map(([label, value]) => (
             <div key={label} className="flex justify-between py-xs border-b border-outline-variant">
-              <span className="font-label-md text-label-md text-on-surface-variant">{label}</span>
+              <span className="font-label-md text-on-surface-variant">{label}</span>
               <span className="font-body-sm text-body-sm text-on-surface dark:text-inverse-on-surface font-medium text-right max-w-[55%]">{value}</span>
             </div>
           ))}
+          {order.reportFiles && order.reportFiles.length > 0 && (
+            <div className="py-sm">
+              <span className="font-label-md text-on-surface-variant block mb-xs">Attached PDF / Files</span>
+              <div className="space-y-xs">
+                {order.reportFiles.map((f: any) => (
+                  <a
+                    key={f.id}
+                    href={f.file_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-primary text-body-sm hover:underline flex items-center gap-xs"
+                  >
+                    <span className="material-symbols-outlined text-sm">attachment</span> View Lab Report File ({f.file_type.toUpperCase()})
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         <div className="flex gap-sm pt-sm">
           <button onClick={onClose} className="flex-1 py-sm rounded-lg border border-outline-variant text-on-surface-variant font-label-lg hover:bg-surface-container transition-colors">{t.close}</button>
@@ -409,7 +523,7 @@ function DispatchModal({ order, t, onClose, onDispatch }: { order: LabOrder; t: 
         </div>
         <div>
           <label className="font-label-md text-label-md text-on-surface-variant block mb-xs">{t.dispatchTo}</label>
-          <input className="w-full px-sm py-xs rounded-lg border border-outline-variant bg-surface-container-lowest text-body-sm focus:outline-none focus:ring-2 focus:ring-primary" value={doctor} onChange={e => setDoctor(e.target.value)} />
+          <input className="w-full px-sm py-xs rounded-lg border border-outline-variant bg-surface-container-lowest text-body-sm focus:outline-none" value={doctor} onChange={e => setDoctor(e.target.value)} />
         </div>
         <div>
           <label className="font-label-md text-label-md text-on-surface-variant block mb-xs">{t.dispatchMethod}</label>
@@ -432,10 +546,9 @@ function DispatchModal({ order, t, onClose, onDispatch }: { order: LabOrder; t: 
   )
 }
 
-// ─── Helpers ───────────────────────────────────────────────────────────────────
 function exportCSV(orders: LabOrder[]) {
-  const headers = ['ID', 'Patient', 'Patient ID', 'Age', 'Ward', 'Test', 'Category', 'Status', 'Priority', 'Requested By', 'Requested At', 'Result', 'Reference Range']
-  const rows = orders.map(o => [o.id, o.patientName, o.patientId, o.age, o.ward, o.testName, o.category, o.status, o.priority, o.requestedBy, o.requestedAt, o.result || '', o.referenceRange || ''])
+  const headers = ['ID', 'Patient', 'Patient ID', 'Age', 'Ward', 'Test', 'Category', 'Status', 'Priority', 'Requested By', 'Requested At', 'Result']
+  const rows = orders.map(o => [o.id, o.patientName, o.patientId, o.age, o.ward, o.testName, o.category, o.status, o.priority, o.requestedBy, o.requestedAt, o.result || ''])
   const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n')
   const blob = new Blob([csv], { type: 'text/csv' })
   const url = URL.createObjectURL(blob)
@@ -445,58 +558,75 @@ function exportCSV(orders: LabOrder[]) {
 
 // ─── Dashboard Tab ─────────────────────────────────────────────────────────────
 function DashboardTab({ orders, t, onNewOrder }: { orders: LabOrder[]; t: typeof T['en']; onNewOrder: () => void }) {
-  const [refreshed, setRefreshed] = useState(false)
   const critical = orders.filter(o => o.status === 'critical').length
   const pending = orders.filter(o => o.status === 'pending').length
-  const inProg = orders.filter(o => o.status === 'in_progress').length
+  const inProgress = orders.filter(o => o.status === 'in_progress').length
   const completed = orders.filter(o => o.status === 'completed').length
 
-  const stats = [
-    { label: t.criticalResults, value: critical, icon: 'priority_high', iconBg: 'bg-error-container text-error', badge: t.immediateAction.toUpperCase(), err: true },
-    { label: t.pendingTests,    value: pending,   icon: 'pending',       iconBg: 'bg-surface-container-high text-on-surface-variant', badge: t.inQueue },
-    { label: t.inProgress,      value: inProg,    icon: 'sync',          iconBg: 'bg-secondary-container text-on-secondary-container', badge: t.processing },
-    { label: t.completedToday,  value: completed, icon: 'check_circle',  iconBg: 'bg-primary-container text-on-primary-container', badge: t.finalized },
-  ]
-
-  const active = orders.filter(o => o.status !== 'completed' && o.status !== 'cancelled')
+  const active = orders.filter(o => ['pending','in_progress','critical'].includes(o.status)).slice(0, 5)
 
   return (
-    <div className="flex flex-col gap-lg">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-md">
-        {stats.map(s => (
-          <div key={s.label} className="glass-card rounded-xl p-lg shadow-sm relative overflow-hidden group hover:shadow-md transition-all cursor-pointer" onClick={s.err ? undefined : undefined}>
-            <div className="absolute -right-3 -top-3 w-16 h-16 bg-surface-container-high rounded-full opacity-20 group-hover:scale-125 transition-transform" />
-            <div className="relative z-10 flex justify-between items-start mb-md">
-              <div className={`p-sm rounded-lg ${s.iconBg}`}>
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>{s.icon}</span>
-              </div>
-              <span className={`font-label-sm text-label-sm uppercase tracking-wide ${s.err && s.value > 0 ? 'text-error font-bold' : 'text-on-surface-variant'}`}>{s.badge}</span>
-            </div>
-            <h3 className="font-title-md text-title-md text-on-surface dark:text-inverse-on-surface mb-xs relative z-10">{s.label}</h3>
-            <span className={`font-display-md text-display-md relative z-10 ${s.err && s.value > 0 ? 'text-error' : 'text-on-surface dark:text-inverse-on-surface'}`}>{s.value}</span>
+    <div className="flex flex-col gap-lg animate-fadeIn">
+      {/* Stats row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
+        <div className="bg-surface-container-lowest dark:bg-inverse-surface p-lg rounded-xl border border-outline-variant/30 relative overflow-hidden shadow-sm">
+          {critical > 0 && <div className="absolute top-0 right-0 p-xs animate-ping"><span className="w-2.5 h-2.5 bg-error rounded-full block"></span></div>}
+          <div className="flex justify-between items-start mb-md">
+            <span className="material-symbols-outlined text-error p-sm bg-error-container/20 rounded-lg">warning</span>
+            <span className="text-error font-bold text-label-md uppercase tracking-wider">{t.immediateAction}</span>
           </div>
-        ))}
+          <p className="font-label-md text-label-md text-secondary">{t.criticalResults}</p>
+          <h3 className="font-headline-lg text-headline-lg text-error">{String(critical).padStart(2, '0')}</h3>
+        </div>
+
+        <div className="bg-surface-container-lowest dark:bg-inverse-surface p-lg rounded-xl border border-outline-variant/30 shadow-sm">
+          <div className="flex justify-between items-start mb-md">
+            <span className="material-symbols-outlined text-primary p-sm bg-primary-container/20 rounded-lg">hourglass_empty</span>
+            <span className="text-on-surface-variant font-bold text-label-md uppercase tracking-wider">{t.inQueue}</span>
+          </div>
+          <p className="font-label-md text-label-md text-secondary">{t.pendingTests}</p>
+          <h3 className="font-headline-lg text-headline-lg text-on-surface">{String(pending).padStart(2, '0')}</h3>
+        </div>
+
+        <div className="bg-surface-container-lowest dark:bg-inverse-surface p-lg rounded-xl border border-outline-variant/30 shadow-sm">
+          <div className="flex justify-between items-start mb-md">
+            <span className="material-symbols-outlined text-secondary p-sm bg-secondary-container/20 rounded-lg">sync</span>
+            <span className="text-secondary font-bold text-label-md uppercase tracking-wider">{t.processing}</span>
+          </div>
+          <p className="font-label-md text-label-md text-secondary">{t.inProgress}</p>
+          <h3 className="font-headline-lg text-headline-lg text-on-surface">{String(inProgress).padStart(2, '0')}</h3>
+        </div>
+
+        <div className="bg-surface-container-lowest dark:bg-inverse-surface p-lg rounded-xl border border-outline-variant/30 shadow-sm">
+          <div className="flex justify-between items-start mb-md">
+            <span className="material-symbols-outlined text-tertiary p-sm bg-tertiary-container/20 rounded-lg">check_circle</span>
+            <span className="text-tertiary font-bold text-label-md uppercase tracking-wider">{t.finalized}</span>
+          </div>
+          <p className="font-label-md text-label-md text-secondary">{t.completedToday}</p>
+          <h3 className="font-headline-lg text-headline-lg text-on-surface">{String(completed).padStart(2, '0')}</h3>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg">
-        {/* Worklist */}
-        <div className="lg:col-span-2 glass-card rounded-xl shadow-sm overflow-hidden">
-          <div className="p-md border-b border-surface-dim dark:border-outline flex justify-between items-center bg-surface-container-lowest dark:bg-on-surface">
-            <div className="flex items-center gap-sm">
-              <h3 className="font-title-lg text-title-lg text-on-surface dark:text-inverse-on-surface">{t.todaysWorklist}</h3>
+        {/* Active list */}
+        <div className="lg:col-span-2 glass-card rounded-xl shadow-sm overflow-hidden border border-outline-variant/20 flex flex-col">
+          <div className="p-md border-b border-surface-dim bg-surface-container-lowest dark:bg-on-surface flex items-center justify-between">
+            <div className="flex items-center gap-xs">
+              <h3 className="font-title-lg text-title-lg text-on-surface">{t.todaysWorklist}</h3>
               <span className="bg-primary-container text-on-primary-container font-label-sm px-sm py-xs rounded-full">{t.live}</span>
             </div>
-            <button onClick={() => { setRefreshed(true); setTimeout(() => setRefreshed(false), 1000) }}
-              className={`p-xs text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors ${refreshed ? 'animate-spin' : ''}`}>
-              <span className="material-symbols-outlined text-[20px]">refresh</span>
+            <button onClick={onNewOrder} className="bg-primary text-on-primary font-label-md py-xs px-md rounded-lg hover:opacity-90 flex items-center gap-xs shadow-sm" style={{ background: '#00685d' }}>
+              <span className="material-symbols-outlined text-[16px]">add</span>{t.newLabOrder}
             </button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead className="bg-surface-container-lowest dark:bg-on-surface">
-                <tr>{[t.patient, t.testType, t.category, t.priority, t.status, t.requested].map(h => (
-                  <th key={h} className="p-sm font-label-md text-label-md text-on-surface-variant border-b border-surface-dim font-semibold whitespace-nowrap">{h}</th>
-                ))}</tr>
+              <thead>
+                <tr className="bg-surface-container/50 border-b border-surface-dim">
+                  {[t.patient, t.testType, t.category, t.priority, t.status, t.requested].map(h => (
+                    <th key={h} className="p-sm font-label-md text-on-surface-variant font-semibold">{h}</th>
+                  ))}
+                </tr>
               </thead>
               <tbody>
                 {active.map((o, i) => (
@@ -519,9 +649,9 @@ function DashboardTab({ orders, t, onNewOrder }: { orders: LabOrder[]; t: typeof
           </div>
         </div>
 
-        {/* Right column */}
+        {/* Categories & Critical alerts */}
         <div className="flex flex-col gap-md">
-          <div className="glass-card rounded-xl shadow-sm overflow-hidden">
+          <div className="glass-card rounded-xl shadow-sm overflow-hidden border border-outline-variant/20">
             <div className="p-md border-b border-surface-dim"><h3 className="font-title-md text-title-md text-on-surface">{t.byCategory}</h3></div>
             <div className="p-md flex flex-col gap-sm">
               {Object.entries(orders.reduce((a, o) => { a[o.category] = (a[o.category] || 0) + 1; return a }, {} as Record<string, number>))
@@ -530,7 +660,7 @@ function DashboardTab({ orders, t, onNewOrder }: { orders: LabOrder[]; t: typeof
                     <span className="font-body-sm text-on-surface">{cat}</span>
                     <div className="flex items-center gap-sm">
                       <div className="w-20 bg-surface-container-high rounded-full h-1.5 overflow-hidden">
-                        <div className="h-full bg-primary rounded-full" style={{ width: `${(count / orders.length) * 100}%`, background: '#00685d' }} />
+                        <div className="h-full bg-primary rounded-full" style={{ width: `${(count / Math.max(1, orders.length)) * 100}%`, background: '#00685d' }} />
                       </div>
                       <span className="font-label-md text-on-surface-variant w-4 text-right">{count}</span>
                     </div>
@@ -539,7 +669,7 @@ function DashboardTab({ orders, t, onNewOrder }: { orders: LabOrder[]; t: typeof
             </div>
           </div>
 
-          <div className="glass-card rounded-xl shadow-sm overflow-hidden">
+          <div className="glass-card rounded-xl shadow-sm overflow-hidden border border-outline-variant/20">
             <div className="p-md border-b border-error-container flex items-center gap-sm">
               <span className="material-symbols-outlined text-error" style={{ fontVariationSettings: "'FILL' 1" }}>notification_important</span>
               <h3 className="font-title-md text-title-md text-error">{t.criticalAlerts}</h3>
@@ -569,7 +699,7 @@ function DashboardTab({ orders, t, onNewOrder }: { orders: LabOrder[]; t: typeof
 // ─── Pending Tab ───────────────────────────────────────────────────────────────
 function PendingTab({ orders, t, onUpdateOrder, onNewOrder, showToast }: {
   orders: LabOrder[]; t: typeof T['en']
-  onUpdateOrder: (id: string, patch: Partial<LabOrder>) => void
+  onUpdateOrder: (id: string, patch: any, file: File | null) => void
   onNewOrder: () => void; showToast: (msg: string) => void
 }) {
   const [search, setSearch] = useState('')
@@ -584,157 +714,153 @@ function PendingTab({ orders, t, onUpdateOrder, onNewOrder, showToast }: {
     (!cat || o.category === cat) && (!pri || o.priority === pri)
   )
 
-  // keep selected in sync after updates
   useEffect(() => {
     if (selected) setSelected(orders.find(o => o.id === selected.id) || null)
   }, [orders])
 
   return (
-    <div className="flex flex-col gap-md">
-      {resultModal && <EnterResultModal order={resultModal} t={t} onClose={() => setResultModal(null)} onSave={(id, result, ref, crit, notes) => {
-        const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        onUpdateOrder(id, { status: 'completed', result, referenceRange: ref, isCritical: crit, notes, completedAt: now })
+    <div className="flex flex-col gap-md animate-fadeIn">
+      {resultModal && <EnterResultModal order={resultModal} t={t} onClose={() => setResultModal(null)} onSave={(id, result, file, crit, notes) => {
+        onUpdateOrder(id, { status: crit ? 'critical' : 'completed', key_findings: result, notes }, file)
         showToast(t.resultSaved)
       }} />}
       {viewModal && <ViewReportModal order={viewModal} t={t} onClose={() => setViewModal(null)} onPrint={() => { window.print(); showToast(t.printedMsg) }} />}
 
       {/* Filters */}
-      <div className="glass-card p-md rounded-xl flex flex-wrap gap-md items-center justify-between shadow-sm">
+      <div className="glass-card p-md rounded-xl flex flex-wrap gap-md items-center justify-between shadow-sm border border-outline-variant/20">
         <div className="flex flex-wrap gap-sm items-center">
           <div className="relative min-w-[220px]">
             <span className="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
-            <input className="w-full pl-xl pr-sm py-xs rounded-lg border border-outline-variant bg-surface-container-lowest dark:bg-surface-variant text-body-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            <input className="w-full pl-xl pr-sm py-xs rounded-lg border border-outline-variant bg-surface-container-lowest dark:bg-surface-variant text-body-sm focus:outline-none"
               placeholder={t.searchPatient} value={search} onChange={e => setSearch(e.target.value)} />
           </div>
-          <select className="bg-surface-container-lowest dark:bg-surface-variant border border-outline-variant rounded-lg text-label-md py-xs px-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          <select className="bg-surface-container-lowest dark:bg-surface-variant border border-outline-variant rounded-lg text-label-md py-xs px-sm focus:outline-none"
             value={cat} onChange={e => setCat(e.target.value)}>
             <option value="">{t.allCategories}</option>
             {['Hematology','Biochemistry','Radiology','Microbiology','Serology','Urinalysis','Hormones'].map(c => <option key={c}>{c}</option>)}
           </select>
-          <select className="bg-surface-container-lowest dark:bg-surface-variant border border-outline-variant rounded-lg text-label-md py-xs px-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          <select className="bg-surface-container-lowest dark:bg-surface-variant border border-outline-variant rounded-lg text-label-md py-xs px-sm focus:outline-none"
             value={pri} onChange={e => setPri(e.target.value)}>
             <option value="">{t.allPriorities}</option>
-            <option>STAT</option><option>Urgent</option><option>Routine</option>
+            <option value="STAT">STAT</option>
+            <option value="Urgent">Urgent</option>
+            <option value="Routine">Routine</option>
           </select>
         </div>
         <div className="flex items-center gap-sm">
           <span className="font-label-md text-on-surface-variant">{filtered.length} {t.showing}</span>
-          <button onClick={onNewOrder} className="bg-primary text-on-primary font-label-md py-xs px-md rounded-lg hover:opacity-90 flex items-center gap-xs shadow-sm" style={{ background: '#00685d' }}>
+          <button onClick={onNewOrder} className="bg-primary text-on-primary font-label-md py-xs px-md rounded-lg hover:opacity-90 flex items-center gap-xs shadow-sm cursor-pointer" style={{ background: '#00685d' }}>
             <span className="material-symbols-outlined text-[16px]">add</span>{t.newLabOrder}
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg">
-        <div className={`${selected ? 'lg:col-span-2' : 'lg:col-span-3'} glass-card rounded-xl shadow-sm overflow-hidden flex flex-col`}>
+        <div className={`${selected ? 'lg:col-span-2' : 'lg:col-span-3'} glass-card rounded-xl shadow-sm overflow-hidden flex flex-col border border-outline-variant/20`}>
           <div className="p-md border-b border-surface-dim bg-surface-container-lowest dark:bg-on-surface flex items-center gap-sm">
             <h3 className="font-title-lg text-title-lg text-on-surface">{t.pendingTests}</h3>
             <span className="bg-primary-container text-on-primary-container font-label-sm px-sm py-xs rounded-full">Live Queue</span>
           </div>
           <div className="overflow-x-auto flex-1">
             <table className="w-full text-left">
-              <thead className="sticky top-0 bg-surface-container-lowest dark:bg-on-surface z-10">
+              <thead className="sticky top-0 bg-surface-container-lowest dark:bg-on-surface z-10 border-b border-surface-dim">
                 <tr>{[t.id, t.patient, t.testType, t.ward, t.priority, t.status, t.requestedBy, t.actions].map(h => (
-                  <th key={h} className="p-sm font-label-md text-on-surface-variant border-b border-surface-dim font-semibold whitespace-nowrap">{h}</th>
+                  <th key={h} className="p-sm font-label-md text-on-surface-variant font-semibold whitespace-nowrap">{h}</th>
                 ))}</tr>
               </thead>
               <tbody>
                 {filtered.map((o, i) => (
                   <tr key={o.id} onClick={() => setSelected(s => s?.id === o.id ? null : o)}
                     className={`hover:bg-surface-container-low transition-colors cursor-pointer ${selected?.id === o.id ? 'bg-primary-container/30' : o.isCritical ? 'bg-error-container/10' : i % 2 === 0 ? '' : 'bg-surface-container/30'}`}>
-                    <td className="p-sm border-b border-surface-dim"><span className="font-label-sm text-primary font-mono">{o.id}</span></td>
+                    <td className="p-sm border-b border-surface-dim"><span className="font-label-sm text-primary font-mono">{o.id.slice(0, 8)}</span></td>
                     <td className="p-sm border-b border-surface-dim">
                       <div className="flex items-center gap-sm"><Avatar name={o.patientName} critical={o.isCritical} />
                         <div><p className="font-body-sm text-on-surface font-semibold whitespace-nowrap">{o.patientName}</p>
-                          <p className="font-label-sm text-on-surface-variant">{o.patientId} · {o.age}y</p></div>
+                          <p className="font-label-sm text-on-surface-variant">{o.patientId}</p></div>
                       </div>
                     </td>
                     <td className="p-sm border-b border-surface-dim font-body-sm text-on-surface whitespace-nowrap">{o.testName}</td>
-                    <td className="p-sm border-b border-surface-dim font-label-sm text-on-surface-variant whitespace-nowrap">{o.ward}</td>
+                    <td className="p-sm border-b border-surface-dim font-body-sm text-secondary">{o.ward}</td>
                     <td className="p-sm border-b border-surface-dim"><PriorityBadge priority={o.priority} /></td>
                     <td className="p-sm border-b border-surface-dim"><StatusBadge status={o.status} t={t} /></td>
-                    <td className="p-sm border-b border-surface-dim font-label-sm text-on-surface-variant whitespace-nowrap">{o.requestedBy}</td>
+                    <td className="p-sm border-b border-surface-dim font-body-sm text-secondary whitespace-nowrap">{o.requestedBy}</td>
                     <td className="p-sm border-b border-surface-dim">
-                      <div className="flex gap-xs" onClick={e => e.stopPropagation()}>
+                      <div className="flex gap-xs">
                         {o.status === 'pending' && (
-                          <button onClick={() => onUpdateOrder(o.id, { status: 'in_progress' })}
-                            className="bg-secondary-container text-on-secondary-container hover:opacity-80 px-sm py-xs rounded font-label-sm whitespace-nowrap transition-colors">{t.start}</button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              onUpdateOrder(o.id, { status: 'in_progress' }, null)
+                            }}
+                            className="bg-primary/10 text-primary hover:bg-primary/20 px-xs py-1 rounded text-xs font-bold"
+                          >
+                            Start
+                          </button>
                         )}
                         {o.status === 'in_progress' && (
-                          <button onClick={() => setResultModal(o)}
-                            className="bg-primary text-on-primary hover:opacity-90 px-sm py-xs rounded font-label-sm shadow-sm whitespace-nowrap" style={{ background: '#00685d' }}>{t.enterResult}</button>
-                        )}
-                        {o.status === 'critical' && (
-                          <button onClick={() => setViewModal(o)}
-                            className="bg-error text-white hover:opacity-90 px-sm py-xs rounded font-label-sm shadow-sm whitespace-nowrap">{t.reviewNow}</button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setResultModal(o)
+                            }}
+                            className="bg-primary text-white hover:opacity-90 px-xs py-1 rounded text-xs font-bold"
+                          >
+                            Result
+                          </button>
                         )}
                       </div>
                     </td>
                   </tr>
                 ))}
-                {filtered.length === 0 && (
-                  <tr><td colSpan={8} className="p-xl text-center font-body-md text-on-surface-variant">
-                    <span className="material-symbols-outlined text-[40px] block mx-auto mb-sm opacity-30">science</span>{t.noOrders}
-                  </td></tr>
-                )}
               </tbody>
             </table>
           </div>
         </div>
 
-        {/* Detail panel */}
+        {/* Panel for Selected Order */}
         {selected && (
-          <div className="glass-card rounded-xl shadow-sm overflow-hidden flex flex-col">
-            <div className="p-md border-b border-surface-dim flex justify-between items-center bg-surface-container-lowest dark:bg-on-surface">
-              <h3 className="font-title-md text-title-md text-on-surface">Order Detail</h3>
-              <button onClick={() => setSelected(null)} className="p-xs text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors">
-                <span className="material-symbols-outlined text-[18px]">close</span>
+          <div className="glass-card rounded-xl p-md shadow-sm border border-outline-variant/20 flex flex-col gap-md h-full min-h-[350px]">
+            <div className="flex justify-between items-start border-b border-surface-dim pb-sm">
+              <h3 className="font-title-lg text-title-lg text-on-surface">Test Overview</h3>
+              <button onClick={() => setSelected(null)} className="text-secondary hover:text-on-surface">
+                <span className="material-symbols-outlined">close</span>
               </button>
             </div>
-            <div className="p-md flex flex-col gap-md flex-1 overflow-auto">
-              <div className="flex items-center gap-md">
-                <Avatar name={selected.patientName} critical={selected.isCritical} />
-                <div>
-                  <p className="font-title-sm text-on-surface font-semibold">{selected.patientName}</p>
-                  <p className="font-body-sm text-on-surface-variant">{selected.patientId} · {selected.ward}</p>
-                </div>
+            {selected.isCritical && (
+              <div className="p-sm rounded-lg bg-error-container flex items-center gap-sm">
+                <span className="material-symbols-outlined text-error" style={{ fontVariationSettings: "'FILL' 1" }}>warning</span>
+                <span className="font-label-md text-error font-semibold">{t.physicianNotified}</span>
               </div>
-              {selected.isCritical && (
-                <div className="p-sm rounded-lg bg-error-container flex items-center gap-sm">
-                  <span className="material-symbols-outlined text-error" style={{ fontVariationSettings: "'FILL' 1" }}>warning</span>
-                  <span className="font-label-md text-error font-semibold">{t.physicianNotified}</span>
+            )}
+            <div className="flex flex-col gap-xs">
+              {[[t.orderId, selected.id.slice(0, 8)],[t.testType, selected.testName],[t.category, selected.category],[t.priority, selected.priority],[t.status, selected.status],[t.requestedBy, selected.requestedBy],[t.requested, selected.requestedAt]].map(([label, value]) => (
+                <div key={label} className="flex justify-between py-xs border-b border-surface-dim">
+                  <span className="font-label-md text-on-surface-variant">{label}</span>
+                  <span className="font-body-sm text-on-surface font-medium">{value}</span>
                 </div>
-              )}
-              <div className="flex flex-col gap-xs">
-                {[[t.orderId, selected.id],[t.testType, selected.testName],[t.category, selected.category],[t.priority, selected.priority],[t.status, selected.status],[t.requestedBy, selected.requestedBy],[t.requested, selected.requestedAt]].map(([label, value]) => (
-                  <div key={label} className="flex justify-between py-xs border-b border-surface-dim">
-                    <span className="font-label-md text-on-surface-variant">{label}</span>
-                    <span className="font-body-sm text-on-surface font-medium">{value}</span>
-                  </div>
-                ))}
-              </div>
-              {selected.notes && <div className="p-sm rounded-lg bg-surface-container-low border border-outline-variant">
-                <p className="font-label-sm text-on-surface-variant mb-xs">{t.notes}</p>
-                <p className="font-body-sm text-on-surface">{selected.notes}</p>
-              </div>}
-              <div className="flex flex-col gap-sm mt-auto">
-                {selected.status === 'pending' && (
-                  <button onClick={() => onUpdateOrder(selected.id, { status: 'in_progress' })}
-                    className="w-full bg-secondary-container text-on-secondary-container py-sm rounded-lg font-label-lg font-semibold hover:opacity-80 flex items-center justify-center gap-xs">
-                    <span className="material-symbols-outlined text-[18px]">play_arrow</span>{t.markInProgress}
-                  </button>
-                )}
-                {selected.status === 'in_progress' && (
-                  <button onClick={() => setResultModal(selected)}
-                    className="w-full py-sm rounded-lg text-white font-label-lg font-semibold hover:opacity-90 shadow-sm flex items-center justify-center gap-xs" style={{ background: '#00685d' }}>
-                    <span className="material-symbols-outlined text-[18px]">upload_file</span>{t.submitResult}
-                  </button>
-                )}
-                <button onClick={() => { window.print(); showToast(t.printedMsg) }}
-                  className="w-full bg-surface-container text-on-surface py-sm rounded-lg font-label-md hover:bg-surface-container-high flex items-center justify-center gap-xs">
-                  <span className="material-symbols-outlined text-[18px]">print</span>{t.printRequisition}
+              ))}
+            </div>
+            {selected.notes && <div className="p-sm rounded-lg bg-surface-container-low border border-outline-variant">
+              <p className="font-label-sm text-on-surface-variant mb-xs">{t.notes}</p>
+              <p className="font-body-sm text-on-surface">{selected.notes}</p>
+            </div>}
+            <div className="flex flex-col gap-sm mt-auto">
+              {selected.status === 'pending' && (
+                <button onClick={() => onUpdateOrder(selected.id, { status: 'in_progress' }, null)}
+                  className="w-full bg-secondary-container text-on-secondary-container py-sm rounded-lg font-label-lg font-semibold hover:opacity-80 flex items-center justify-center gap-xs">
+                  <span className="material-symbols-outlined text-[18px]">play_arrow</span>{t.markInProgress}
                 </button>
-              </div>
+              )}
+              {selected.status === 'in_progress' && (
+                <button onClick={() => setResultModal(selected)}
+                  className="w-full py-sm rounded-lg text-white font-label-lg font-semibold hover:opacity-90 shadow-sm flex items-center justify-center gap-xs" style={{ background: '#00685d' }}>
+                  <span className="material-symbols-outlined text-[18px]">upload_file</span>{t.submitResult}
+                </button>
+              )}
+              <button onClick={() => { window.print(); showToast(t.printedMsg) }}
+                className="w-full bg-surface-container text-on-surface py-sm rounded-lg font-label-md hover:bg-surface-container-high flex items-center justify-center gap-xs">
+                <span className="material-symbols-outlined text-[18px]">print</span>{t.printRequisition}
+              </button>
             </div>
           </div>
         )}
@@ -748,20 +874,20 @@ function CompletedTab({ orders, t, showToast }: { orders: LabOrder[]; t: typeof 
   const [search, setSearch] = useState('')
   const [viewModal, setViewModal] = useState<LabOrder | null>(null)
   const [dispatchModal, setDispatchModal] = useState<LabOrder | null>(null)
-  const completed = orders.filter(o => o.status === 'completed')
+  const completed = orders.filter(o => o.status === 'completed' || o.status === 'critical')
   const filtered = completed.filter(o =>
     !search || o.patientName.toLowerCase().includes(search.toLowerCase()) || o.testName.toLowerCase().includes(search.toLowerCase()) || o.patientId.toLowerCase().includes(search.toLowerCase())
   )
 
   return (
-    <div className="flex flex-col gap-md">
+    <div className="flex flex-col gap-md animate-fadeIn">
       {viewModal && <ViewReportModal order={viewModal} t={t} onClose={() => setViewModal(null)} onPrint={() => showToast(t.printedMsg)} />}
       {dispatchModal && <DispatchModal order={dispatchModal} t={t} onClose={() => setDispatchModal(null)} onDispatch={() => showToast(t.dispatchedMsg)} />}
 
-      <div className="glass-card p-md rounded-xl flex flex-wrap gap-md items-center justify-between shadow-sm">
+      <div className="glass-card p-md rounded-xl flex flex-wrap gap-md items-center justify-between shadow-sm border border-outline-variant/20">
         <div className="relative min-w-[220px]">
           <span className="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
-          <input className="w-full pl-xl pr-sm py-xs rounded-lg border border-outline-variant bg-surface-container-lowest dark:bg-surface-variant text-body-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          <input className="w-full pl-xl pr-sm py-xs rounded-lg border border-outline-variant bg-surface-container-lowest dark:bg-surface-variant text-body-sm focus:outline-none"
             placeholder={t.searchCompleted} value={search} onChange={e => setSearch(e.target.value)} />
         </div>
         <div className="flex items-center gap-sm">
@@ -773,21 +899,21 @@ function CompletedTab({ orders, t, showToast }: { orders: LabOrder[]; t: typeof 
         </div>
       </div>
 
-      <div className="glass-card rounded-xl shadow-sm overflow-hidden">
+      <div className="glass-card rounded-xl shadow-sm overflow-hidden border border-outline-variant/20">
         <div className="p-md border-b border-surface-dim bg-surface-container-lowest dark:bg-on-surface">
           <h3 className="font-title-lg text-title-lg text-on-surface">Completed Reports</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
-            <thead className="sticky top-0 bg-surface-container-lowest dark:bg-on-surface z-10">
-              <tr>{[t.id, t.patient, t.testType, t.category, t.result, t.refRange, t.completedAt, t.actions].map(h => (
-                <th key={h} className="p-sm font-label-md text-on-surface-variant border-b border-surface-dim font-semibold whitespace-nowrap">{h}</th>
+            <thead className="sticky top-0 bg-surface-container-lowest dark:bg-on-surface z-10 border-b border-surface-dim">
+              <tr>{[t.id, t.patient, t.testType, t.category, t.result, t.completedAt, t.actions].map(h => (
+                <th key={h} className="p-sm font-label-md text-on-surface-variant font-semibold whitespace-nowrap">{h}</th>
               ))}</tr>
             </thead>
             <tbody>
               {filtered.map((o, i) => (
-                <tr key={o.id} className={`hover:bg-surface-container-low transition-colors ${i % 2 === 0 ? '' : 'bg-surface-container/30'}`}>
-                  <td className="p-sm border-b border-surface-dim"><span className="font-label-sm text-primary font-mono">{o.id}</span></td>
+                <tr key={o.id} className={`hover:bg-surface-container-low transition-colors border-b border-outline-variant/10 ${i % 2 === 0 ? '' : 'bg-surface-container/30'}`}>
+                  <td className="p-sm border-b border-surface-dim"><span className="font-label-sm text-primary font-mono">{o.id.slice(0, 8)}</span></td>
                   <td className="p-sm border-b border-surface-dim">
                     <div className="flex items-center gap-sm"><Avatar name={o.patientName} />
                       <div><p className="font-body-sm text-on-surface font-semibold whitespace-nowrap">{o.patientName}</p>
@@ -797,28 +923,19 @@ function CompletedTab({ orders, t, showToast }: { orders: LabOrder[]; t: typeof 
                   <td className="p-sm border-b border-surface-dim font-body-sm text-on-surface whitespace-nowrap">{o.testName}</td>
                   <td className="p-sm border-b border-surface-dim font-label-sm text-on-surface-variant">{o.category}</td>
                   <td className="p-sm border-b border-surface-dim font-body-sm text-on-surface">{o.result || '—'}</td>
-                  <td className="p-sm border-b border-surface-dim font-label-sm text-on-surface-variant whitespace-nowrap">{o.referenceRange || '—'}</td>
                   <td className="p-sm border-b border-surface-dim font-label-sm text-on-surface-variant whitespace-nowrap">{o.completedAt || '—'}</td>
                   <td className="p-sm border-b border-surface-dim">
                     <div className="flex gap-xs">
-                      <button onClick={() => setViewModal(o)} className="p-xs text-primary hover:bg-primary-container rounded transition-colors" title={t.view}>
-                        <span className="material-symbols-outlined text-[18px]">visibility</span>
+                      <button onClick={() => setViewModal(o)} className="text-primary hover:underline font-label-md text-xs font-bold">
+                        {t.view}
                       </button>
-                      <button onClick={() => { window.print(); showToast(t.printedMsg) }} className="p-xs text-on-surface-variant hover:bg-surface-container-high rounded transition-colors" title={t.print}>
-                        <span className="material-symbols-outlined text-[18px]">print</span>
-                      </button>
-                      <button onClick={() => setDispatchModal(o)} className="p-xs text-on-surface-variant hover:bg-surface-container-high rounded transition-colors" title={t.dispatch}>
-                        <span className="material-symbols-outlined text-[18px]">share</span>
+                      <button onClick={() => setDispatchModal(o)} className="text-secondary hover:underline font-label-md text-xs font-bold">
+                        {t.dispatch}
                       </button>
                     </div>
                   </td>
                 </tr>
               ))}
-              {filtered.length === 0 && (
-                <tr><td colSpan={8} className="p-xl text-center font-body-md text-on-surface-variant">
-                  <span className="material-symbols-outlined text-[40px] block mx-auto mb-sm opacity-30">check_circle</span>{t.noCompleted}
-                </td></tr>
-              )}
             </tbody>
           </table>
         </div>
@@ -827,73 +944,51 @@ function CompletedTab({ orders, t, showToast }: { orders: LabOrder[]; t: typeof 
   )
 }
 
-// ─── Patient History Tab ───────────────────────────────────────────────────────
+// ─── History Tab ───────────────────────────────────────────────────────────────
 function HistoryTab({ orders, t, showToast }: { orders: LabOrder[]; t: typeof T['en']; showToast: (m: string) => void }) {
-  const [search, setSearch] = useState('')
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null)
+  const [viewModal, setViewModal] = useState<LabOrder | null>(null)
 
-  const byPatient = orders.reduce((acc, o) => {
-    if (!acc[o.patientId]) acc[o.patientId] = { name: o.patientName, id: o.patientId, age: o.age, orders: [] }
+  const patientMap = orders.reduce((acc, o) => {
+    if (!acc[o.patientId]) {
+      acc[o.patientId] = { name: o.patientName, orders: [] }
+    }
     acc[o.patientId].orders.push(o)
     return acc
-  }, {} as Record<string, { name: string; id: string; age: number; orders: LabOrder[] }>)
+  }, {} as Record<string, { name: string; orders: LabOrder[] }>)
 
-  const patients = Object.values(byPatient).filter(p =>
-    !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.id.toLowerCase().includes(search.toLowerCase())
-  )
-  const sel = patients.find(p => p.id === selectedId) || null
+  const patientsList = Object.entries(patientMap).map(([id, p]) => ({ id, name: p.name, orders: p.orders }))
+  const sel = selectedPatientId ? patientMap[selectedPatientId] : null
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg" style={{ minHeight: '600px' }}>
-      {/* Patient list */}
-      <div className="glass-card rounded-xl shadow-sm overflow-hidden flex flex-col">
-        <div className="p-md border-b border-surface-dim bg-surface-container-lowest dark:bg-on-surface">
-          <h3 className="font-title-lg text-title-lg text-on-surface mb-sm">{t.patient}</h3>
-          <div className="relative">
-            <span className="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
-            <input className="w-full pl-xl pr-sm py-xs rounded-lg border border-outline-variant bg-surface-container-lowest dark:bg-surface-variant text-body-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder={t.searchPatient} value={search} onChange={e => setSearch(e.target.value)} />
-          </div>
-        </div>
-        <div className="flex-1 overflow-auto">
-          {patients.map(p => (
-            <div key={p.id} onClick={() => setSelectedId(p.id)}
-              className={`p-md border-b border-surface-dim cursor-pointer hover:bg-surface-container-low transition-colors ${selectedId === p.id ? 'bg-primary-container/30 border-l-4 border-l-primary' : ''}`}
-              style={selectedId === p.id ? { borderLeftColor: '#00685d' } : {}}>
-              <div className="flex items-center gap-sm">
-                <Avatar name={p.name} critical={p.orders.some(o => o.isCritical)} />
-                <div className="flex-1 min-w-0">
-                  <p className="font-body-md text-on-surface font-semibold truncate">{p.name}</p>
-                  <p className="font-label-sm text-on-surface-variant">{p.id} · {p.age}y · {p.orders.length} {t.tests}</p>
-                </div>
-                {p.orders.some(o => o.isCritical) && (
-                  <span className="material-symbols-outlined text-error text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>warning</span>
-                )}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-lg animate-fadeIn">
+      {viewModal && <ViewReportModal order={viewModal} t={t} onClose={() => setViewModal(null)} onPrint={() => showToast(t.printedMsg)} />}
+
+      {/* Patient List */}
+      <div className="glass-card rounded-xl overflow-hidden border border-outline-variant/20 flex flex-col h-full max-h-[600px]">
+        <div className="p-md bg-surface-container-low border-b border-surface-dim"><h3 className="font-title-md text-title-md text-on-surface">{t.patient}</h3></div>
+        <div className="flex-1 overflow-auto divide-y divide-outline-variant/10">
+          {patientsList.map(p => (
+            <div key={p.id} onClick={() => setSelectedPatientId(p.id)}
+              className={`p-md flex items-center gap-sm cursor-pointer hover:bg-surface-container-low transition-colors ${selectedPatientId === p.id ? 'bg-primary-container/20 font-semibold' : ''}`}>
+              <Avatar name={p.name} />
+              <div>
+                <p className="font-body-md text-on-surface">{p.name}</p>
+                <p className="font-label-sm text-on-surface-variant">{p.id} · {p.orders.length} {t.tests}</p>
               </div>
             </div>
           ))}
-          {patients.length === 0 && (
-            <div className="p-xl text-center">
-              <span className="material-symbols-outlined text-[40px] block mx-auto mb-sm opacity-30">person_search</span>
-              <p className="font-body-md text-on-surface-variant">{t.noOrders}</p>
-            </div>
-          )}
         </div>
       </div>
 
-      {/* History detail */}
-      <div className="lg:col-span-2 glass-card rounded-xl shadow-sm overflow-hidden flex flex-col">
+      {/* Patient Lab History Details */}
+      <div className="md:col-span-2 glass-card rounded-xl overflow-hidden border border-outline-variant/20 flex flex-col min-h-[400px]">
         {sel ? (
           <>
-            <div className="p-md border-b border-surface-dim bg-surface-container-lowest dark:bg-on-surface flex items-center justify-between">
-              <div className="flex items-center gap-md">
-                <div className="w-11 h-11 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-sm" style={{ background: '#00685d', color: '#fff' }}>
-                  {sel.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                </div>
-                <div>
-                  <h3 className="font-title-lg text-title-lg text-on-surface">{sel.name}</h3>
-                  <p className="font-body-sm text-on-surface-variant">{sel.id} · Age {sel.age}</p>
-                </div>
+            <div className="p-md bg-surface-container-low border-b border-surface-dim flex justify-between items-center">
+              <div>
+                <h3 className="font-title-md text-title-md text-on-surface">{sel.name}</h3>
+                <p className="font-label-sm text-on-surface-variant">{selectedPatientId}</p>
               </div>
               <button onClick={() => { exportCSV(sel.orders); showToast(t.exportedMsg) }}
                 className="bg-secondary-container text-primary font-label-md py-xs px-md rounded-lg hover:opacity-80 flex items-center gap-xs">
@@ -910,12 +1005,12 @@ function HistoryTab({ orders, t, showToast }: { orders: LabOrder[]; t: typeof T[
                         <p className="font-title-sm text-on-surface font-semibold">{o.testName}</p>
                         <PriorityBadge priority={o.priority} />
                       </div>
-                      <p className="font-label-sm text-on-surface-variant">{o.id} · {o.category} · {o.requestedBy}</p>
+                      <p className="font-label-sm text-on-surface-variant">{o.id.slice(0, 8)} · {o.category} · {o.requestedBy}</p>
                     </div>
                     <StatusBadge status={o.status} t={t} />
                   </div>
                   <div className="flex flex-wrap gap-lg">
-                    {[[t.requested, o.requestedAt],[o.completedAt ? t.completedAt : null, o.completedAt],[o.result ? t.result : null, o.result],[o.referenceRange ? t.refRange : null, o.referenceRange]].filter(([l]) => l).map(([label, value]) => (
+                    {[[t.requested, o.requestedAt],[o.completedAt ? t.completedAt : null, o.completedAt],[o.result ? t.result : null, o.result]].filter(([l]) => l).map(([label, value]) => (
                       <div key={label}>
                         <span className="font-label-sm text-on-surface-variant block">{label}</span>
                         <span className={`font-body-sm font-semibold ${o.isCritical && label === t.result ? 'text-error' : 'text-on-surface'}`}>{value}</span>
@@ -944,22 +1039,29 @@ function HistoryTab({ orders, t, showToast }: { orders: LabOrder[]; t: typeof T[
   )
 }
 
-// ─── Main Page ─────────────────────────────────────────────────────────────────
+// ─── Main Page Component ─────────────────────────────────────────────────────────
 export default function LaboratoryPage() {
   const location = useLocation()
   const navigate = useNavigate()
   const user = useAuthStore(s => s.user)
   const { language } = useUIStore()
-  const t = T[language as Lang] ?? T.en
+  const t = (T[language as Lang] ?? T.en) as typeof T.en
   const isLabTech = user?.roles.includes('Lab Tech')
 
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab') || 'dashboard'
   const setTab = (tab: string) => navigate(`/laboratory?tab=${tab}`, { replace: true })
 
-  const [orders, setOrders] = useState<LabOrder[]>(INITIAL_ORDERS)
   const [newOrderOpen, setNewOrderOpen] = useState(false)
   const [toast, setToast] = useState('')
+
+  // React Query Hook integration
+  const { data: labTestsData, refetch } = useLabTestsList()
+  const createLabTest = useCreateLabTest()
+  const updateLabStatus = useUpdateLabStatus()
+  const uploadLabReport = useUploadLabReport()
+
+  const orders = (labTestsData?.results || []).map(mapBackendToFrontend)
 
   useEffect(() => {
     if (isLabTech && !queryParams.get('tab')) navigate('/laboratory?tab=pending', { replace: true })
@@ -967,12 +1069,48 @@ export default function LaboratoryPage() {
 
   const showToast = (msg: string) => setToast(msg)
 
-  const updateOrder = (id: string, patch: Partial<LabOrder>) =>
-    setOrders(prev => prev.map(o => o.id === id ? { ...o, ...patch } : o))
+  const handleUpdateOrder = (id: string, patch: any, file: File | null) => {
+    // If setting status to completed/critical with result/findings
+    if (patch.status === 'completed' || patch.status === 'critical') {
+      updateLabStatus.mutate({
+        id,
+        data: { new_status: patch.status, key_findings: patch.key_findings },
+      }, {
+        onSuccess: () => {
+          if (file) {
+            uploadLabReport.mutate({
+              id,
+              data: { file },
+            }, {
+              onSuccess: () => {
+                refetch()
+              }
+            })
+          } else {
+            refetch()
+          }
+        }
+      })
+    } else {
+      // Just progress status e.g. marking in_progress
+      updateLabStatus.mutate({
+        id,
+        data: { new_status: patch.status },
+      }, {
+        onSuccess: () => {
+          refetch()
+        }
+      })
+    }
+  }
 
-  const addOrder = (o: LabOrder) => {
-    setOrders(prev => [o, ...prev])
-    showToast(t.orderAdded)
+  const handleAddOrder = (payload: any) => {
+    createLabTest.mutate(payload, {
+      onSuccess: () => {
+        showToast(t.orderAdded)
+        refetch()
+      },
+    })
   }
 
   const tabs = [
@@ -985,10 +1123,10 @@ export default function LaboratoryPage() {
   return (
     <div className="flex-1 overflow-y-auto p-margin-mobile md:p-margin-desktop w-full max-w-[1440px] mx-auto pb-xl">
       {toast && <Toast message={toast} onClose={() => setToast('')} />}
-      {newOrderOpen && <NewOrderModal t={t} onClose={() => setNewOrderOpen(false)} onAdd={addOrder} />}
+      {newOrderOpen && <NewOrderModal t={t} onClose={() => setNewOrderOpen(false)} onAdd={handleAddOrder} />}
 
-      {/* ── Header ─────────────────────────────────────────────── */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-lg gap-md">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-lg gap-md pt-4">
         <div>
           <div className="flex items-center gap-sm mb-xs">
             <div className="p-sm rounded-xl" style={{ background: '#00685d' }}>
@@ -1003,11 +1141,11 @@ export default function LaboratoryPage() {
         <div className="flex flex-col items-end gap-xs">
           <div className="flex gap-sm">
             <button onClick={() => { exportCSV(orders); showToast(t.exportedMsg) }}
-              className="bg-secondary-container text-primary font-label-lg py-sm px-md rounded-lg hover:opacity-80 flex items-center gap-xs transition-opacity">
+              className="bg-secondary-container text-primary font-label-lg py-sm px-md rounded-lg hover:opacity-80 flex items-center gap-xs transition-opacity cursor-pointer">
               <span className="material-symbols-outlined text-[18px]">picture_as_pdf</span>{t.exportSummary}
             </button>
             <button onClick={() => setNewOrderOpen(true)}
-              className="text-white font-label-lg py-sm px-md rounded-lg hover:opacity-90 flex items-center gap-xs shadow-sm transition-opacity" style={{ background: '#00685d' }}>
+              className="text-white font-label-lg py-sm px-md rounded-lg hover:opacity-90 flex items-center gap-xs shadow-sm transition-opacity cursor-pointer" style={{ background: '#00685d' }}>
               <span className="material-symbols-outlined text-[18px]">add</span>{t.newLabOrder}
             </button>
           </div>
@@ -1019,11 +1157,11 @@ export default function LaboratoryPage() {
         </div>
       </div>
 
-      {/* ── Tabs ────────────────────────────────────────────────── */}
+      {/* Tabs */}
       <div className="flex gap-xs mb-lg p-xs bg-surface-container rounded-xl overflow-x-auto">
         {tabs.map(tab => (
           <button key={tab.id} onClick={() => setTab(tab.id)}
-            className={`flex items-center gap-xs py-sm px-md rounded-lg font-label-lg whitespace-nowrap transition-all duration-150 ${activeTab === tab.id ? 'bg-white dark:bg-surface text-primary shadow-sm font-semibold' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'}`}>
+            className={`flex items-center gap-xs py-sm px-md rounded-lg font-label-lg whitespace-nowrap transition-all duration-150 cursor-pointer ${activeTab === tab.id ? 'bg-white dark:bg-surface text-primary shadow-sm font-semibold' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'}`}>
             <span className="material-symbols-outlined text-[18px]" style={activeTab === tab.id ? { fontVariationSettings: "'FILL' 1" } : {}}>{tab.icon}</span>
             {tab.label}
             {tab.id === 'pending' && orders.filter(o => ['pending','in_progress','critical'].includes(o.status)).length > 0 && (
@@ -1032,7 +1170,7 @@ export default function LaboratoryPage() {
               </span>
             )}
             {tab.id === 'dashboard' && orders.filter(o => o.isCritical).length > 0 && (
-              <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full bg-error text-white">
+              <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full bg-error text-white animate-pulse">
                 {orders.filter(o => o.isCritical).length}
               </span>
             )}
@@ -1040,9 +1178,9 @@ export default function LaboratoryPage() {
         ))}
       </div>
 
-      {/* ── Tab Content ─────────────────────────────────────────── */}
+      {/* Tab Content */}
       {activeTab === 'dashboard' && <DashboardTab orders={orders} t={t} onNewOrder={() => setNewOrderOpen(true)} />}
-      {activeTab === 'pending'   && <PendingTab   orders={orders} t={t} onUpdateOrder={updateOrder} onNewOrder={() => setNewOrderOpen(true)} showToast={showToast} />}
+      {activeTab === 'pending'   && <PendingTab   orders={orders} t={t} onUpdateOrder={handleUpdateOrder} onNewOrder={() => setNewOrderOpen(true)} showToast={showToast} />}
       {activeTab === 'completed' && <CompletedTab orders={orders} t={t} showToast={showToast} />}
       {activeTab === 'history'   && <HistoryTab   orders={orders} t={t} showToast={showToast} />}
     </div>

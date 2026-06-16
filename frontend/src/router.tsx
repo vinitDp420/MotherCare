@@ -29,6 +29,7 @@ const HRPage = lazy(() => import('@/modules/hr/HRPage'))
 const ReportsPage = lazy(() => import('@/modules/reports/ReportsPage'))
 const SettingsPage = lazy(() => import('@/modules/settings/SettingsPage'))
 const ConsultationPage = lazy(() => import('@/modules/consultations/ConsultationPage'))
+const PrintPrescriptionPage = lazy(() => import('@/modules/prescriptions/PrintPrescriptionPage'))
 
 // ── Guards ───────────────────────────────────────────────────────────────────
 function RequireAuth({ children }: { children: ReactNode }) {
@@ -72,6 +73,10 @@ export const router = createBrowserRouter([
       { path: '/reports', element: <ReportsPage /> },
       { path: '/settings', element: <SettingsPage /> },
     ],
+  },
+  {
+    path: '/prescriptions/:id/print',
+    element: <RequireAuth><PrintPrescriptionPage /></RequireAuth>
   },
 
   // 404 fallback

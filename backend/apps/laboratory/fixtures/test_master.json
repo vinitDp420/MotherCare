@@ -1,0 +1,498 @@
+[
+  {
+    "model": "laboratory.testmaster",
+    "pk": "7aa76ca4-216a-5f9c-acce-6ee370ab757e",
+    "fields": {
+      "name": "Complete Blood Count",
+      "code": "CBC",
+      "category": "Hematology",
+      "normal_range": "12.0 - 16.0",
+      "unit": "g/dL",
+      "price": "300.00",
+      "turnaround_hours": 12,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "ad8c7ca0-b1f3-5a89-9510-e83e34faa9c6",
+    "fields": {
+      "name": "Blood Grouping & Rh Typing",
+      "code": "BG_RH",
+      "category": "Hematology",
+      "normal_range": "N/A",
+      "unit": "",
+      "price": "150.00",
+      "turnaround_hours": 4,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "29adba26-3768-53b2-88c8-921d281316ad",
+    "fields": {
+      "name": "Oral Glucose Tolerance Test (75g)",
+      "code": "OGTT",
+      "category": "Biochemistry",
+      "normal_range": "< 140",
+      "unit": "mg/dL",
+      "price": "450.00",
+      "turnaround_hours": 24,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "7823b60e-cb09-5801-b01f-4a0f9b0c3d7f",
+    "fields": {
+      "name": "Glucose Challenge Test (50g)",
+      "code": "GCT",
+      "category": "Biochemistry",
+      "normal_range": "< 140",
+      "unit": "mg/dL",
+      "price": "350.00",
+      "turnaround_hours": 12,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "207a4279-7b07-54fd-8968-ca67d1903e05",
+    "fields": {
+      "name": "Urine Routine & Microscopy",
+      "code": "URINE_RM",
+      "category": "Urinalysis",
+      "normal_range": "Negative",
+      "unit": "",
+      "price": "150.00",
+      "turnaround_hours": 8,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "593062bd-cdd6-5fb2-9734-fa888bad1d33",
+    "fields": {
+      "name": "Rubella Antibody IgG",
+      "code": "RUBELLA_IGG",
+      "category": "Serology",
+      "normal_range": "> 10 (Immuned)",
+      "unit": "IU/mL",
+      "price": "600.00",
+      "turnaround_hours": 24,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "d3c18f35-24f3-5473-9ca7-01ace16e6e3e",
+    "fields": {
+      "name": "HIV I & II Antibodies Screen",
+      "code": "HIV_SCR",
+      "category": "Serology",
+      "normal_range": "Non-Reactive",
+      "unit": "",
+      "price": "400.00",
+      "turnaround_hours": 24,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "9001601d-94bc-51c2-9aaf-6f6f28ce4e79",
+    "fields": {
+      "name": "HBsAg Screen (Hep B)",
+      "code": "HBSAG",
+      "category": "Serology",
+      "normal_range": "Non-Reactive",
+      "unit": "",
+      "price": "350.00",
+      "turnaround_hours": 24,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "f8abb094-e88e-58b3-bac2-fd761710d711",
+    "fields": {
+      "name": "VDRL / Syphilis Screen",
+      "code": "VDRL",
+      "category": "Serology",
+      "normal_range": "Non-Reactive",
+      "unit": "",
+      "price": "250.00",
+      "turnaround_hours": 24,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "15950bc5-45e0-53db-9391-2fbc28792cd2",
+    "fields": {
+      "name": "Thyroid Stimulating Hormone",
+      "code": "TSH",
+      "category": "Endocrinology",
+      "normal_range": "0.4 - 4.0",
+      "unit": "uIU/mL",
+      "price": "500.00",
+      "turnaround_hours": 24,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "034f3a96-8ade-5076-85f6-32fba43b2f0a",
+    "fields": {
+      "name": "Glycated Hemoglobin",
+      "code": "HBA1C",
+      "category": "Biochemistry",
+      "normal_range": "4.0 - 5.6",
+      "unit": "%",
+      "price": "450.00",
+      "turnaround_hours": 24,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "f8893640-674d-5638-b91d-5819e4c7d1b1",
+    "fields": {
+      "name": "Serum Iron Level",
+      "code": "SERUM_IRON",
+      "category": "Biochemistry",
+      "normal_range": "50 - 170",
+      "unit": "ug/dL",
+      "price": "400.00",
+      "turnaround_hours": 24,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "cc3ea8c4-23cb-5e0c-beea-a238bbe1af12",
+    "fields": {
+      "name": "Serum Ferritin Level",
+      "code": "FERRITIN",
+      "category": "Biochemistry",
+      "normal_range": "15 - 150",
+      "unit": "ng/mL",
+      "price": "600.00",
+      "turnaround_hours": 24,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "3111c0f8-ef89-52f6-8b73-ed61f1fb28f7",
+    "fields": {
+      "name": "Serum Calcium Level",
+      "code": "CALCIUM",
+      "category": "Biochemistry",
+      "normal_range": "8.5 - 10.2",
+      "unit": "mg/dL",
+      "price": "250.00",
+      "turnaround_hours": 12,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "b443d589-c93b-5c2e-9bb1-f1414911b705",
+    "fields": {
+      "name": "25-Hydroxy Vitamin D",
+      "code": "VIT_D",
+      "category": "Endocrinology",
+      "normal_range": "30 - 100",
+      "unit": "ng/mL",
+      "price": "1200.00",
+      "turnaround_hours": 48,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "08b38bd1-f390-5933-a4e0-6146319fc107",
+    "fields": {
+      "name": "Serum Albumin",
+      "code": "ALBUMIN",
+      "category": "Biochemistry",
+      "normal_range": "3.5 - 5.0",
+      "unit": "g/dL",
+      "price": "200.00",
+      "turnaround_hours": 12,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "cd2d3050-ba9c-5546-9c9b-5e11d10ee1df",
+    "fields": {
+      "name": "Serum Creatinine",
+      "code": "CREATININE",
+      "category": "Biochemistry",
+      "normal_range": "0.5 - 1.1",
+      "unit": "mg/dL",
+      "price": "250.00",
+      "turnaround_hours": 12,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "d186603a-7bec-5c27-bf10-9665005d09d5",
+    "fields": {
+      "name": "Liver Function Test",
+      "code": "LFT",
+      "category": "Biochemistry",
+      "normal_range": "N/A",
+      "unit": "",
+      "price": "650.00",
+      "turnaround_hours": 24,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "64bb5535-fb90-5e7a-999c-d6db1e5f042e",
+    "fields": {
+      "name": "Renal Function Test",
+      "code": "RFT",
+      "category": "Biochemistry",
+      "normal_range": "N/A",
+      "unit": "",
+      "price": "550.00",
+      "turnaround_hours": 24,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "576199ad-35ac-51d0-8725-7fdf59c42415",
+    "fields": {
+      "name": "Beta hCG Quantitative",
+      "code": "BETA_HCG",
+      "category": "Endocrinology",
+      "normal_range": "N/A",
+      "unit": "mIU/mL",
+      "price": "750.00",
+      "turnaround_hours": 12,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "ffd10401-30a7-597a-962f-6cda7c7a36ac",
+    "fields": {
+      "name": "Obstetric Ultrasound Scan",
+      "code": "OB_USG",
+      "category": "Radiology",
+      "normal_range": "N/A",
+      "unit": "",
+      "price": "1500.00",
+      "turnaround_hours": 4,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "cee84dbb-77dc-528b-abdf-bd45002c01f7",
+    "fields": {
+      "name": "Anomaly Ultrasound Scan",
+      "code": "ANOMALY_USG",
+      "category": "Radiology",
+      "normal_range": "N/A",
+      "unit": "",
+      "price": "2500.00",
+      "turnaround_hours": 24,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "51c2d0b2-10fa-528d-bd7d-003432bdac09",
+    "fields": {
+      "name": "Papanicolaou Test (Pap Smear)",
+      "code": "PAP_SMEAR",
+      "category": "Pathology",
+      "normal_range": "Normal",
+      "unit": "",
+      "price": "800.00",
+      "turnaround_hours": 72,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "103a238d-3aa3-5e93-be11-0fcc398ebce2",
+    "fields": {
+      "name": "Free Thyroxine (FT4)",
+      "code": "FT4",
+      "category": "Endocrinology",
+      "normal_range": "0.8 - 1.8",
+      "unit": "ng/dL",
+      "price": "450.00",
+      "turnaround_hours": 24,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "35aeabd8-ff18-56d5-a06a-e3889ec35e17",
+    "fields": {
+      "name": "Toxoplasmosis IgG Antibody",
+      "code": "TOXO_IGG",
+      "category": "Serology",
+      "normal_range": "Negative",
+      "unit": "",
+      "price": "500.00",
+      "turnaround_hours": 24,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "350e80d4-17ac-5d53-b3f8-16e20518cb08",
+    "fields": {
+      "name": "Cytomegalovirus IgG Antibody",
+      "code": "CMV_IGG",
+      "category": "Serology",
+      "normal_range": "Negative",
+      "unit": "",
+      "price": "500.00",
+      "turnaround_hours": 24,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "415f1c6f-9a96-5e1f-860d-f221cdc6b07a",
+    "fields": {
+      "name": "G6PD Enzyme Activity",
+      "code": "G6PD",
+      "category": "Biochemistry",
+      "normal_range": "4.6 - 13.5",
+      "unit": "U/g Hb",
+      "price": "800.00",
+      "turnaround_hours": 48,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "b3f2e678-aa6e-598a-87a0-83727eb448a9",
+    "fields": {
+      "name": "Indirect Coomb's Test",
+      "code": "COOMBS_INDIRECT",
+      "category": "Hematology",
+      "normal_range": "Negative",
+      "unit": "",
+      "price": "450.00",
+      "turnaround_hours": 24,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "86db7bc9-9463-50c2-b163-2966b7393906",
+    "fields": {
+      "name": "Platelet Count check",
+      "code": "PLATELETS",
+      "category": "Hematology",
+      "normal_range": "150 - 450",
+      "unit": "10^3/uL",
+      "price": "200.00",
+      "turnaround_hours": 8,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "b6edbef3-b889-57c7-99d5-7db0c97947ec",
+    "fields": {
+      "name": "Prothrombin Time & INR",
+      "code": "PT_INR",
+      "category": "Hematology",
+      "normal_range": "0.8 - 1.2",
+      "unit": "INR",
+      "price": "400.00",
+      "turnaround_hours": 12,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  },
+  {
+    "model": "laboratory.testmaster",
+    "pk": "537be9ac-c143-5e71-a5dc-2c02c5fdae4e",
+    "fields": {
+      "name": "Bleeding & Clotting Time",
+      "code": "BT_CT",
+      "category": "Hematology",
+      "normal_range": "BT: 2-7, CT: 5-11",
+      "unit": "mins",
+      "price": "200.00",
+      "turnaround_hours": 4,
+      "is_active": true,
+      "created_at": "2026-06-16T00:00:00Z",
+      "updated_at": "2026-06-16T00:00:00Z"
+    }
+  }
+]

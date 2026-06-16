@@ -46,6 +46,7 @@ export interface AuthUser {
   is_active: boolean;
   roles: string[];
   permissions: string[];  // "module:action" format
+  patient_profile_id?: string | null;
   last_login: string | null;
 }
 

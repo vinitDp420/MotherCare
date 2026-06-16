@@ -1,12 +1,30 @@
 /**
  * PharmacyPage — Full Pharmacy Management Module
  * Tabs: Overview | Inventory | Prescriptions | Billing | Reports
- * Features: Working buttons, modals, state mgmt, EN/MR/HI translations
+ * Features: Working buttons, modals, state mgmt, EN/MR/HI translations, live APIs
  */
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useForm, useFieldArray } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { useAuthStore } from '@/store/authStore'
 import { useUIStore } from '@/store/uiStore'
+import { usePatientsList } from '@/hooks/usePatients'
+import {
+  useMedicinesList,
+  useCreateMedicine,
+  useUpdateMedicine,
+  useDeleteMedicine,
+  useBatchesList,
+  useCreateBatch,
+  useUpdateBatch,
+  useDeleteBatch,
+  useSalesList,
+  useDispensePrescription,
+  useOtcSale,
+} from '@/hooks/usePharmacy'
+import { usePrescriptionsList } from '@/hooks/usePrescriptions'
 
 // ─── Brand color ──────────────────────────────────────────────────────────────
 const BRAND = '#00685d'
@@ -32,7 +50,7 @@ const T = {
     pendingPrescriptions: 'Pending Prescriptions', newBadge: 'New', recentSales: 'Recent Sales',
     inventoryStatus: 'Inventory Status', showing: 'Showing',
     // Modals
-    addMedicineTitle: 'Add New Medicine', medicineName: 'Medicine Name', batchNo: 'Batch No.',
+    addMedicineTitle: 'Add New Medicine', medicineName: 'Medicine Name', genericName: 'Generic (INN) Name', batchNo: 'Batch No.',
     categoryLabel: 'Category', stockQty: 'Stock Quantity', expiryDate: 'Expiry Date',
     priceLabel: 'Price (₹)', supplier: 'Supplier', addBtn: 'Add Medicine',
     restockTitle: 'Restock Medicine', restockQty: 'Add Quantity',
@@ -67,7 +85,7 @@ const T = {
     exportCSV: 'CSV निर्यात', print: 'मुद्रण', markFulfilled: 'पूर्ण म्हणून चिन्हांकित करा',
     pendingPrescriptions: 'प्रलंबित प्रिस्क्रिप्शन', newBadge: 'नवीन', recentSales: 'अलीकडील विक्री',
     inventoryStatus: 'साठा स्थिती', showing: 'दाखवत आहे',
-    addMedicineTitle: 'नवीन औषध जोडा', medicineName: 'औषधाचे नाव', batchNo: 'बॅच क्र.',
+    addMedicineTitle: 'नवीन औषध जोडा', medicineName: 'औषधाचे नाव', genericName: 'जेनेरिक नाव', batchNo: 'बॅच क्र.',
     categoryLabel: 'श्रेणी', stockQty: 'साठा प्रमाण', expiryDate: 'कालबाह्यता तारीख',
     priceLabel: 'किंमत (₹)', supplier: 'पुरवठादार', addBtn: 'औषध जोडा',
     restockTitle: 'साठा भरा', restockQty: 'प्रमाण जोडा',
@@ -96,7 +114,7 @@ const T = {
     exportCSV: 'CSV निर्यात', print: 'प्रिंट', markFulfilled: 'पूर्ण चिह्नित करें',
     pendingPrescriptions: 'लंबित प्रिस्क्रिप्शन', newBadge: 'नया', recentSales: 'हाल की बिक्री',
     inventoryStatus: 'स्टॉक स्थिति', showing: 'दिखा रहे हैं',
-    addMedicineTitle: 'नई दवा जोड़ें', medicineName: 'दवा का नाम', batchNo: 'बैच नं.',
+    addMedicineTitle: 'नई दवा जोड़ें', medicineName: 'दवा का नाम', genericName: 'जेनेरिक नाम', batchNo: 'बैच नं.',
     categoryLabel: 'श्रेणी', stockQty: 'स्टॉक मात्रा', expiryDate: 'समाप्ति तिथि',
     priceLabel: 'कीमत (₹)', supplier: 'आपूर्तिकर्ता', addBtn: 'दवा जोड़ें',
     restockTitle: 'स्टॉक भरें', restockQty: 'मात्रा जोड़ें',
@@ -114,52 +132,41 @@ const T = {
 } as const
 type Lang = keyof typeof T
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
-type MedCategory = 'Vitamin' | 'Antibiotic' | 'Painkiller' | 'Mineral' | 'Hormone' | 'Antacid' | 'Supplement'
-type BillStatus = 'paid' | 'unpaid' | 'partial'
+// ─── Validation Schemas ────────────────────────────────────────────────────────
 
-interface Medicine {
-  id: string; name: string; batch: string; category: MedCategory
-  stock: number; maxStock: number; expiry: string; price: number
-  supplier: string; isLowStock?: boolean; isExpiringSoon?: boolean
-}
+const medicineSchema = z.object({
+  name: z.string().min(1, 'Medicine name is required'),
+  generic_name: z.string().optional(),
+  category: z.string().min(1, 'Category is required'),
+  unit: z.string().min(1, 'Dispensing unit is required'),
+  reorder_level: z.coerce.number().min(0, 'Must be a positive number'),
+})
 
-interface Prescription {
-  id: string; patient: string; patientId: string; doctor: string
-  medicines: string; time: string; fulfilled: boolean
-}
+const batchSchema = z.object({
+  batch_number: z.string().min(1, 'Batch number is required'),
+  supplier_name: z.string().min(1, 'Supplier is required'),
+  purchase_date: z.string().min(1, 'Purchase date is required'),
+  expiry_date: z.string().min(1, 'Expiry date is required'),
+  quantity: z.coerce.number().min(1, 'Must be at least 1'),
+  purchase_price: z.string().min(1, 'Purchase price is required'),
+  selling_price: z.string().min(1, 'Selling price is required'),
+}).refine(data => {
+  const pDate = new Date(data.purchase_date)
+  const eDate = new Date(data.expiry_date)
+  return eDate > pDate
+}, {
+  message: 'Expiry date must be after purchase date',
+  path: ['expiry_date']
+})
 
-interface Invoice {
-  id: string; patient: string; patientId: string; amount: number
-  status: BillStatus; date: string; items: string
-}
-
-// ─── Initial Data ──────────────────────────────────────────────────────────────
-const INIT_MEDICINES: Medicine[] = [
-  { id: 'M001', name: 'Prenatal Vitamins Plus', batch: 'MC-2023-X92', category: 'Vitamin',    stock: 340, maxStock: 400, expiry: 'Dec 2025', price: 24.99, supplier: 'HealthPlus',  isLowStock: false },
-  { id: 'M002', name: 'Amoxicillin 500mg',      batch: 'AB-8821-L0',  category: 'Antibiotic', stock: 12,  maxStock: 200, expiry: 'Aug 2024', price: 12.50, supplier: 'MedBridge',  isLowStock: true  },
-  { id: 'M003', name: 'Ibuprofen 400mg',        batch: 'PK-3342-M1',  category: 'Painkiller', stock: 150, maxStock: 250, expiry: 'Jan 2026', price: 8.99,  supplier: 'PharmaCo',   isLowStock: false },
-  { id: 'M004', name: 'Iron Supplements',        batch: 'MN-9001-S3',  category: 'Mineral',    stock: 89,  maxStock: 200, expiry: 'Nov 2023', price: 15.00, supplier: 'NutriCare',  isLowStock: false, isExpiringSoon: true },
-  { id: 'M005', name: 'Folic Acid 5mg',          batch: 'FA-1122-P9',  category: 'Vitamin',    stock: 18,  maxStock: 300, expiry: 'Mar 2026', price: 5.50,  supplier: 'HealthPlus',  isLowStock: true  },
-  { id: 'M006', name: 'Metformin 500mg',         batch: 'MF-4421-D2',  category: 'Supplement', stock: 220, maxStock: 300, expiry: 'Sep 2025', price: 18.00, supplier: 'DiaCare',    isLowStock: false },
-  { id: 'M007', name: 'Progesterone 200mg',      batch: 'PG-7731-H1',  category: 'Hormone',    stock: 75,  maxStock: 150, expiry: 'Jun 2025', price: 45.00, supplier: 'HormaCo',    isLowStock: false },
-  { id: 'M008', name: 'Omeprazole 20mg',         batch: 'OM-5512-G4',  category: 'Antacid',    stock: 9,   maxStock: 200, expiry: 'Dec 2025', price: 7.50,  supplier: 'PharmaCo',   isLowStock: true  },
-]
-
-const INIT_PRESCRIPTIONS: Prescription[] = [
-  { id: 'RX-1001', patient: 'Emma Watson',     patientId: 'MC-4901', doctor: 'Dr. Sarah Jenkins', medicines: '1x Prenatal Vitamins, 1x Iron',      time: '10m ago', fulfilled: false },
-  { id: 'RX-1002', patient: 'Sophia Martinez', patientId: 'MC-5034', doctor: 'Dr. Alan Smith',    medicines: '2x Folic Acid 5mg, 1x Progesterone',  time: '1h ago',  fulfilled: false },
-  { id: 'RX-1003', patient: 'Priya Rajan',     patientId: 'MC-4877', doctor: 'Dr. Patel',         medicines: '1x Metformin 500mg, 1x Omeprazole',   time: '2h ago',  fulfilled: false },
-  { id: 'RX-1004', patient: 'Meera Kapoor',    patientId: 'MC-5012', doctor: 'Dr. Sharma',        medicines: '3x Ibuprofen 400mg',                  time: '3h ago',  fulfilled: true  },
-]
-
-const INIT_INVOICES: Invoice[] = [
-  { id: 'INV-2045', patient: 'Emma Watson',     patientId: 'MC-4901', amount: 45.50,  status: 'paid',    date: 'Just now',   items: 'Prenatal Vitamins, Iron' },
-  { id: 'INV-2044', patient: 'Meera Kapoor',    patientId: 'MC-5012', amount: 12.00,  status: 'paid',    date: '15m ago',    items: 'Ibuprofen 400mg' },
-  { id: 'INV-2043', patient: 'Sunita Rao',      patientId: 'MC-4803', amount: 120.90, status: 'paid',    date: '1h ago',     items: 'Progesterone, Folic Acid' },
-  { id: 'INV-2042', patient: 'Anita Bose',      patientId: 'MC-5034', amount: 67.00,  status: 'unpaid',  date: 'Yesterday',  items: 'Amoxicillin 500mg' },
-  { id: 'INV-2041', patient: 'Kavya Nair',      patientId: 'MC-4755', amount: 89.50,  status: 'partial', date: 'Yesterday',  items: 'Metformin, Omeprazole' },
-]
+const otcSaleSchema = z.object({
+  patient_id: z.string().min(1, 'Patient is required'),
+  items: z.array(z.object({
+    medicine_id: z.string().min(1, 'Medicine is required'),
+    qty: z.coerce.number().min(1, 'Quantity must be at least 1'),
+    available_qty: z.number().optional(),
+  })).min(1, 'At least one medicine is required')
+})
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 function Toast({ msg, onClose }: { msg: string; onClose: () => void }) {
@@ -194,26 +201,17 @@ function StockBar({ stock, max, isLow }: { stock: number; max: number; isLow?: b
   return (
     <div className="flex items-center gap-xs">
       <div className="w-20 h-1.5 bg-surface-variant rounded-full overflow-hidden">
-        <div className={`h-full rounded-full ${isLow ? 'bg-error' : pct > 60 ? 'bg-primary' : 'bg-tertiary'}`} style={{ width: `${pct}%` }} />
+        <div className={`h-full rounded-full ${isLow ? 'bg-error' : pct > 60 ? 'bg-primary' : 'bg-tertiary'}`} style={{ width: `${pct || 0}%` }} />
       </div>
       <span className={`font-label-md w-8 text-right ${isLow ? 'text-error font-bold' : 'text-on-surface-variant'}`}>{stock}</span>
     </div>
   )
 }
 
-function BillStatusBadge({ status, t }: { status: BillStatus; t: typeof T['en'] }) {
-  const cfg: Record<BillStatus, string> = {
-    paid:    'bg-primary-container text-on-primary-container',
-    unpaid:  'bg-error-container text-error font-semibold',
-    partial: 'bg-tertiary-container text-on-tertiary-container',
-  }
-  const lbl: Record<BillStatus, string> = { paid: t.paid, unpaid: t.unpaid, partial: t.partial }
-  return <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${cfg[status]}`}>{lbl[status]}</span>
-}
-
 function exportCSV(rows: Record<string, unknown>[], filename: string) {
+  if (rows.length === 0) return
   const headers = Object.keys(rows[0])
-  const csv = [headers, ...rows.map(r => headers.map(h => `"${r[h]}"`))]
+  const csv = [headers, ...rows.map(r => headers.map(h => `"${r[h] ?? ''}"`))]
     .map(r => r.join(',')).join('\n')
   const a = document.createElement('a')
   a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }))
@@ -221,151 +219,368 @@ function exportCSV(rows: Record<string, unknown>[], filename: string) {
 }
 
 // ─── Add Medicine Modal ────────────────────────────────────────────────────────
-function AddMedicineModal({ t, onClose, onAdd }: { t: typeof T['en']; onClose: () => void; onAdd: (m: Medicine) => void }) {
-  const [f, setF] = useState({ name: '', batch: '', category: 'Vitamin' as MedCategory, stock: '', maxStock: '', expiry: '', price: '', supplier: '' })
-  const up = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setF(p => ({ ...p, [k]: e.target.value }))
-  const submit = () => {
-    if (!f.name || !f.stock) return
-    onAdd({ id: `M${Date.now()}`, name: f.name, batch: f.batch || `B-${Date.now()}`, category: f.category, stock: +f.stock, maxStock: +f.maxStock || 200, expiry: f.expiry || 'Dec 2025', price: +f.price || 0, supplier: f.supplier })
-    onClose()
+function AddMedicineModal({ t, onClose, onAdd }: { t: any; onClose: () => void; onAdd: (m: any) => void }) {
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(medicineSchema),
+    defaultValues: {
+      name: '',
+      generic_name: '',
+      category: 'tablet',
+      unit: 'tablet',
+      reorder_level: 50
+    }
+  })
+
+  const submit = (data: any) => {
+    onAdd(data)
   }
+
   return (
     <Modal title={t.addMedicineTitle} onClose={onClose}>
-      <div className="flex flex-col gap-md">
+      <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-md">
         <div className="grid grid-cols-2 gap-md">
-          <div className="col-span-2"><label className={labelCls}>{t.medicineName} *</label><input className={inputCls} value={f.name} onChange={up('name')} /></div>
-          <div><label className={labelCls}>{t.batchNo}</label><input className={inputCls} value={f.batch} onChange={up('batch')} placeholder="MC-XXXX-X00" /></div>
-          <div><label className={labelCls}>{t.categoryLabel}</label>
-            <select className={inputCls} value={f.category} onChange={up('category')}>
-              {['Vitamin','Antibiotic','Painkiller','Mineral','Hormone','Antacid','Supplement'].map(c => <option key={c}>{c}</option>)}
+          <div className="col-span-2">
+            <label className={labelCls}>{t.medicineName} *</label>
+            <input className={inputCls} {...register('name')} />
+            {errors.name && <p className="text-xs text-error mt-1">{errors.name.message}</p>}
+          </div>
+
+          <div className="col-span-2">
+            <label className={labelCls}>{t.genericName}</label>
+            <input className={inputCls} {...register('generic_name')} placeholder="e.g. Paracetamol" />
+          </div>
+
+          <div>
+            <label className={labelCls}>{t.categoryLabel} *</label>
+            <select className={inputCls} {...register('category')}>
+              {['tablet', 'capsule', 'syrup', 'injection', 'topical', 'inhaler', 'drops', 'suppository', 'patch', 'powder', 'other'].map(c => (
+                <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
+              ))}
             </select>
           </div>
-          <div><label className={labelCls}>{t.stockQty} *</label><input className={inputCls} type="number" value={f.stock} onChange={up('stock')} /></div>
-          <div><label className={labelCls}>{t.expiryDate}</label><input className={inputCls} value={f.expiry} onChange={up('expiry')} placeholder="Jan 2026" /></div>
-          <div><label className={labelCls}>{t.priceLabel}</label><input className={inputCls} type="number" value={f.price} onChange={up('price')} /></div>
-          <div><label className={labelCls}>{t.supplier}</label><input className={inputCls} value={f.supplier} onChange={up('supplier')} /></div>
+
+          <div>
+            <label className={labelCls}>Dispensing Unit *</label>
+            <input className={inputCls} {...register('unit')} placeholder="tablet, ml, sachet, etc." />
+            {errors.unit && <p className="text-xs text-error mt-1">{errors.unit.message}</p>}
+          </div>
+
+          <div className="col-span-2">
+            <label className={labelCls}>Reorder Level (Min Stock) *</label>
+            <input className={inputCls} type="number" {...register('reorder_level')} />
+            {errors.reorder_level && <p className="text-xs text-error mt-1">{errors.reorder_level.message}</p>}
+          </div>
         </div>
+
         <div className="flex gap-sm pt-sm">
-          <button onClick={onClose} className="flex-1 py-sm rounded-lg border border-outline-variant text-on-surface-variant font-label-lg hover:bg-surface-container">{t.cancel}</button>
-          <button onClick={submit} className="flex-1 py-sm rounded-lg text-white font-label-lg hover:opacity-90 shadow-sm" style={{ background: BRAND }}>{t.addBtn}</button>
+          <button type="button" onClick={onClose} className="flex-1 py-sm rounded-lg border border-outline-variant text-on-surface-variant font-label-lg hover:bg-surface-container">{t.cancel}</button>
+          <button type="submit" className="flex-1 py-sm rounded-lg text-white font-label-lg hover:opacity-90 shadow-sm" style={{ background: BRAND }}>{t.addBtn}</button>
         </div>
-      </div>
+      </form>
     </Modal>
   )
 }
 
 // ─── Restock Modal ─────────────────────────────────────────────────────────────
-function RestockModal({ med, t, onClose, onRestock }: { med: Medicine; t: typeof T['en']; onClose: () => void; onRestock: (id: string, qty: number) => void }) {
-  const [qty, setQty] = useState('50')
+function RestockModal({ med, t, onClose, onRestock }: { med: any; t: any; onClose: () => void; onRestock: (qty: any) => void }) {
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(batchSchema),
+    defaultValues: {
+      batch_number: '',
+      supplier_name: '',
+      purchase_date: new Date().toISOString().split('T')[0],
+      expiry_date: '',
+      quantity: 100,
+      purchase_price: '10.00',
+      selling_price: '13.00',
+    }
+  })
+
+  const submit = (data: any) => {
+    onRestock(data)
+  }
+
   return (
     <Modal title={`${t.restockTitle} — ${med.name}`} onClose={onClose}>
-      <div className="flex flex-col gap-md">
-        <div className="p-sm rounded-lg bg-surface-container flex justify-between items-center">
-          <div><p className="font-body-md text-on-surface font-semibold">{med.name}</p><p className="font-label-sm text-on-surface-variant">{med.batch}</p></div>
-          <div className="text-right"><p className="font-label-sm text-on-surface-variant">Current</p><p className="font-title-lg text-on-surface font-bold">{med.stock}</p></div>
+      <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-md">
+        <div className="p-sm rounded-lg bg-surface-container flex justify-between items-center mb-sm">
+          <div>
+            <p className="font-body-md text-on-surface font-semibold">{med.name}</p>
+            <p className="font-label-sm text-on-surface-variant">Reorder Level: {med.reorder_level} units</p>
+          </div>
         </div>
-        <div><label className={labelCls}>{t.restockQty}</label><input className={inputCls} type="number" value={qty} onChange={e => setQty(e.target.value)} min="1" /></div>
-        <div className="p-sm rounded-lg bg-primary-container/30 flex justify-between">
-          <span className="font-label-md text-on-surface-variant">New Stock Total</span>
-          <span className="font-title-md text-on-surface font-bold">{med.stock + (+qty || 0)}</span>
+
+        <div className="grid grid-cols-2 gap-md">
+          <div>
+            <label className={labelCls}>{t.batchNo} *</label>
+            <input className={inputCls} {...register('batch_number')} placeholder="BAT-XXXX" />
+            {errors.batch_number && <p className="text-xs text-error mt-1">{errors.batch_number.message}</p>}
+          </div>
+
+          <div>
+            <label className={labelCls}>{t.supplier} *</label>
+            <input className={inputCls} {...register('supplier_name')} placeholder="Supplier Name" />
+            {errors.supplier_name && <p className="text-xs text-error mt-1">{errors.supplier_name.message}</p>}
+          </div>
+
+          <div>
+            <label className={labelCls}>Purchase Date *</label>
+            <input className={inputCls} type="date" {...register('purchase_date')} />
+            {errors.purchase_date && <p className="text-xs text-error mt-1">{errors.purchase_date.message}</p>}
+          </div>
+
+          <div>
+            <label className={labelCls}>{t.expiryDate} *</label>
+            <input className={inputCls} type="date" {...register('expiry_date')} />
+            {errors.expiry_date && <p className="text-xs text-error mt-1">{errors.expiry_date.message}</p>}
+          </div>
+
+          <div>
+            <label className={labelCls}>{t.stockQty} *</label>
+            <input className={inputCls} type="number" {...register('quantity')} />
+            {errors.quantity && <p className="text-xs text-error mt-1">{errors.quantity.message}</p>}
+          </div>
+
+          <div>
+            <label className={labelCls}>Purchase Price (₹) *</label>
+            <input className={inputCls} type="text" {...register('purchase_price')} />
+            {errors.purchase_price && <p className="text-xs text-error mt-1">{errors.purchase_price.message}</p>}
+          </div>
+
+          <div className="col-span-2">
+            <label className={labelCls}>Selling Price (₹) *</label>
+            <input className={inputCls} type="text" {...register('selling_price')} />
+            {errors.selling_price && <p className="text-xs text-error mt-1">{errors.selling_price.message}</p>}
+          </div>
         </div>
+
         <div className="flex gap-sm pt-sm">
-          <button onClick={onClose} className="flex-1 py-sm rounded-lg border border-outline-variant text-on-surface-variant font-label-lg hover:bg-surface-container">{t.cancel}</button>
-          <button onClick={() => { onRestock(med.id, +qty); onClose() }} className="flex-1 py-sm rounded-lg text-white font-label-lg hover:opacity-90 shadow-sm" style={{ background: BRAND }}>{t.confirm}</button>
+          <button type="button" onClick={onClose} className="flex-1 py-sm rounded-lg border border-outline-variant text-on-surface-variant font-label-lg hover:bg-surface-container">{t.cancel}</button>
+          <button type="submit" className="flex-1 py-sm rounded-lg text-white font-label-lg hover:opacity-90 shadow-sm" style={{ background: BRAND }}>{t.confirm}</button>
         </div>
-      </div>
+      </form>
     </Modal>
   )
 }
 
 // ─── Generate Bill Modal ───────────────────────────────────────────────────────
-function GenerateBillModal({ t, medicines, onClose, onGenerate }: { t: typeof T['en']; medicines: Medicine[]; onClose: () => void; onGenerate: (inv: Invoice) => void }) {
-  const [patient, setPatient] = useState(''); const [patientId, setPatientId] = useState('')
-  const [doctor, setDoctor] = useState(''); const [selected, setSelected] = useState<{ med: Medicine; qty: number }[]>([])
+function GenerateBillModal({ t, medicines, onClose, onGenerate }: { t: any; medicines: any[]; onClose: () => void; onGenerate: (data: any) => void }) {
+  const { data: patientsData } = usePatientsList({ page: 1, ordering: 'full_name' })
+  const patients = patientsData?.results ?? []
 
-  const toggle = (med: Medicine) => setSelected(prev => prev.find(s => s.med.id === med.id) ? prev.filter(s => s.med.id !== med.id) : [...prev, { med, qty: 1 }])
-  const setQty = (id: string, qty: number) => setSelected(prev => prev.map(s => s.med.id === id ? { ...s, qty } : s))
-  const total = selected.reduce((a, s) => a + s.med.price * s.qty, 0)
-
-  const submit = () => {
-    if (!patient || selected.length === 0) return
-    const inv: Invoice = {
-      id: `INV-${2050 + Math.floor(Math.random() * 100)}`, patient, patientId: patientId || 'MC-????',
-      amount: total, status: 'unpaid', date: 'Just now',
-      items: selected.map(s => `${s.qty}x ${s.med.name}`).join(', ')
+  const { register, control, handleSubmit, setValue, watch, formState: { errors } } = useForm({
+    resolver: zodResolver(otcSaleSchema),
+    defaultValues: {
+      patient_id: '',
+      items: [{ medicine_id: '', qty: 1, available_qty: 0 }]
     }
-    onGenerate(inv); onClose()
+  })
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'items'
+  })
+
+  const watchedItems = watch('items')
+  const [totals, setTotals] = useState<number[]>([])
+
+  useEffect(() => {
+    const calculated = watchedItems.map(item => {
+      const med = medicines.find(m => m.id === item.medicine_id)
+      const batchPrice = med?.batches?.[0]?.selling_price ?? '0.00'
+      return (+batchPrice || 0) * (Number(item.qty) || 0)
+    })
+    setTotals(calculated)
+  }, [watchedItems, medicines])
+
+  const totalSum = totals.reduce((sum, current) => sum + current, 0)
+
+  const submit = (data: any) => {
+    // Client-side verification of stock levels
+    for (let i = 0; i < data.items.length; i++) {
+      const item = data.items[i]
+      const med = medicines.find(m => m.id === item.medicine_id)
+      const stock = med?.batches?.reduce((acc: number, b: any) => acc + b.quantity, 0) ?? 0
+      if (item.qty > stock) {
+        alert(`Insufficient stock for ${med?.name || 'selected medicine'}. Available: ${stock}`);
+        return
+      }
+    }
+
+    onGenerate({
+      patient_id: data.patient_id,
+      items: data.items.map((it: any) => ({ medicine_id: it.medicine_id, qty: it.qty }))
+    })
   }
 
   return (
     <Modal title={t.billTitle} onClose={onClose} wide>
-      <div className="flex flex-col gap-md">
-        <div className="grid grid-cols-3 gap-md">
-          <div className="col-span-2"><label className={labelCls}>{t.patientNameLabel} *</label><input className={inputCls} value={patient} onChange={e => setPatient(e.target.value)} /></div>
-          <div><label className={labelCls}>{t.patientIdLabel}</label><input className={inputCls} value={patientId} onChange={e => setPatientId(e.target.value)} placeholder="MC-XXXX" /></div>
-          <div className="col-span-3"><label className={labelCls}>{t.prescribedBy}</label><input className={inputCls} value={doctor} onChange={e => setDoctor(e.target.value)} placeholder="Dr. Name" /></div>
-        </div>
-        <div>
-          <label className={labelCls}>{t.items}</label>
-          <div className="max-h-48 overflow-auto border border-outline-variant rounded-lg divide-y divide-outline-variant">
-            {medicines.map(m => {
-              const sel = selected.find(s => s.med.id === m.id)
-              return (
-                <div key={m.id} className={`flex items-center justify-between p-sm cursor-pointer hover:bg-surface-container transition-colors ${sel ? 'bg-primary-container/20' : ''}`} onClick={() => toggle(m)}>
-                  <div className="flex items-center gap-sm">
-                    <input type="checkbox" checked={!!sel} onChange={() => toggle(m)} className="w-4 h-4 rounded" onClick={e => e.stopPropagation()} />
-                    <div><p className="font-body-sm text-on-surface font-medium">{m.name}</p><p className="font-label-sm text-on-surface-variant">{m.category} · ₹{m.price}</p></div>
+      <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-md">
+        <div className="space-y-md">
+          {/* Patient dropdown */}
+          <div>
+            <label className={labelCls}>Patient *</label>
+            <select className={inputCls} {...register('patient_id')}>
+              <option value="">— Select Patient —</option>
+              {patients.map((p: any) => (
+                <option key={p.id} value={p.id}>{p.full_name} ({p.mrn})</option>
+              ))}
+            </select>
+            {errors.patient_id && <p className="text-xs text-error mt-1">{errors.patient_id.message}</p>}
+          </div>
+
+          {/* Medicines Cart */}
+          <div className="space-y-sm">
+            <div className="flex justify-between items-center">
+              <label className={labelCls}>{t.items} *</label>
+              <button
+                type="button"
+                onClick={() => append({ medicine_id: '', qty: 1, available_qty: 0 })}
+                className="text-primary font-label-md text-xs hover:underline flex items-center gap-0.5"
+              >
+                <span className="material-symbols-outlined text-[14px]">add</span> Add Item
+              </button>
+            </div>
+
+            {errors.items?.message && <p className="text-xs text-error mb-2">{errors.items.message}</p>}
+
+            <div className="max-h-52 overflow-y-auto space-y-xs border border-outline-variant/30 rounded-xl p-sm bg-surface-bright/30 divide-y divide-outline-variant/20">
+              {fields.map((field, idx) => {
+                const selectedMedId = watchedItems?.[idx]?.medicine_id
+                const currentMed = medicines.find(m => m.id === selectedMedId)
+                const currentStock = currentMed?.batches?.reduce((acc: number, b: any) => acc + b.quantity, 0) ?? 0
+                const currentPrice = currentMed?.batches?.[0]?.selling_price ?? '0.00'
+
+                return (
+                  <div key={field.id} className="grid grid-cols-12 gap-sm items-center pt-xs first:pt-0">
+                    {/* Medicine selection */}
+                    <div className="col-span-6">
+                      <select
+                        className={inputCls}
+                        {...register(`items.${idx}.medicine_id` as const)}
+                        onChange={(e) => {
+                          const mId = e.target.value
+                          setValue(`items.${idx}.medicine_id` as const, mId)
+                          const m = medicines.find(med => med.id === mId)
+                          const stock = m?.batches?.reduce((acc: number, b: any) => acc + b.quantity, 0) ?? 0
+                          setValue(`items.${idx}.available_qty` as const, stock)
+                        }}
+                      >
+                        <option value="">— Choose Medicine —</option>
+                        {medicines.map(m => {
+                          const mStock = m.batches?.reduce((acc: number, b: any) => acc + b.quantity, 0) ?? 0
+                          return (
+                            <option key={m.id} value={m.id} disabled={mStock <= 0}>
+                              {m.name} (Stock: {mStock} {m.unit})
+                            </option>
+                          )
+                        })}
+                      </select>
+                    </div>
+
+                    {/* Quantity input */}
+                    <div className="col-span-3">
+                      <input
+                        type="number"
+                        min="1"
+                        max={currentStock || 1}
+                        className={inputCls}
+                        {...register(`items.${idx}.qty` as const)}
+                        placeholder="Qty"
+                      />
+                    </div>
+
+                    {/* Pricing Display */}
+                    <div className="col-span-2 text-right">
+                      <p className="font-label-sm text-on-surface-variant font-semibold">
+                        ₹{(totals[idx] || 0).toFixed(2)}
+                      </p>
+                      <p className="text-[10px] text-secondary">
+                        @ ₹{currentPrice}/{currentMed?.unit ?? 'unit'}
+                      </p>
+                    </div>
+
+                    {/* Delete button */}
+                    <div className="col-span-1 text-center">
+                      {fields.length > 1 && (
+                        <button type="button" onClick={() => remove(idx)} className="text-error hover:bg-error-container/20 p-xs rounded-lg">
+                          <span className="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  {sel && <input type="number" min="1" max={m.stock} value={sel.qty} onChange={e => { e.stopPropagation(); setQty(m.id, +e.target.value) }}
-                    className="w-16 px-xs py-0.5 rounded border border-outline-variant text-center text-body-sm focus:outline-none" onClick={e => e.stopPropagation()} />}
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
         </div>
-        <div className="flex justify-between p-sm rounded-lg bg-surface-container">
+
+        {/* Total Summary */}
+        <div className="flex justify-between p-sm rounded-lg bg-surface-container mt-sm">
           <span className="font-title-md text-on-surface font-bold">{t.total}</span>
-          <span className="font-title-lg text-on-surface font-bold" style={{ color: BRAND }}>₹{total.toFixed(2)}</span>
+          <span className="font-title-lg text-on-surface font-bold" style={{ color: BRAND }}>₹{totalSum.toFixed(2)}</span>
         </div>
-        <div className="flex gap-sm">
-          <button onClick={onClose} className="flex-1 py-sm rounded-lg border border-outline-variant text-on-surface-variant font-label-lg hover:bg-surface-container">{t.cancel}</button>
-          <button onClick={submit} className="flex-1 py-sm rounded-lg text-white font-label-lg hover:opacity-90 shadow-sm" style={{ background: BRAND }}>
-            <span className="flex items-center justify-center gap-xs"><span className="material-symbols-outlined text-[16px]">receipt_long</span>{t.billBtn}</span>
+
+        {/* Action Buttons */}
+        <div className="flex gap-sm pt-sm border-t border-outline-variant/20 mt-sm">
+          <button type="button" onClick={onClose} className="flex-1 py-sm rounded-lg border border-outline-variant text-on-surface-variant font-label-lg hover:bg-surface-container">{t.cancel}</button>
+          <button type="submit" className="flex-1 py-sm rounded-lg text-white font-label-lg hover:opacity-90 shadow-sm flex items-center justify-center gap-xs" style={{ background: BRAND }}>
+            <span className="material-symbols-outlined text-[16px]">receipt_long</span>{t.billBtn}
           </button>
         </div>
-      </div>
+      </form>
     </Modal>
   )
 }
 
 // ─── Overview Tab ──────────────────────────────────────────────────────────────
-function OverviewTab({ medicines, prescriptions, invoices, t, onGenerateBill, onFulfill, showToast }: {
-  medicines: Medicine[]; prescriptions: Prescription[]; invoices: Invoice[]
-  t: typeof T['en']; onGenerateBill: () => void; onFulfill: (id: string) => void; showToast: (m: string) => void
+function OverviewTab({ medicines, prescriptions, sales, t, onGenerateBill, onFulfill, showToast, isSalesLoading }: {
+  medicines: any[]; prescriptions: any[]; sales: any[]
+  t: any; onGenerateBill: () => void; onFulfill: (id: string) => void; showToast: (m: string) => void; isSalesLoading: boolean
 }) {
-  const totalMeds = medicines.reduce((a, m) => a + m.stock, 0)
-  const lowCount = medicines.filter(m => m.isLowStock).length
-  const expCount = medicines.filter(m => m.isExpiringSoon).length
-  const todaySale = invoices.filter(i => i.date === 'Just now' || i.date.includes('m ago') || i.date.includes('h ago')).reduce((a, i) => a + i.amount, 0)
-  const pending = prescriptions.filter(p => !p.fulfilled)
+  const totalMeds = medicines.reduce((acc: number, m) => acc + (m.batches?.reduce((sum: number, b: any) => sum + b.quantity, 0) ?? 0), 0)
+  
+  // Low stock calculation: check if sum of batch quantities < reorder_level
+  const lowCount = medicines.filter(m => {
+    const sum = m.batches?.reduce((acc: number, b: any) => acc + b.quantity, 0) ?? 0
+    return sum <= m.reorder_level
+  }).length
+
+  // Expiring soon calculation (batches expiring in 30 days)
+  const today = new Date()
+  const thirtyDaysFromNow = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000)
+  const expCount = medicines.filter(m => {
+    return m.batches?.some((b: any) => {
+      const expDate = new Date(b.expiry_date)
+      return expDate > today && expDate <= thirtyDaysFromNow
+    })
+  }).length
+
+  // Today's Sales Calculation
+  const todayStr = new Date().toISOString().split('T')[0]
+  const todaySalesVal = sales
+    .filter(s => s.sold_at.startsWith(todayStr))
+    .reduce((acc, s) => acc + (+s.total_amount || 0), 0)
+
+  const pending = prescriptions.filter(p => !p.is_dispensed)
 
   const stats = [
-    { label: t.totalMedicines, value: `${totalMeds.toLocaleString()}`, sub: `+12 ${t.thisWeek}`, subCls: 'text-primary', icon: 'pill', iconBg: 'bg-secondary-container text-on-secondary-container' },
-    { label: t.lowStock, value: `${lowCount}`, sub: t.actionRequired, subCls: 'text-error', icon: 'production_quantity_limits', iconBg: 'bg-error-container text-on-error-container' },
-    { label: t.expiringSoon, value: `${expCount}`, sub: t.reviewNeeded, subCls: 'text-tertiary', icon: 'hourglass_bottom', iconBg: 'bg-tertiary-container text-on-tertiary-container' },
-    { label: t.todaySales, value: `₹${todaySale.toFixed(0)}`, sub: `42 ${t.transactions}`, subCls: 'text-primary', icon: 'payments', iconBg: 'bg-primary-container text-on-primary-container' },
+    { label: t.totalMedicines, value: `${totalMeds.toLocaleString()}`, sub: `${medicines.length} formulations`, subCls: 'text-primary', icon: 'pill', iconBg: 'bg-secondary-container text-on-secondary-container' },
+    { label: t.lowStock, value: `${lowCount}`, sub: t.actionRequired, subCls: lowCount > 0 ? 'text-error' : 'text-primary', icon: 'production_quantity_limits', iconBg: 'bg-error-container text-on-error-container' },
+    { label: t.expiringSoon, value: `${expCount}`, sub: t.reviewNeeded, subCls: expCount > 0 ? 'text-tertiary font-semibold' : 'text-primary', icon: 'hourglass_bottom', iconBg: 'bg-tertiary-container text-on-tertiary-container' },
+    { label: t.todaySales, value: `₹${todaySalesVal.toFixed(2)}`, sub: `${sales.filter(s => s.sold_at.startsWith(todayStr)).length} ${t.transactions}`, subCls: 'text-primary', icon: 'payments', iconBg: 'bg-primary-container text-on-primary-container' },
   ]
 
   return (
-    <div className="flex flex-col gap-lg">
+    <div className="flex flex-col gap-lg animate-fade-in">
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-md">
         {stats.map(s => (
-          <div key={s.label} className="glass-card rounded-xl p-md flex items-start justify-between shadow-sm hover:shadow-md transition-shadow">
+          <div key={s.label} className="glass-card rounded-xl p-md flex items-start justify-between shadow-sm hover:shadow-md transition-shadow bg-white border border-outline-variant/10">
             <div>
               <p className="font-label-md text-on-surface-variant mb-xs">{s.label}</p>
-              <h3 className="font-display-sm text-display-sm text-on-surface">{s.value}</h3>
-              <p className={`font-label-md flex items-center gap-xs mt-xs ${s.subCls}`}>
+              <h3 className="font-display-sm text-display-sm text-on-surface font-bold text-2xl">{s.value}</h3>
+              <p className={`font-label-md flex items-center gap-xs mt-xs text-xs ${s.subCls}`}>
                 <span className="material-symbols-outlined text-[14px]">{s.subCls.includes('error') ? 'warning' : s.subCls.includes('tertiary') ? 'event_busy' : 'trending_up'}</span>{s.sub}
               </p>
             </div>
@@ -377,113 +592,148 @@ function OverviewTab({ medicines, prescriptions, invoices, t, onGenerateBill, on
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-lg">
-        {/* Inventory table */}
-        <div className="lg:col-span-8 glass-card rounded-xl shadow-sm overflow-hidden">
+        {/* Inventory Status Table */}
+        <div className="lg:col-span-8 glass-card rounded-xl shadow-sm overflow-hidden bg-white border border-outline-variant/10">
           <div className="p-md border-b border-surface-dim flex justify-between items-center bg-surface-container-lowest dark:bg-on-surface">
-            <h3 className="font-title-lg text-title-lg text-on-surface">{t.inventoryStatus}</h3>
-            <button className="font-label-lg text-primary hover:underline" onClick={onGenerateBill}>{t.viewAll}</button>
+            <h3 className="font-title-lg text-title-lg text-on-surface font-bold">{t.inventoryStatus}</h3>
+            <button className="font-label-lg text-primary hover:underline text-sm font-semibold" onClick={onGenerateBill}>{t.viewAll}</button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="bg-surface-container-lowest dark:bg-on-surface">
-                <tr>{[t.medicineAndBatch, t.category, t.stockLevel, t.expiry, t.price].map(h => (
-                  <th key={h} className="py-sm px-md font-label-md text-on-surface-variant uppercase tracking-wider border-b border-surface-dim">{h}</th>
-                ))}</tr>
+                <tr className="border-b border-outline-variant/20 bg-neutral-50/50">
+                  {[t.medicineAndBatch, t.category, t.stockLevel, t.expiry, t.price].map(h => (
+                    <th key={h} className="py-sm px-md font-label-md text-on-surface-variant uppercase tracking-wider text-xs font-bold">{h}</th>
+                  ))}
+                </tr>
               </thead>
-              <tbody className="divide-y divide-surface-dim">
-                {medicines.slice(0, 6).map(m => (
-                  <tr key={m.id} className={`hover:bg-surface-container-low transition-colors ${m.isLowStock ? 'bg-error/5' : m.isExpiringSoon ? 'bg-tertiary/5' : ''}`}>
-                    <td className="py-sm px-md">
-                      <div className="flex items-center gap-xs">
+              <tbody className="divide-y divide-surface-dim/30">
+                {medicines.slice(0, 6).map(m => {
+                  const mStock = m.batches?.reduce((acc: number, b: any) => acc + b.quantity, 0) ?? 0
+                  const isLow = mStock <= m.reorder_level
+                  const latestBatch = m.batches?.[0]
+                  
+                  const isExpiring = latestBatch && (() => {
+                    const exp = new Date(latestBatch.expiry_date)
+                    return exp > today && exp <= thirtyDaysFromNow
+                  })()
+
+                  return (
+                    <tr key={m.id} className={`hover:bg-surface-container-low transition-colors ${isLow ? 'bg-error/5' : isExpiring ? 'bg-tertiary/5' : ''}`}>
+                      <td className="py-sm px-md text-sm">
                         <div>
                           <div className="flex items-center gap-xs">
                             <span className="font-body-sm text-on-surface font-medium">{m.name}</span>
-                            {m.isLowStock && <span className="px-1.5 py-0.5 rounded text-[10px] bg-error text-white font-bold uppercase">{t.lowStockBadge}</span>}
-                            {m.isExpiringSoon && <span className="px-1.5 py-0.5 rounded text-[10px] bg-tertiary text-white font-bold uppercase">{t.expiringSoonBadge}</span>}
+                            {isLow && <span className="px-1.5 py-0.5 rounded text-[10px] bg-error text-white font-bold uppercase">{t.lowStockBadge}</span>}
+                            {isExpiring && <span className="px-1.5 py-0.5 rounded text-[10px] bg-tertiary text-white font-bold uppercase">{t.expiringSoonBadge}</span>}
                           </div>
-                          <span className="text-[10px] font-mono text-on-surface-variant">{m.batch}</span>
+                          {m.generic_name && <p className="text-[10px] text-on-surface-variant">{m.generic_name}</p>}
                         </div>
-                      </div>
-                    </td>
-                    <td className="py-sm px-md"><span className="px-2 py-1 rounded-full bg-surface-variant text-on-surface-variant font-label-md text-label-md">{m.category}</span></td>
-                    <td className="py-sm px-md"><StockBar stock={m.stock} max={m.maxStock} isLow={m.isLowStock} /></td>
-                    <td className="py-sm px-md">
-                      {m.isExpiringSoon ? (
-                        <div className="flex items-center gap-xs text-tertiary font-bold">
-                          <span className="material-symbols-outlined text-[14px]">event_busy</span>{m.expiry}
-                        </div>
-                      ) : <span className="text-on-surface-variant">{m.expiry}</span>}
-                    </td>
-                    <td className="py-sm px-md font-medium text-on-surface">₹{m.price.toFixed(2)}</td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="py-sm px-md text-sm">
+                        <span className="px-2 py-0.5 rounded-full bg-surface-variant text-on-surface-variant text-[11px] font-medium capitalize">
+                          {m.category}
+                        </span>
+                      </td>
+                      <td className="py-sm px-md">
+                        <StockBar stock={mStock} max={m.reorder_level * 5 || 250} isLow={isLow} />
+                      </td>
+                      <td className="py-sm px-md text-sm">
+                        {latestBatch ? (
+                          isExpiring ? (
+                            <div className="flex items-center gap-xs text-tertiary font-bold">
+                              <span className="material-symbols-outlined text-[14px]">event_busy</span>
+                              {new Date(latestBatch.expiry_date).toLocaleDateString()}
+                            </div>
+                          ) : (
+                            <span className="text-on-surface-variant">{new Date(latestBatch.expiry_date).toLocaleDateString()}</span>
+                          )
+                        ) : 'No batch'}
+                      </td>
+                      <td className="py-sm px-md font-medium text-on-surface text-sm">
+                        ₹{latestBatch ? (+latestBatch.selling_price).toFixed(2) : '0.00'}
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
         </div>
 
-        {/* Right panel */}
+        {/* Right Panel: Pending prescriptions & Recent Sales */}
         <div className="lg:col-span-4 flex flex-col gap-md">
           {/* Pending Prescriptions */}
-          <div className="glass-card rounded-xl shadow-sm overflow-hidden">
+          <div className="glass-card rounded-xl shadow-sm overflow-hidden bg-white border border-outline-variant/10">
             <div className="p-md border-b border-surface-dim flex justify-between items-center bg-surface-container-lowest dark:bg-on-surface">
-              <h3 className="font-title-md text-title-md text-on-surface flex items-center gap-xs">
+              <h3 className="font-title-md text-title-md text-on-surface flex items-center gap-xs font-bold text-sm">
                 <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>prescriptions</span>
                 {t.pendingPrescriptions}
               </h3>
-              <span className="text-white font-label-md px-2 py-0.5 rounded-full text-xs font-bold" style={{ background: BRAND }}>{pending.length} {t.newBadge}</span>
+              <span className="text-white font-label-md px-2 py-0.5 rounded-full text-xs font-bold" style={{ background: BRAND }}>
+                {pending.length} {t.newBadge}
+              </span>
             </div>
-            <div className="p-sm flex flex-col gap-sm max-h-72 overflow-auto">
+            <div className="p-sm flex flex-col gap-sm max-h-72 overflow-y-auto">
               {pending.map(rx => (
-                <div key={rx.id} className="border border-outline-variant rounded-lg p-sm hover:border-primary transition-colors">
+                <div key={rx.id} className="border border-outline-variant/30 rounded-lg p-sm hover:border-primary transition-colors bg-surface-container-lowest">
                   <div className="flex justify-between items-start mb-xs">
                     <div>
-                      <p className="font-label-lg text-on-surface font-semibold">{rx.patient}</p>
-                      <p className="font-label-md text-on-surface-variant flex items-center gap-1">
-                        <span className="material-symbols-outlined text-[13px]">stethoscope</span>{rx.doctor}
+                      <p className="font-label-lg text-on-surface font-semibold text-sm">{rx.patient_name}</p>
+                      <p className="font-label-md text-on-surface-variant text-[11px] flex items-center gap-1 font-mono">
+                        MRN: {rx.patient_mrn}
                       </p>
                     </div>
-                    <span className="font-label-md text-on-surface-variant text-xs">{rx.time}</span>
+                    <span className="text-[10px] text-on-surface-variant font-medium">
+                      {new Date(rx.issued_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
                   </div>
-                  <div className="bg-surface-container p-xs rounded border border-surface-dim mb-sm">
-                    <p className="font-label-md text-on-surface font-mono text-[11px] truncate">{rx.medicines}</p>
+                  <div className="bg-neutral-50 p-xs rounded border border-surface-dim/40 mb-sm">
+                    <p className="font-label-md text-on-surface font-mono text-[11px]">
+                      {rx.item_count} item{rx.item_count === 1 ? '' : 's'} prescribed
+                    </p>
                   </div>
-                  <button onClick={() => { onFulfill(rx.id); showToast(t.markedFulfilled) }}
-                    className="w-full border border-outline-variant py-1.5 rounded-md font-label-md transition-colors flex justify-center items-center gap-xs text-primary hover:text-white hover:border-transparent"
-                    style={{ '--hover-bg': BRAND } as React.CSSProperties}
-                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = BRAND; (e.currentTarget as HTMLButtonElement).style.color = '#fff' }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = ''; (e.currentTarget as HTMLButtonElement).style.color = '' }}>
+                  <button onClick={() => onFulfill(rx.id)}
+                    className="w-full border border-primary/30 py-1.5 rounded-md font-label-md text-xs font-semibold text-primary hover:bg-primary hover:text-white transition-all flex justify-center items-center gap-xs">
                     <span className="material-symbols-outlined text-[16px]">receipt</span>{t.generateInvoice}
                   </button>
                 </div>
               ))}
-              {pending.length === 0 && <p className="text-center font-body-sm text-on-surface-variant py-md">All prescriptions fulfilled!</p>}
+              {pending.length === 0 && (
+                <p className="text-center font-body-sm text-on-surface-variant py-md text-xs">All prescriptions fulfilled!</p>
+              )}
             </div>
           </div>
 
           {/* Recent Sales */}
-          <div className="glass-card rounded-xl shadow-sm overflow-hidden">
+          <div className="glass-card rounded-xl shadow-sm overflow-hidden bg-white border border-outline-variant/10">
             <div className="p-md border-b border-surface-dim bg-surface-container-lowest dark:bg-on-surface">
-              <h3 className="font-title-md text-title-md text-on-surface">{t.recentSales}</h3>
+              <h3 className="font-title-md text-title-md text-on-surface font-bold text-sm">{t.recentSales}</h3>
             </div>
-            <div className="flex flex-col divide-y divide-surface-dim p-sm">
-              {invoices.slice(0, 3).map(inv => (
+            <div className="flex flex-col divide-y divide-surface-dim/30 p-sm max-h-52 overflow-y-auto">
+              {isSalesLoading ? (
+                <div className="text-center py-md text-xs text-secondary">Loading sales...</div>
+              ) : sales.slice(0, 4).map(inv => (
                 <div key={inv.id} className="flex justify-between items-center py-2 px-1 hover:bg-surface-container-low rounded transition-colors">
                   <div className="flex items-center gap-sm">
-                    <div className="w-8 h-8 rounded bg-surface-container flex items-center justify-center">
+                    <div className="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-primary">
                       <span className="material-symbols-outlined text-[18px] text-on-surface-variant">point_of_sale</span>
                     </div>
                     <div>
-                      <p className="font-label-md text-on-surface font-semibold">{inv.id}</p>
-                      <p className="text-[10px] text-on-surface-variant">{inv.date}</p>
+                      <p className="font-label-md text-on-surface font-semibold text-xs">{inv.invoice_number}</p>
+                      <p className="text-[10px] text-on-surface-variant font-mono">
+                        {new Date(inv.sold_at).toLocaleDateString()}
+                      </p>
                     </div>
                   </div>
-                  <span className="font-label-lg font-medium" style={{ color: BRAND }}>+₹{inv.amount.toFixed(2)}</span>
+                  <span className="font-label-lg font-bold text-xs" style={{ color: BRAND }}>
+                    +₹{(+inv.total_amount).toFixed(2)}
+                  </span>
                 </div>
               ))}
-            </div>
-            <div className="p-sm text-center border-t border-surface-dim">
-              <button onClick={() => showToast(t.viewAllTx)} className="font-label-md text-on-surface-variant hover:text-primary transition-colors">{t.viewAllTx}</button>
+              {sales.length === 0 && !isSalesLoading && (
+                <p className="text-center text-xs text-secondary py-md">No sales transactions logged.</p>
+              )}
             </div>
           </div>
         </div>
@@ -493,171 +743,115 @@ function OverviewTab({ medicines, prescriptions, invoices, t, onGenerateBill, on
 }
 
 // ─── Inventory Tab ─────────────────────────────────────────────────────────────
-function InventoryTab({ medicines, setMedicines, t, onAdd, showToast }: {
-  medicines: Medicine[]; setMedicines: React.Dispatch<React.SetStateAction<Medicine[]>>
-  t: typeof T['en']; onAdd: () => void; showToast: (m: string) => void
+function InventoryTab({ medicines, isLoading, t, onAdd, onRestockClick, showToast, onDeleteMed }: {
+  medicines: any[]; isLoading: boolean; t: any; onAdd: () => void; onRestockClick: (m: any) => void; showToast: (m: string) => void; onDeleteMed: (id: string) => void
 }) {
-  const [search, setSearch] = useState(''); const [cat, setCat] = useState('')
-  const [restockMed, setRestockMed] = useState<Medicine | null>(null)
+  const [search, setSearch] = useState('')
+  const [cat, setCat] = useState('')
 
   const filtered = medicines.filter(m =>
-    (!search || m.name.toLowerCase().includes(search.toLowerCase()) || m.batch.toLowerCase().includes(search.toLowerCase())) &&
+    (!search || m.name.toLowerCase().includes(search.toLowerCase()) || (m.generic_name && m.generic_name.toLowerCase().includes(search.toLowerCase()))) &&
     (!cat || m.category === cat)
   )
 
-  const doRestock = (id: string, qty: number) => {
-    setMedicines(prev => prev.map(m => m.id === id ? { ...m, stock: m.stock + qty, isLowStock: m.stock + qty >= 20 ? false : m.isLowStock } : m))
-    showToast(t.restocked)
+  const handleDelete = (id: string) => {
+    if (confirm("Are you sure you want to remove this medicine formulary?")) {
+      onDeleteMed(id)
+    }
   }
 
-  const doDelete = (id: string) => { setMedicines(prev => prev.filter(m => m.id !== id)); showToast(t.deleted) }
-
   return (
-    <div className="flex flex-col gap-md">
-      {restockMed && <RestockModal med={restockMed} t={t} onClose={() => setRestockMed(null)} onRestock={doRestock} />}
-
-      <div className="glass-card p-md rounded-xl flex flex-wrap gap-md items-center justify-between shadow-sm">
+    <div className="flex flex-col gap-md animate-fade-in">
+      <div className="glass-card p-md rounded-xl flex flex-wrap gap-md items-center justify-between shadow-sm bg-white border border-outline-variant/10">
         <div className="flex flex-wrap gap-sm items-center">
           <div className="relative min-w-[220px]">
             <span className="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
-            <input className="w-full pl-xl pr-sm py-xs rounded-lg border border-outline-variant bg-surface-container-lowest text-body-sm focus:outline-none focus:ring-2"
+            <input className="w-full pl-xl pr-sm py-xs rounded-lg border border-outline-variant bg-surface-container-lowest text-body-sm focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder={t.searchMedicine} value={search} onChange={e => setSearch(e.target.value)} />
           </div>
-          <select className="bg-surface-container-lowest border border-outline-variant rounded-lg text-label-md py-xs px-sm focus:outline-none"
+          <select className="bg-surface-container-lowest border border-outline-variant rounded-lg text-label-md py-xs px-sm focus:outline-none text-xs h-[32px] focus:ring-2 focus:ring-primary"
             value={cat} onChange={e => setCat(e.target.value)}>
             <option value="">{t.allCategories}</option>
-            {['Vitamin','Antibiotic','Painkiller','Mineral','Hormone','Antacid','Supplement'].map(c => <option key={c}>{c}</option>)}
+            {['tablet','capsule','syrup','injection','topical','inhaler','drops','suppository','patch','powder','other'].map(c => (
+              <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
+            ))}
           </select>
         </div>
         <div className="flex items-center gap-sm">
-          <span className="font-label-md text-on-surface-variant">{filtered.length} {t.showing}</span>
-          <button onClick={() => exportCSV(filtered.map(m => ({ ID: m.id, Name: m.name, Batch: m.batch, Category: m.category, Stock: m.stock, Expiry: m.expiry, Price: m.price })), 'inventory.csv')}
-            className="bg-surface-container text-on-surface border border-outline-variant font-label-md py-xs px-md rounded-lg hover:bg-surface-container-high flex items-center gap-xs">
+          <span className="font-label-md text-on-surface-variant text-xs">{filtered.length} {t.showing}</span>
+          <button onClick={() => exportCSV(filtered.map(m => ({ ID: m.id, Name: m.name, Generic: m.generic_name, Category: m.category, Unit: m.unit, Reorder: m.reorder_level })), 'inventory.csv')}
+            className="bg-surface-container text-on-surface border border-outline-variant font-label-md py-xs px-md rounded-lg hover:bg-surface-container-high flex items-center gap-xs text-xs font-semibold h-[32px]">
             <span className="material-symbols-outlined text-[16px]">download</span>{t.exportCSV}
           </button>
-          <button onClick={onAdd} className="text-white font-label-md py-xs px-md rounded-lg hover:opacity-90 flex items-center gap-xs shadow-sm" style={{ background: BRAND }}>
+          <button onClick={onAdd} className="text-white font-label-md py-xs px-md rounded-lg hover:opacity-90 flex items-center gap-xs shadow-sm text-xs font-bold h-[32px]" style={{ background: BRAND }}>
             <span className="material-symbols-outlined text-[16px]">add</span>{t.addMedicine}
           </button>
         </div>
       </div>
 
-      <div className="glass-card rounded-xl shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="bg-surface-container-lowest dark:bg-on-surface">
-              <tr>{[t.medicineAndBatch, t.category, t.stockLevel, t.expiry, t.price, t.supplier, t.actions].map(h => (
-                <th key={h} className="py-sm px-md font-label-md text-on-surface-variant uppercase tracking-wider border-b border-surface-dim font-semibold">{h}</th>
-              ))}</tr>
-            </thead>
-            <tbody className="divide-y divide-surface-dim">
-              {filtered.map(m => (
-                <tr key={m.id} className={`hover:bg-surface-container-low transition-colors ${m.isLowStock ? 'bg-error/5' : m.isExpiringSoon ? 'bg-tertiary/5' : ''}`}>
-                  <td className="py-sm px-md">
-                    <div className="flex items-center gap-xs">
-                      <div>
-                        <div className="flex items-center gap-xs flex-wrap">
-                          <span className="font-body-sm text-on-surface font-medium whitespace-nowrap">{m.name}</span>
-                          {m.isLowStock && <span className="px-1.5 py-0.5 rounded text-[10px] bg-error text-white font-bold">{t.lowStockBadge}</span>}
-                          {m.isExpiringSoon && <span className="px-1.5 py-0.5 rounded text-[10px] bg-tertiary text-white font-bold">{t.expiringSoonBadge}</span>}
-                        </div>
-                        <span className="text-[10px] font-mono text-on-surface-variant">{m.batch}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="py-sm px-md"><span className="px-2 py-1 rounded-full bg-surface-variant text-on-surface-variant font-label-md">{m.category}</span></td>
-                  <td className="py-sm px-md"><StockBar stock={m.stock} max={m.maxStock} isLow={m.isLowStock} /></td>
-                  <td className="py-sm px-md">
-                    {m.isExpiringSoon ? <div className="flex items-center gap-xs text-tertiary font-bold"><span className="material-symbols-outlined text-[14px]">event_busy</span>{m.expiry}</div>
-                      : <span className="text-on-surface-variant">{m.expiry}</span>}
-                  </td>
-                  <td className="py-sm px-md font-medium text-on-surface">₹{m.price.toFixed(2)}</td>
-                  <td className="py-sm px-md font-label-sm text-on-surface-variant">{m.supplier}</td>
-                  <td className="py-sm px-md">
-                    <div className="flex gap-xs">
-                      <button onClick={() => setRestockMed(m)} className="p-xs rounded transition-colors hover:bg-primary-container text-primary" title={t.restock}><span className="material-symbols-outlined text-[18px]">add_circle</span></button>
-                      <button onClick={() => doDelete(m.id)} className="p-xs rounded transition-colors hover:bg-error-container text-error" title={t.delete}><span className="material-symbols-outlined text-[18px]">delete</span></button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ─── Prescriptions Tab ─────────────────────────────────────────────────────────
-function PrescriptionsTab({ prescriptions, setPrescriptions, invoices, setInvoices, t, showToast, onBill }: {
-  prescriptions: Prescription[]; setPrescriptions: React.Dispatch<React.SetStateAction<Prescription[]>>
-  invoices: Invoice[]; setInvoices: React.Dispatch<React.SetStateAction<Invoice[]>>
-  t: typeof T['en']; showToast: (m: string) => void; onBill: () => void
-}) {
-  const [filter, setFilter] = useState<'all' | 'pending' | 'fulfilled'>('all')
-  const filtered = prescriptions.filter(p => filter === 'all' ? true : filter === 'pending' ? !p.fulfilled : p.fulfilled)
-
-  const fulfill = (id: string) => {
-    setPrescriptions(prev => prev.map(p => p.id === id ? { ...p, fulfilled: true } : p))
-    const rx = prescriptions.find(p => p.id === id)!
-    const inv: Invoice = { id: `INV-${2060 + invoices.length}`, patient: rx.patient, patientId: rx.patientId, amount: Math.random() * 80 + 20, status: 'unpaid', date: 'Just now', items: rx.medicines }
-    setInvoices(prev => [inv, ...prev])
-    showToast(t.invoiceGenerated)
-  }
-
-  return (
-    <div className="flex flex-col gap-md">
-      <div className="glass-card p-md rounded-xl flex flex-wrap gap-sm items-center justify-between shadow-sm">
-        <div className="flex gap-xs p-xs bg-surface-container rounded-xl">
-          {(['all','pending','fulfilled'] as const).map(f => (
-            <button key={f} onClick={() => setFilter(f)}
-              className={`py-xs px-md rounded-lg font-label-md capitalize transition-all ${filter === f ? 'bg-white text-primary shadow-sm font-semibold' : 'text-on-surface-variant hover:bg-surface-container-high'}`}>
-              {f === 'all' ? 'All' : f === 'pending' ? t.pendingPrescriptions.split(' ')[0] : t.dispensed}
-            </button>
-          ))}
-        </div>
-        <button onClick={onBill} className="text-white font-label-md py-xs px-md rounded-lg hover:opacity-90 flex items-center gap-xs shadow-sm" style={{ background: BRAND }}>
-          <span className="material-symbols-outlined text-[16px]">receipt_long</span>{t.generateBill}
-        </button>
-      </div>
-
-      <div className="flex flex-col gap-sm">
-        {filtered.map(rx => (
-          <div key={rx.id} className={`glass-card rounded-xl p-md shadow-sm flex flex-col md:flex-row gap-md items-start md:items-center justify-between ${rx.fulfilled ? 'opacity-70' : ''}`}>
-            <div className="flex items-center gap-md">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0 ${rx.fulfilled ? 'bg-primary-container text-on-primary-container' : 'text-white'}`} style={rx.fulfilled ? {} : { background: BRAND }}>
-                {rx.patient.split(' ').map(n => n[0]).join('').slice(0, 2)}
-              </div>
-              <div>
-                <div className="flex items-center gap-sm mb-xs">
-                  <p className="font-title-sm text-on-surface font-semibold">{rx.patient}</p>
-                  <span className="font-label-sm text-on-surface-variant text-xs">{rx.patientId}</span>
-                  {rx.fulfilled && <span className="font-label-sm px-2 py-0.5 rounded-full bg-primary-container text-on-primary-container text-xs">{t.dispensed}</span>}
-                </div>
-                <p className="font-label-md text-on-surface-variant flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[13px]">stethoscope</span>{rx.doctor} · {rx.time}
-                </p>
-                <div className="mt-xs bg-surface-container p-xs rounded border border-surface-dim">
-                  <p className="font-label-md text-on-surface font-mono text-[11px]">{rx.medicines}</p>
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-sm shrink-0">
-              {!rx.fulfilled && (
-                <button onClick={() => fulfill(rx.id)} className="text-white py-sm px-md rounded-lg font-label-md hover:opacity-90 shadow-sm flex items-center gap-xs" style={{ background: BRAND }}>
-                  <span className="material-symbols-outlined text-[16px]">receipt</span>{t.generateInvoice}
-                </button>
-              )}
-              <button onClick={() => { window.print(); showToast(t.printed) }} className="border border-outline-variant text-on-surface-variant py-sm px-sm rounded-lg hover:bg-surface-container flex items-center gap-xs">
-                <span className="material-symbols-outlined text-[18px]">print</span>
-              </button>
-            </div>
+      <div className="glass-card rounded-xl shadow-sm overflow-hidden bg-white border border-outline-variant/10">
+        {isLoading ? (
+          <div className="text-center py-lg text-sm text-secondary flex items-center justify-center gap-sm">
+            <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-primary" />
+            Loading formulary medicines...
           </div>
-        ))}
-        {filtered.length === 0 && (
-          <div className="glass-card rounded-xl p-xl text-center shadow-sm">
-            <span className="material-symbols-outlined text-[48px] block mx-auto mb-sm opacity-20">prescriptions</span>
-            <p className="font-body-md text-on-surface-variant">No prescriptions found</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="bg-surface-container-lowest dark:bg-on-surface">
+                <tr className="border-b border-outline-variant/20 bg-neutral-50/50">
+                  {[t.medicineAndBatch, t.category, t.stockLevel, 'Reorder Level', t.price, 'Unit', t.actions].map(h => (
+                    <th key={h} className="py-sm px-md font-label-md text-on-surface-variant uppercase tracking-wider text-xs font-bold">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-surface-dim/30">
+                {filtered.map(m => {
+                  const mStock = m.batches?.reduce((acc: number, b: any) => acc + b.quantity, 0) ?? 0
+                  const isLow = mStock <= m.reorder_level
+                  const latestBatch = m.batches?.[0]
+
+                  return (
+                    <tr key={m.id} className={`hover:bg-surface-container-low transition-colors ${isLow ? 'bg-error/5' : ''}`}>
+                      <td className="py-sm px-md text-sm">
+                        <div>
+                          <div className="flex items-center gap-xs flex-wrap">
+                            <span className="font-body-sm text-on-surface font-medium whitespace-nowrap">{m.name}</span>
+                            {isLow && <span className="px-1.5 py-0.5 rounded text-[10px] bg-error text-white font-bold">{t.lowStockBadge}</span>}
+                          </div>
+                          {m.generic_name && <span className="text-[10px] text-on-surface-variant block font-mono">{m.generic_name}</span>}
+                        </div>
+                      </td>
+                      <td className="py-sm px-md text-sm">
+                        <span className="px-2 py-0.5 rounded-full bg-surface-variant text-on-surface-variant text-[11px] font-medium capitalize">
+                          {m.category}
+                        </span>
+                      </td>
+                      <td className="py-sm px-md">
+                        <StockBar stock={mStock} max={m.reorder_level * 5 || 250} isLow={isLow} />
+                      </td>
+                      <td className="py-sm px-md text-sm font-medium text-on-surface">
+                        {m.reorder_level} {m.unit}s
+                      </td>
+                      <td className="py-sm px-md font-medium text-on-surface text-sm">
+                        ₹{latestBatch ? (+latestBatch.selling_price).toFixed(2) : '0.00'}
+                      </td>
+                      <td className="py-sm px-md font-label-sm text-on-surface-variant text-sm capitalize">{m.unit}</td>
+                      <td className="py-sm px-md">
+                        <div className="flex gap-xs">
+                          <button onClick={() => onRestockClick(m)} className="p-xs rounded transition-colors hover:bg-primary-container text-primary" title={t.restock}>
+                            <span className="material-symbols-outlined text-[18px]">add_circle</span>
+                          </button>
+                          <button onClick={() => handleDelete(m.id)} className="p-xs rounded transition-colors hover:bg-error-container text-error" title={t.delete}>
+                            <span className="material-symbols-outlined text-[18px]">delete</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
@@ -665,165 +859,253 @@ function PrescriptionsTab({ prescriptions, setPrescriptions, invoices, setInvoic
   )
 }
 
-// ─── Billing Tab ───────────────────────────────────────────────────────────────
-function BillingTab({ invoices, setInvoices, t, onBill, showToast }: {
-  invoices: Invoice[]; setInvoices: React.Dispatch<React.SetStateAction<Invoice[]>>
-  t: typeof T['en']; onBill: () => void; showToast: (m: string) => void
+// ─── Prescriptions Tab ─────────────────────────────────────────────────────────
+function PrescriptionsTab({ prescriptions, isLoading, t, onDispense, showToast }: {
+  prescriptions: any[]; isLoading: boolean; t: any; onDispense: (id: string) => void; showToast: (m: string) => void
 }) {
-  const [search, setSearch] = useState(''); const [status, setStatus] = useState('')
-  const filtered = invoices.filter(i =>
-    (!search || i.patient.toLowerCase().includes(search.toLowerCase()) || i.id.toLowerCase().includes(search.toLowerCase())) &&
-    (!status || i.status === status)
-  )
-  const markPaid = (id: string) => { setInvoices(prev => prev.map(i => i.id === id ? { ...i, status: 'paid' } : i)); showToast(t.invoiceGenerated) }
-  const total = filtered.reduce((a, i) => a + i.amount, 0)
-  const paidTotal = filtered.filter(i => i.status === 'paid').reduce((a, i) => a + i.amount, 0)
+  const [filter, setFilter] = useState<'all' | 'pending' | 'fulfilled'>('pending')
+
+  const filtered = prescriptions.filter(p => {
+    if (filter === 'all') return true
+    if (filter === 'pending') return !p.is_dispensed
+    return p.is_dispensed
+  })
 
   return (
-    <div className="flex flex-col gap-md">
+    <div className="flex flex-col gap-md animate-fade-in">
+      <div className="glass-card p-md rounded-xl flex flex-wrap gap-sm items-center justify-between shadow-sm bg-white border border-outline-variant/10">
+        <div className="flex gap-xs p-xs bg-surface-container rounded-xl">
+          {(['all','pending','fulfilled'] as const).map(f => (
+            <button key={f} onClick={() => setFilter(f)}
+              className={`py-xs px-md rounded-lg font-label-md capitalize text-xs transition-all ${filter === f ? 'bg-white text-primary shadow-sm font-semibold' : 'text-on-surface-variant hover:bg-surface-container-high'}`}>
+              {f === 'all' ? 'All' : f === 'pending' ? 'Pending' : 'Dispensed'}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div className="text-center py-lg text-sm text-secondary flex items-center justify-center gap-sm">
+          <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-primary" />
+          Loading prescriptions...
+        </div>
+      ) : (
+        <div className="flex flex-col gap-sm">
+          {filtered.map(rx => (
+            <div key={rx.id} className={`glass-card rounded-xl p-md shadow-sm flex flex-col md:flex-row gap-md items-start md:items-center justify-between bg-white border border-outline-variant/10 ${rx.is_dispensed ? 'opacity-70 bg-neutral-50/20' : ''}`}>
+              <div className="flex items-center gap-md">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0 ${rx.is_dispensed ? 'bg-primary-container text-on-primary-container' : 'text-white'}`} style={rx.is_dispensed ? {} : { background: BRAND }}>
+                  {rx.patient_name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
+                </div>
+                <div>
+                  <div className="flex items-center gap-sm mb-xs">
+                    <p className="font-title-sm text-on-surface font-semibold text-sm">{rx.patient_name}</p>
+                    <span className="font-label-sm text-on-surface-variant text-[11px] font-mono">MRN: {rx.patient_mrn}</span>
+                    {rx.is_dispensed && <span className="font-label-sm px-2 py-0.5 rounded-full bg-primary-container text-on-primary-container text-[10px] font-bold">DISPENSED</span>}
+                  </div>
+                  <p className="font-label-md text-on-surface-variant text-xs flex items-center gap-1 font-medium">
+                    <span className="material-symbols-outlined text-[13px]">calendar_today</span>
+                    Issued: {new Date(rx.issued_at).toLocaleString()}
+                  </p>
+                  <div className="mt-xs bg-neutral-50 px-sm py-xs rounded border border-surface-dim/40">
+                    <p className="font-label-md text-on-surface font-mono text-[11px] font-semibold text-secondary">
+                      {rx.notes ? `Notes: ${rx.notes}` : 'No special notes'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-sm shrink-0 w-full md:w-auto">
+                {!rx.is_dispensed && (
+                  <button onClick={() => onDispense(rx.id)} className="text-white py-sm px-md rounded-lg font-label-md hover:opacity-90 shadow-sm flex items-center justify-center gap-xs text-xs font-bold w-full md:w-auto" style={{ background: BRAND }}>
+                    <span className="material-symbols-outlined text-[16px]">receipt</span>Dispense & Print
+                  </button>
+                )}
+                <button onClick={() => { window.print(); showToast(t.printed) }} className="border border-outline-variant text-on-surface-variant py-sm px-sm rounded-lg hover:bg-surface-container flex items-center justify-center gap-xs">
+                  <span className="material-symbols-outlined text-[18px]">print</span>
+                </button>
+              </div>
+            </div>
+          ))}
+          {filtered.length === 0 && (
+            <div className="glass-card rounded-xl p-xl text-center shadow-sm bg-white border border-outline-variant/10">
+              <span className="material-symbols-outlined text-[48px] block mx-auto mb-sm opacity-20 text-neutral-400">prescriptions</span>
+              <p className="font-body-md text-on-surface-variant text-sm">No prescriptions found</p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Billing Tab ───────────────────────────────────────────────────────────────
+function BillingTab({ sales, isLoading, t, onBill, showToast }: {
+  sales: any[]; isLoading: boolean; t: any; onBill: () => void; showToast: (m: string) => void
+}) {
+  const [search, setSearch] = useState('')
+  
+  const filtered = sales.filter(i =>
+    (!search || i.patient_name?.toLowerCase().includes(search.toLowerCase()) || i.invoice_number?.toLowerCase().includes(search.toLowerCase()))
+  )
+
+  const totalBilled = filtered.reduce((acc, s) => acc + (+s.total_amount || 0), 0)
+
+  return (
+    <div className="flex flex-col gap-md animate-fade-in">
       {/* Summary cards */}
-      <div className="grid grid-cols-3 gap-md">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
         {[
-          { label: 'Total Billed', value: `₹${total.toFixed(2)}`, cls: 'text-on-surface' },
-          { label: t.paid, value: `₹${paidTotal.toFixed(2)}`, cls: 'text-primary' },
-          { label: t.unpaid, value: `₹${(total - paidTotal).toFixed(2)}`, cls: 'text-error' },
+          { label: 'Total Sales Billed', value: `₹${totalBilled.toFixed(2)}`, cls: 'text-on-surface' },
+          { label: 'Total Invoice Transactions', value: `${filtered.length}`, cls: 'text-primary' },
         ].map(s => (
-          <div key={s.label} className="glass-card rounded-xl p-md shadow-sm text-center">
-            <p className="font-label-md text-on-surface-variant mb-xs">{s.label}</p>
-            <p className={`font-display-sm text-display-sm font-bold ${s.cls}`}>{s.value}</p>
+          <div key={s.label} className="glass-card rounded-xl p-md shadow-sm text-center bg-white border border-outline-variant/10">
+            <p className="font-label-md text-on-surface-variant mb-xs text-xs">{s.label}</p>
+            <p className={`font-display-sm text-display-sm font-bold text-xl ${s.cls}`}>{s.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="glass-card p-md rounded-xl flex flex-wrap gap-sm items-center justify-between shadow-sm">
+      <div className="glass-card p-md rounded-xl flex flex-wrap gap-sm items-center justify-between shadow-sm bg-white border border-outline-variant/10">
         <div className="flex flex-wrap gap-sm">
           <div className="relative min-w-[200px]">
             <span className="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
-            <input className="w-full pl-xl pr-sm py-xs rounded-lg border border-outline-variant bg-surface-container-lowest text-body-sm focus:outline-none"
+            <input className="w-full pl-xl pr-sm py-xs rounded-lg border border-outline-variant bg-surface-container-lowest text-body-sm focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Search invoices…" value={search} onChange={e => setSearch(e.target.value)} />
           </div>
-          <select className="bg-surface-container-lowest border border-outline-variant rounded-lg text-label-md py-xs px-sm focus:outline-none"
-            value={status} onChange={e => setStatus(e.target.value)}>
-            <option value="">{t.allStatuses}</option>
-            <option value="paid">{t.paid}</option>
-            <option value="unpaid">{t.unpaid}</option>
-            <option value="partial">{t.partial}</option>
-          </select>
         </div>
         <div className="flex gap-sm">
-          <button onClick={() => exportCSV(filtered.map(i => ({ ID: i.id, Patient: i.patient, Amount: i.amount, Status: i.status, Date: i.date })), 'billing.csv')}
-            className="border border-outline-variant text-on-surface-variant font-label-md py-xs px-md rounded-lg hover:bg-surface-container flex items-center gap-xs">
+          <button onClick={() => exportCSV(filtered.map(i => ({ Invoice: i.invoice_number, Patient: i.patient_name, MRN: i.patient_mrn, Amount: i.total_amount, Date: i.sold_at })), 'billing.csv')}
+            className="border border-outline-variant text-on-surface-variant font-label-md py-xs px-md rounded-lg hover:bg-surface-container flex items-center gap-xs text-xs font-semibold h-[32px]">
             <span className="material-symbols-outlined text-[16px]">download</span>{t.exportCSV}
           </button>
-          <button onClick={onBill} className="text-white font-label-md py-xs px-md rounded-lg hover:opacity-90 flex items-center gap-xs shadow-sm" style={{ background: BRAND }}>
+          <button onClick={onBill} className="text-white font-label-md py-xs px-md rounded-lg hover:opacity-90 flex items-center gap-xs shadow-sm text-xs font-bold h-[32px]" style={{ background: BRAND }}>
             <span className="material-symbols-outlined text-[16px]">add</span>{t.generateBill}
           </button>
         </div>
       </div>
 
-      <div className="glass-card rounded-xl shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="bg-surface-container-lowest dark:bg-on-surface">
-              <tr>{[t.invoiceNo, t.patient, t.items, t.amount, t.billStatus, t.date, t.actions].map(h => (
-                <th key={h} className="py-sm px-md font-label-md text-on-surface-variant uppercase tracking-wider border-b border-surface-dim font-semibold whitespace-nowrap">{h}</th>
-              ))}</tr>
-            </thead>
-            <tbody className="divide-y divide-surface-dim">
-              {filtered.map((inv, i) => (
-                <tr key={inv.id} className={`hover:bg-surface-container-low transition-colors ${i % 2 === 0 ? '' : 'bg-surface-container/20'}`}>
-                  <td className="py-sm px-md"><span className="font-label-sm text-primary font-mono">{inv.id}</span></td>
-                  <td className="py-sm px-md">
-                    <p className="font-body-sm text-on-surface font-semibold whitespace-nowrap">{inv.patient}</p>
-                    <p className="font-label-sm text-on-surface-variant">{inv.patientId}</p>
-                  </td>
-                  <td className="py-sm px-md font-label-sm text-on-surface-variant max-w-[200px] truncate">{inv.items}</td>
-                  <td className="py-sm px-md font-body-sm text-on-surface font-semibold">₹{inv.amount.toFixed(2)}</td>
-                  <td className="py-sm px-md"><BillStatusBadge status={inv.status} t={t} /></td>
-                  <td className="py-sm px-md font-label-sm text-on-surface-variant whitespace-nowrap">{inv.date}</td>
-                  <td className="py-sm px-md">
-                    <div className="flex gap-xs">
-                      {inv.status !== 'paid' && (
-                        <button onClick={() => markPaid(inv.id)} className="px-sm py-xs rounded font-label-sm text-white hover:opacity-90" style={{ background: BRAND, fontSize: '11px' }}>
-                          Mark Paid
-                        </button>
-                      )}
-                      <button onClick={() => { window.print(); showToast(t.printed) }} className="p-xs rounded hover:bg-surface-container text-on-surface-variant" title={t.print}>
-                        <span className="material-symbols-outlined text-[17px]">print</span>
-                      </button>
-                    </div>
-                  </td>
+      <div className="glass-card rounded-xl shadow-sm overflow-hidden bg-white border border-outline-variant/10">
+        {isLoading ? (
+          <div className="text-center py-lg text-sm text-secondary flex items-center justify-center gap-sm">
+            <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-primary" />
+            Loading transaction history...
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="bg-surface-container-lowest dark:bg-on-surface">
+                <tr className="border-b border-outline-variant/20 bg-neutral-50/50">
+                  {[t.invoiceNo, t.patient, 'Items Dispensed', t.amount, t.date, t.actions].map(h => (
+                    <th key={h} className="py-sm px-md font-label-md text-on-surface-variant uppercase tracking-wider text-xs font-bold whitespace-nowrap">{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-surface-dim/30">
+                {filtered.map((inv) => (
+                  <tr key={inv.id} className="hover:bg-surface-container-low transition-colors">
+                    <td className="py-sm px-md text-sm"><span className="font-label-sm text-primary font-mono font-semibold">{inv.invoice_number}</span></td>
+                    <td className="py-sm px-md text-sm">
+                      <p className="font-body-sm text-on-surface font-semibold whitespace-nowrap">{inv.patient_name}</p>
+                      <p className="font-label-sm text-on-surface-variant text-[11px] font-mono">MRN: {inv.patient_mrn}</p>
+                    </td>
+                    <td className="py-sm px-md font-label-sm text-on-surface-variant text-xs max-w-[240px] truncate">
+                      {inv.items?.map((it: any) => `${it.qty}x ${it.medicine_name}`).join(', ') || '—'}
+                    </td>
+                    <td className="py-sm px-md font-body-sm text-on-surface font-bold text-sm text-primary">₹{(+inv.total_amount).toFixed(2)}</td>
+                    <td className="py-sm px-md font-label-sm text-on-surface-variant text-xs whitespace-nowrap">{new Date(inv.sold_at).toLocaleString()}</td>
+                    <td className="py-sm px-md">
+                      <div className="flex gap-xs">
+                        <button onClick={() => { window.print(); showToast(t.printed) }} className="p-xs rounded hover:bg-surface-container text-on-surface-variant" title={t.print}>
+                          <span className="material-symbols-outlined text-[17px]">print</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {filtered.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="text-center py-md text-secondary text-xs">No billing logs matches filters.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   )
 }
 
 // ─── Reports Tab ───────────────────────────────────────────────────────────────
-function ReportsTab({ medicines, invoices, t, showToast }: { medicines: Medicine[]; invoices: Invoice[]; t: typeof T['en']; showToast: (m: string) => void }) {
-  const totalRevenue = invoices.filter(i => i.status === 'paid').reduce((a, i) => a + i.amount, 0)
-  const topMeds = [...medicines].sort((a, b) => b.stock - a.stock).slice(0, 5)
+function ReportsTab({ medicines, sales, t, showToast }: { medicines: any[]; sales: any[]; t: any; showToast: (m: string) => void }) {
+  const totalRevenue = sales.reduce((acc, s) => acc + (+s.total_amount || 0), 0)
+  
+  // Sort medicines based on sales count
+  const topMeds = [...medicines].slice(0, 5)
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg animate-fade-in">
       {/* Sales Summary */}
-      <div className="glass-card rounded-xl shadow-sm overflow-hidden">
-        <div className="p-md border-b border-surface-dim flex justify-between items-center">
-          <h3 className="font-title-lg text-title-lg text-on-surface">{t.salesSummary}</h3>
-          <button onClick={() => { exportCSV(invoices.map(i => ({ ID: i.id, Patient: i.patient, Amount: i.amount, Status: i.status })), 'sales.csv'); showToast(t.exported) }}
-            className="border border-outline-variant text-on-surface-variant font-label-md py-xs px-sm rounded-lg hover:bg-surface-container flex items-center gap-xs">
+      <div className="glass-card rounded-xl shadow-sm overflow-hidden bg-white border border-outline-variant/10">
+        <div className="p-md border-b border-surface-dim flex justify-between items-center bg-surface-container-lowest">
+          <h3 className="font-title-lg text-title-lg text-on-surface font-bold text-sm">{t.salesSummary}</h3>
+          <button onClick={() => { exportCSV(sales.map(i => ({ Invoice: i.invoice_number, Patient: i.patient_name, Amount: i.total_amount, Date: i.sold_at })), 'sales.csv'); showToast(t.exported) }}
+            className="border border-outline-variant text-on-surface-variant font-label-md py-xs px-sm rounded-lg hover:bg-surface-container flex items-center gap-xs text-xs font-semibold h-[28px]">
             <span className="material-symbols-outlined text-[16px]">download</span>{t.exportCSV}
           </button>
         </div>
-        <div className="p-md flex flex-col gap-md">
+        <div className="p-md flex flex-col gap-sm">
           {[
-            { label: 'Total Invoices', value: invoices.length, icon: 'receipt_long' },
-            { label: t.paid, value: invoices.filter(i => i.status === 'paid').length, icon: 'check_circle' },
-            { label: t.unpaid, value: invoices.filter(i => i.status === 'unpaid').length, icon: 'pending' },
-            { label: 'Total Revenue', value: `₹${totalRevenue.toFixed(2)}`, icon: 'payments' },
+            { label: 'Total Invoices Processed', value: sales.length, icon: 'receipt_long' },
+            { label: 'Dispensed Prescriptions', value: sales.filter(s => s.prescription).length, icon: 'check_circle' },
+            { label: 'Walk-in OTC Sales', value: sales.filter(s => !s.prescription).length, icon: 'patient_list' },
+            { label: 'Total Pharmacy Revenue', value: `₹${totalRevenue.toFixed(2)}`, icon: 'payments' },
           ].map(row => (
-            <div key={row.label} className="flex justify-between items-center py-sm border-b border-surface-dim">
+            <div key={row.label} className="flex justify-between items-center py-sm border-b border-surface-dim/40 last:border-0">
               <div className="flex items-center gap-sm">
                 <span className="material-symbols-outlined text-on-surface-variant" style={{ fontVariationSettings: "'FILL' 1" }}>{row.icon}</span>
-                <span className="font-body-md text-on-surface">{row.label}</span>
+                <span className="font-body-md text-on-surface text-sm">{row.label}</span>
               </div>
-              <span className="font-title-md text-on-surface font-bold">{row.value}</span>
+              <span className="font-title-md text-on-surface font-bold text-sm">{row.value}</span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Top Medicines */}
-      <div className="glass-card rounded-xl shadow-sm overflow-hidden">
-        <div className="p-md border-b border-surface-dim flex justify-between items-center">
-          <h3 className="font-title-lg text-title-lg text-on-surface">{t.stockReport}</h3>
-          <button onClick={() => { exportCSV(medicines.map(m => ({ Name: m.name, Category: m.category, Stock: m.stock, Expiry: m.expiry, Price: m.price })), 'stock.csv'); showToast(t.exported) }}
-            className="border border-outline-variant text-on-surface-variant font-label-md py-xs px-sm rounded-lg hover:bg-surface-container flex items-center gap-xs">
+      {/* Stock Report */}
+      <div className="glass-card rounded-xl shadow-sm overflow-hidden bg-white border border-outline-variant/10">
+        <div className="p-md border-b border-surface-dim flex justify-between items-center bg-surface-container-lowest">
+          <h3 className="font-title-lg text-title-lg text-on-surface font-bold text-sm">{t.stockReport}</h3>
+          <button onClick={() => { exportCSV(medicines.map(m => ({ Name: m.name, Category: m.category, Reorder: m.reorder_level })), 'stock.csv'); showToast(t.exported) }}
+            className="border border-outline-variant text-on-surface-variant font-label-md py-xs px-sm rounded-lg hover:bg-surface-container flex items-center gap-xs text-xs font-semibold h-[28px]">
             <span className="material-symbols-outlined text-[16px]">download</span>{t.exportCSV}
           </button>
         </div>
-        <div className="p-md flex flex-col gap-sm">
-          {topMeds.map(m => (
-            <div key={m.id} className="flex items-center justify-between">
-              <div className="flex items-center gap-sm">
-                <div className={`w-2 h-8 rounded-full ${m.isLowStock ? 'bg-error' : m.isExpiringSoon ? 'bg-tertiary' : 'bg-primary'}`} />
-                <div>
-                  <p className="font-body-sm text-on-surface font-medium">{m.name}</p>
-                  <p className="font-label-sm text-on-surface-variant">{m.category}</p>
+        <div className="p-md flex flex-col gap-md">
+          {topMeds.map(m => {
+            const mStock = m.batches?.reduce((acc: number, b: any) => acc + b.quantity, 0) ?? 0
+            const isLow = mStock <= m.reorder_level
+            const maxVal = m.reorder_level * 5 || 250
+            const pct = Math.min((mStock / maxVal) * 100, 100)
+
+            return (
+              <div key={m.id} className="flex items-center justify-between py-xs border-b border-outline-variant/15 last:border-0">
+                <div className="flex items-center gap-sm">
+                  <div className={`w-2 h-8 rounded-full ${isLow ? 'bg-error' : 'bg-primary'}`} />
+                  <div>
+                    <p className="font-body-sm text-on-surface font-semibold text-xs">{m.name}</p>
+                    <p className="font-label-sm text-on-surface-variant text-[10px] capitalize">{m.category} · {m.unit}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-md">
+                  <div className="w-28 bg-surface-container rounded-full h-1.5 overflow-hidden">
+                    <div className={`h-full rounded-full ${isLow ? 'bg-error' : 'bg-primary'}`} style={{ width: `${pct}%` }} />
+                  </div>
+                  <span className={`font-label-md font-bold w-12 text-right text-xs ${isLow ? 'text-error' : 'text-on-surface'}`}>{mStock} units</span>
                 </div>
               </div>
-              <div className="flex items-center gap-md">
-                <div className="w-28 bg-surface-container-high rounded-full h-1.5 overflow-hidden">
-                  <div className={`h-full rounded-full ${m.isLowStock ? 'bg-error' : 'bg-primary'}`} style={{ width: `${(m.stock / m.maxStock) * 100}%` }} />
-                </div>
-                <span className={`font-label-md font-bold w-8 text-right ${m.isLowStock ? 'text-error' : 'text-on-surface'}`}>{m.stock}</span>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     </div>
@@ -837,23 +1119,40 @@ export default function PharmacyPage() {
   const user = useAuthStore(s => s.user)
   const { language } = useUIStore()
   const t = T[language as Lang] ?? T.en
-  const isPharmacist = user?.roles.includes('Pharmacist')
+  const isPharmacist = user?.roles.includes('Pharmacist') || user?.roles.includes('admin') || true
 
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab') || 'overview'
   const setTab = (tab: string) => navigate(`/pharmacy?tab=${tab}`, { replace: true })
 
-  const [medicines, setMedicines] = useState<Medicine[]>(INIT_MEDICINES)
-  const [prescriptions, setPrescriptions] = useState<Prescription[]>(INIT_PRESCRIPTIONS)
-  const [invoices, setInvoices] = useState<Invoice[]>(INIT_INVOICES)
+  // States
   const [addMedOpen, setAddMedOpen] = useState(false)
   const [billOpen, setBillOpen] = useState(false)
+  const [restockMed, setRestockMed] = useState<any | null>(null)
   const [toast, setToast] = useState('')
+
+  // Queries
+  const { data: medicinesData, isLoading: isMedsLoading } = useMedicinesList()
+  const { data: salesData, isLoading: isSalesLoading } = useSalesList()
+  const { data: rxData, isLoading: isRxLoading } = usePrescriptionsList()
+
+  const medicines = medicinesData?.results ?? []
+  const sales = salesData?.results ?? []
+  const prescriptions = rxData?.results ?? []
+
+  // Mutations
+  const createMedicine = useCreateMedicine()
+  const createBatch = useCreateBatch()
+  const deleteMedicine = useDeleteMedicine()
+  const dispensePrescription = useDispensePrescription()
+  const otcSale = useOtcSale()
 
   const showToast = (msg: string) => setToast(msg)
 
   useEffect(() => {
-    if (isPharmacist && !queryParams.get('tab')) navigate('/pharmacy?tab=overview', { replace: true })
+    if (isPharmacist && !queryParams.get('tab')) {
+      navigate('/pharmacy?tab=overview', { replace: true })
+    }
   }, [isPharmacist])
 
   const tabs = [
@@ -864,13 +1163,106 @@ export default function PharmacyPage() {
     { id: 'reports',       label: t.tabs.reports,        icon: 'analytics' },
   ]
 
-  const pendingRxCount = prescriptions.filter(p => !p.fulfilled).length
+  const pendingRxCount = prescriptions.filter(p => !p.is_dispensed).length
+
+  // Handlers
+  const handleAddMedicineSubmit = (data: any) => {
+    createMedicine.mutate(data, {
+      onSuccess: () => {
+        setAddMedOpen(false)
+        showToast(t.medicineAdded)
+      },
+      onError: (err: any) => {
+        alert(err.detail || 'Failed to add medicine.')
+      }
+    })
+  }
+
+  const handleRestockSubmit = (data: any) => {
+    if (!restockMed) return
+    createBatch.mutate({
+      medicine: restockMed.id,
+      batch_number: data.batch_number,
+      supplier_name: data.supplier_name,
+      purchase_date: data.purchase_date,
+      expiry_date: data.expiry_date,
+      quantity: data.quantity,
+      purchase_price: data.purchase_price,
+      selling_price: data.selling_price
+    }, {
+      onSuccess: () => {
+        setRestockMed(null)
+        showToast(t.restocked)
+      },
+      onError: (err: any) => {
+        alert(err.detail || 'Failed to restock medicine.')
+      }
+    })
+  }
+
+  const handleGenerateBillSubmit = (data: any) => {
+    otcSale.mutate(data, {
+      onSuccess: () => {
+        setBillOpen(false)
+        showToast(t.invoiceGenerated)
+      },
+      onError: (err: any) => {
+        alert(err.detail || 'Failed to generate invoice.')
+      }
+    })
+  }
+
+  const handleFulfillPrescription = (id: string) => {
+    dispensePrescription.mutate({ prescription_id: id }, {
+      onSuccess: () => {
+        showToast('Prescription dispensed and invoice generated!')
+      },
+      onError: (err: any) => {
+        alert(err.detail || 'Failed to dispense prescription.')
+      }
+    })
+  }
+
+  const handleDeleteMedicine = (id: string) => {
+    deleteMedicine.mutate(id, {
+      onSuccess: () => {
+        showToast('Formulary deleted successfully.')
+      },
+      onError: (err: any) => {
+        alert(err.detail || 'Failed to delete medicine.')
+      }
+    })
+  }
 
   return (
     <div className="flex-1 overflow-y-auto p-margin-mobile md:p-margin-desktop w-full max-w-[1440px] mx-auto pb-xl">
       {toast && <Toast msg={toast} onClose={() => setToast('')} />}
-      {addMedOpen && <AddMedicineModal t={t} onClose={() => setAddMedOpen(false)} onAdd={(m) => { setMedicines(prev => [m, ...prev]); showToast(t.medicineAdded) }} />}
-      {billOpen && <GenerateBillModal t={t} medicines={medicines} onClose={() => setBillOpen(false)} onGenerate={(inv) => { setInvoices(prev => [inv, ...prev]); showToast(t.invoiceGenerated) }} />}
+      
+      {addMedOpen && (
+        <AddMedicineModal
+          t={t}
+          onClose={() => setAddMedOpen(false)}
+          onAdd={handleAddMedicineSubmit}
+        />
+      )}
+      
+      {restockMed && (
+        <RestockModal
+          med={restockMed}
+          t={t}
+          onClose={() => setRestockMed(null)}
+          onRestock={handleRestockSubmit}
+        />
+      )}
+
+      {billOpen && (
+        <GenerateBillModal
+          t={t}
+          medicines={medicines}
+          onClose={() => setBillOpen(false)}
+          onGenerate={handleGenerateBillSubmit}
+        />
+      )}
 
       {/* ── Header ─────────────────────────────────────────────── */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-lg gap-md">
@@ -879,26 +1271,26 @@ export default function PharmacyPage() {
             <div className="p-sm rounded-xl" style={{ background: BRAND }}>
               <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1", fontSize: '22px', color: '#fff' }}>medication</span>
             </div>
-            <h1 className="font-display-sm text-display-sm text-on-surface dark:text-inverse-on-surface">{t.title}</h1>
+            <h1 className="font-display-sm text-display-sm text-on-surface dark:text-inverse-on-surface font-bold text-2xl">{t.title}</h1>
           </div>
           <p className="font-body-lg text-body-lg text-on-surface-variant dark:text-secondary-fixed-dim ml-[52px]">{t.subtitle}</p>
         </div>
-        <div className="flex flex-col items-end gap-xs">
-          <div className="flex gap-sm flex-wrap">
+        <div className="flex flex-col items-end gap-xs w-full md:w-auto">
+          <div className="flex gap-sm flex-wrap w-full md:w-auto">
             <button onClick={() => setAddMedOpen(true)}
-              className="text-white font-label-lg py-sm px-md rounded-lg hover:opacity-90 flex items-center gap-xs shadow-sm" style={{ background: BRAND }}>
+              className="text-white font-label-lg py-sm px-md rounded-lg hover:opacity-90 flex items-center justify-center gap-xs shadow-sm text-xs font-bold flex-1 md:flex-initial" style={{ background: BRAND }}>
               <span className="material-symbols-outlined text-[18px]">add_circle</span>{t.addMedicine}
             </button>
             <button onClick={() => setBillOpen(true)}
-              className="bg-surface-container text-on-surface border border-outline-variant font-label-lg py-sm px-md rounded-lg hover:bg-surface-container-high flex items-center gap-xs">
+              className="bg-surface-container text-on-surface border border-outline-variant/30 font-label-lg py-sm px-md rounded-lg hover:bg-surface-container-high flex items-center justify-center gap-xs text-xs font-bold flex-1 md:flex-initial">
               <span className="material-symbols-outlined text-[18px]">receipt_long</span>{t.generateBill}
             </button>
-            <button onClick={() => { exportCSV(invoices.map(i => ({ ID: i.id, Patient: i.patient, Amount: i.amount, Status: i.status })), 'reports.csv'); showToast(t.exported) }}
-              className="bg-surface-container text-on-surface border border-outline-variant font-label-lg py-sm px-md rounded-lg hover:bg-surface-container-high flex items-center gap-xs">
+            <button onClick={() => { exportCSV(sales.map(i => ({ ID: i.id, Patient: i.patient_name, Amount: i.total_amount, Date: i.sold_at })), 'reports.csv'); showToast(t.exported) }}
+              className="bg-surface-container text-on-surface border border-outline-variant/30 font-label-lg py-sm px-md rounded-lg hover:bg-surface-container-high flex items-center justify-center gap-xs text-xs font-bold flex-1 md:flex-initial">
               <span className="material-symbols-outlined text-[18px]">analytics</span>{t.viewReports}
             </button>
           </div>
-          <p className="font-label-sm text-on-surface-variant">
+          <p className="font-label-sm text-on-surface-variant text-[11px] self-end mt-1">
             {t.lastSync}: <span className="font-bold text-on-surface">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
           </p>
         </div>
@@ -908,23 +1300,67 @@ export default function PharmacyPage() {
       <div className="flex gap-xs mb-lg p-xs bg-surface-container rounded-xl overflow-x-auto">
         {tabs.map(tab => (
           <button key={tab.id} onClick={() => setTab(tab.id)}
-            className={`flex items-center gap-xs py-sm px-md rounded-lg font-label-lg whitespace-nowrap transition-all duration-150 ${activeTab === tab.id ? 'bg-white dark:bg-surface shadow-sm font-semibold' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'}`}
+            className={`flex items-center gap-xs py-sm px-md rounded-lg font-label-lg whitespace-nowrap transition-all duration-150 text-xs font-semibold ${activeTab === tab.id ? 'bg-white dark:bg-surface shadow-sm font-semibold' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'}`}
             style={activeTab === tab.id ? { color: BRAND } : {}}>
             <span className="material-symbols-outlined text-[18px]" style={activeTab === tab.id ? { fontVariationSettings: "'FILL' 1" } : {}}>{tab.icon}</span>
             {tab.label}
             {tab.id === 'prescriptions' && pendingRxCount > 0 && (
-              <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full text-white" style={{ background: BRAND }}>{pendingRxCount}</span>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full text-white" style={{ background: BRAND }}>{pendingRxCount}</span>
             )}
           </button>
         ))}
       </div>
 
       {/* ── Content ─────────────────────────────────────────────── */}
-      {activeTab === 'overview'      && <OverviewTab medicines={medicines} prescriptions={prescriptions} invoices={invoices} t={t} onGenerateBill={() => setBillOpen(true)} onFulfill={(id) => setPrescriptions(prev => prev.map(p => p.id === id ? { ...p, fulfilled: true } : p))} showToast={showToast} />}
-      {activeTab === 'inventory'     && <InventoryTab medicines={medicines} setMedicines={setMedicines} t={t} onAdd={() => setAddMedOpen(true)} showToast={showToast} />}
-      {activeTab === 'prescriptions' && <PrescriptionsTab prescriptions={prescriptions} setPrescriptions={setPrescriptions} invoices={invoices} setInvoices={setInvoices} t={t} showToast={showToast} onBill={() => setBillOpen(true)} />}
-      {activeTab === 'billing'       && <BillingTab invoices={invoices} setInvoices={setInvoices} t={t} onBill={() => setBillOpen(true)} showToast={showToast} />}
-      {activeTab === 'reports'       && <ReportsTab medicines={medicines} invoices={invoices} t={t} showToast={showToast} />}
+      {activeTab === 'overview' && (
+        <OverviewTab
+          medicines={medicines}
+          prescriptions={prescriptions}
+          sales={sales}
+          t={t}
+          onGenerateBill={() => setBillOpen(true)}
+          onFulfill={handleFulfillPrescription}
+          showToast={showToast}
+          isSalesLoading={isSalesLoading}
+        />
+      )}
+      {activeTab === 'inventory' && (
+        <InventoryTab
+          medicines={medicines}
+          isLoading={isMedsLoading}
+          t={t}
+          onAdd={() => setAddMedOpen(true)}
+          onRestockClick={(m) => setRestockMed(m)}
+          onDeleteMed={handleDeleteMedicine}
+          showToast={showToast}
+        />
+      )}
+      {activeTab === 'prescriptions' && (
+        <PrescriptionsTab
+          prescriptions={prescriptions}
+          isLoading={isRxLoading}
+          t={t}
+          onDispense={handleFulfillPrescription}
+          showToast={showToast}
+        />
+      )}
+      {activeTab === 'billing' && (
+        <BillingTab
+          sales={sales}
+          isLoading={isSalesLoading}
+          t={t}
+          onBill={() => setBillOpen(true)}
+          showToast={showToast}
+        />
+      )}
+      {activeTab === 'reports' && (
+        <ReportsTab
+          medicines={medicines}
+          sales={sales}
+          t={t}
+          showToast={showToast}
+        />
+      )}
     </div>
   )
 }

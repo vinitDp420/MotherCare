@@ -58,6 +58,7 @@ LOCAL_APPS = [
     "apps.consultations",
     "apps.prescriptions",
     "apps.laboratory",
+    "apps.referrals",
     # Inpatient
     "apps.admissions",
     "apps.delivery",

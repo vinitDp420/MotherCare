@@ -74,3 +74,20 @@ class IsSelf(BasePermission):
 
     def has_object_permission(self, request: Request, view: APIView, obj: object) -> bool:
         return bool(hasattr(obj, "user") and obj.user == request.user) or obj == request.user
+
+
+class IsDoctor(BasePermission):
+    """
+    Permission check: user must be authenticated, active, and have an associated Doctor profile.
+    """
+
+    message = "You must be registered as a Doctor to perform this action."
+
+    def has_permission(self, request: Request, view: APIView) -> bool:
+        if not (request.user and request.user.is_authenticated and request.user.is_active):
+            return False
+        try:
+            return hasattr(request.user, "staff_profile") and hasattr(request.user.staff_profile, "doctor_profile")
+        except AttributeError:
+            return False
+

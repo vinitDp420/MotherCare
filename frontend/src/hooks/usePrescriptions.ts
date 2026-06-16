@@ -1,6 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { prescriptionsApi, PrescriptionWritePayload } from '@/api/endpoints/prescriptions.api'
 
+export function usePrescriptionsList(params?: { patient?: string; consultation?: string; page?: number }) {
+  return useQuery({
+    queryKey: ['prescriptions', params],
+    queryFn: () => prescriptionsApi.list(params),
+    placeholderData: (prev) => prev,
+  })
+}
+
 export function usePrescription(id: string) {
   return useQuery({
     queryKey: ['prescription', id],

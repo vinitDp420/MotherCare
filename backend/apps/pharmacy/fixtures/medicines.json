@@ -1,0 +1,800 @@
+[
+  {
+    "model": "pharmacy.medicine",
+    "pk": "b9eb021f-54ac-44ce-913c-ca164625a114",
+    "fields": {
+      "name": "Folic Acid 5mg",
+      "generic_name": "Folic Acid",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 100,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "ccaa4d9f-05ad-4faa-88e3-73dd7555df22",
+    "fields": {
+      "name": "Iron Polymaltose 100mg",
+      "generic_name": "Iron Polymaltose Complex",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 100,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "814fdc45-47b0-432a-ae64-66b70885d1b9",
+    "fields": {
+      "name": "Calcium Carbonate + D3",
+      "generic_name": "Calcium Carbonate + Cholecalciferol",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 100,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "fa041d15-185a-4632-9081-cdd61dbf7e2a",
+    "fields": {
+      "name": "Nifedipine 10mg SR",
+      "generic_name": "Nifedipine",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "6d024064-a721-470a-afe6-c675dde0a941",
+    "fields": {
+      "name": "Labetalol 100mg",
+      "generic_name": "Labetalol Hydrochloride",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "994991dc-d99d-47b6-a091-e3caf614bf01",
+    "fields": {
+      "name": "Methyldopa 250mg",
+      "generic_name": "Methyldopa",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 100,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "9f6396a8-6d10-41d4-bc6e-7bc4d7835d2f",
+    "fields": {
+      "name": "Misoprostol 200mcg",
+      "generic_name": "Misoprostol",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "0fc9f5c2-cf21-4cc4-849e-344b32603079",
+    "fields": {
+      "name": "Mifepristone 200mg",
+      "generic_name": "Mifepristone",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 20,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "f0ecaf03-f9b5-495b-96ea-4a04acb4253b",
+    "fields": {
+      "name": "Doxylamine + Pyridoxine",
+      "generic_name": "Doxylamine Succinate + Pyridoxine Hydrochloride",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 100,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "73dcfa55-a427-43d3-946b-ac8183b3aee1",
+    "fields": {
+      "name": "Metoclopramide 10mg",
+      "generic_name": "Metoclopramide Hydrochloride",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 100,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "fa9bfa0b-0bb6-4f0f-98f1-0e14e5bf0c0d",
+    "fields": {
+      "name": "Ondansetron 4mg",
+      "generic_name": "Ondansetron",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 100,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "531bac89-bd16-4a40-8703-09a4250b6656",
+    "fields": {
+      "name": "Paracetamol 500mg",
+      "generic_name": "Paracetamol",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 200,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "b4920aa5-083b-424c-9f8f-7d383bb77ad4",
+    "fields": {
+      "name": "Ibuprofen 400mg",
+      "generic_name": "Ibuprofen",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 150,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "91d8593e-1185-4ef6-bdbf-d6ec4c87d8b4",
+    "fields": {
+      "name": "Tranexamic Acid 500mg",
+      "generic_name": "Tranexamic Acid",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "77ccbb59-45dd-42cf-878a-7784aff758f8",
+    "fields": {
+      "name": "Cefixime 200mg",
+      "generic_name": "Cefixime Trihydrate",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "ec47d2d1-df09-4f45-a148-ede645d7807f",
+    "fields": {
+      "name": "Amoxicillin + Clavulanate 625mg",
+      "generic_name": "Amoxicillin + Clavulanic Acid",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "2c70abf2-da00-4f8b-9c53-ec87ef11bb48",
+    "fields": {
+      "name": "Metronidazole 400mg",
+      "generic_name": "Metronidazole",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 100,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "a09da9f3-2ac3-48ca-94fe-27baac789172",
+    "fields": {
+      "name": "Azithromycin 500mg",
+      "generic_name": "Azithromycin",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 30,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "b0f3b159-dbb4-4347-88e4-8eb980db5666",
+    "fields": {
+      "name": "Ferrous Ascorbate 100mg",
+      "generic_name": "Ferrous Ascorbate",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 100,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "3c6e4a93-3a0d-41e5-967a-32220d099494",
+    "fields": {
+      "name": "Roxithromycin 150mg",
+      "generic_name": "Roxithromycin",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "7713ffee-bd1b-4bfd-84a5-aeea8912ac94",
+    "fields": {
+      "name": "Pantoprazole 40mg",
+      "generic_name": "Pantoprazole Sodium",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 100,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "27315ad9-b262-4d23-a097-a642e1572702",
+    "fields": {
+      "name": "Thyroxine 50mcg",
+      "generic_name": "Levothyroxine Sodium",
+      "category": "tablet",
+      "unit": "tablet",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "517f8552-3fd2-4515-8989-ced2538b0104",
+    "fields": {
+      "name": "Prenatal Vitamins + DHA",
+      "generic_name": "Multivitamins + Docosahexaenoic Acid",
+      "category": "capsule",
+      "unit": "capsule",
+      "reorder_level": 100,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "cc8fec48-0336-40ca-9637-39a2bcaed514",
+    "fields": {
+      "name": "Progesterone 200mg",
+      "generic_name": "Micronized Progesterone",
+      "category": "capsule",
+      "unit": "capsule",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "51a6a3e7-a9f2-4060-9a7f-9fd45ddce7ae",
+    "fields": {
+      "name": "Doxycycline 100mg",
+      "generic_name": "Doxycycline Hyclate",
+      "category": "capsule",
+      "unit": "capsule",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "626f32b3-8ae7-4788-87b3-3c40d9c87d02",
+    "fields": {
+      "name": "Cephalexin 500mg",
+      "generic_name": "Cephalexin",
+      "category": "capsule",
+      "unit": "capsule",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "53bf4112-d938-450e-bc2b-3d18446dbaae",
+    "fields": {
+      "name": "Oxytocin Injection 10 IU/ml",
+      "generic_name": "Oxytocin",
+      "category": "injection",
+      "unit": "ampoule",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "ce22b882-5fda-488d-9d1a-9efc062b1a65",
+    "fields": {
+      "name": "Methylergometrine 0.2mg/ml",
+      "generic_name": "Methylergometrine Maleate",
+      "category": "injection",
+      "unit": "ampoule",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "b62de284-35ff-4dcf-bc90-b706715b01b4",
+    "fields": {
+      "name": "Carboprost Injection 250mcg/ml",
+      "generic_name": "Carboprost Tromethamine",
+      "category": "injection",
+      "unit": "ampoule",
+      "reorder_level": 20,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "89f082ce-db82-4181-b93c-9a5337ffd3e4",
+    "fields": {
+      "name": "Labetalol Injection 5mg/ml",
+      "generic_name": "Labetalol Hydrochloride",
+      "category": "injection",
+      "unit": "vial",
+      "reorder_level": 20,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "e2898fb3-ab5a-4f63-8fdb-b5337cbb8536",
+    "fields": {
+      "name": "Magnesium Sulfate 50%",
+      "generic_name": "Magnesium Sulfate heptahydrate",
+      "category": "injection",
+      "unit": "ampoule",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "7d0f14d5-ddc4-4406-99f0-d3ed4a69d082",
+    "fields": {
+      "name": "Ondansetron Injection 2mg/ml",
+      "generic_name": "Ondansetron Hydrochloride",
+      "category": "injection",
+      "unit": "ampoule",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "a80420f7-0492-4971-afe5-65e52445ca62",
+    "fields": {
+      "name": "Tranexamic Acid Inj 100mg/ml",
+      "generic_name": "Tranexamic Acid",
+      "category": "injection",
+      "unit": "ampoule",
+      "reorder_level": 30,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "2b7f8561-4987-436b-b399-f85b5fe0a45d",
+    "fields": {
+      "name": "Ceftriaxone Injection 1g",
+      "generic_name": "Ceftriaxone Sodium",
+      "category": "injection",
+      "unit": "vial",
+      "reorder_level": 30,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "a8d00231-265c-463c-9cec-13e893f2bd55",
+    "fields": {
+      "name": "Paracetamol Inj 150mg/ml",
+      "generic_name": "Paracetamol",
+      "category": "injection",
+      "unit": "ampoule",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "e2c6d6d5-56e5-404f-bf1a-b2c7e62ff90c",
+    "fields": {
+      "name": "Betamethasone Injection 4mg/ml",
+      "generic_name": "Betamethasone Sodium Phosphate",
+      "category": "injection",
+      "unit": "ampoule",
+      "reorder_level": 30,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "1a5c9c73-730c-4dc1-9ad8-533ba4908e52",
+    "fields": {
+      "name": "Dexamethasone Injection 4mg/ml",
+      "generic_name": "Dexamethasone Sodium Phosphate",
+      "category": "injection",
+      "unit": "ampoule",
+      "reorder_level": 30,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "3b96b6d3-5c75-4fec-81c7-ea566ef3704a",
+    "fields": {
+      "name": "Tetanus Toxoid Vaccine",
+      "generic_name": "Tetanus Toxoid",
+      "category": "injection",
+      "unit": "vial",
+      "reorder_level": 30,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "aa9aa8f4-2929-472f-b890-1398a94ff75f",
+    "fields": {
+      "name": "Hepatitis B Vaccine (Pediatric)",
+      "generic_name": "Hepatitis B Recombinant Vaccine",
+      "category": "injection",
+      "unit": "vial",
+      "reorder_level": 30,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "60375b39-c684-4604-bf3a-e5b1dfec5a36",
+    "fields": {
+      "name": "BCG Vaccine",
+      "generic_name": "Bacillus Calmette-Guerin Vaccine",
+      "category": "injection",
+      "unit": "vial",
+      "reorder_level": 30,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "70424f2f-8e49-423c-a022-5d9792a96ec1",
+    "fields": {
+      "name": "Vitamin K1 Injection 1mg/0.5ml",
+      "generic_name": "Phytomenadione (Vitamin K1)",
+      "category": "injection",
+      "unit": "ampoule",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "431829b4-62ae-460b-9861-d10b6ac8d8f1",
+    "fields": {
+      "name": "Enoxaparin Injection 40mg",
+      "generic_name": "Enoxaparin Sodium",
+      "category": "injection",
+      "unit": "prefilled syringe",
+      "reorder_level": 20,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "7849abc7-5e6b-446b-bde7-37232c2c4d45",
+    "fields": {
+      "name": "Insulin Regular 100 IU/ml",
+      "generic_name": "Insulin Human (rDNA)",
+      "category": "injection",
+      "unit": "vial",
+      "reorder_level": 10,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "16512706-0eec-467e-90b6-0572e3e09597",
+    "fields": {
+      "name": "Ferrous Ascorbate Syrup",
+      "generic_name": "Ferrous Ascorbate + Folic Acid",
+      "category": "syrup",
+      "unit": "bottle",
+      "reorder_level": 30,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "41c276cc-caa7-4109-874c-1032053034a1",
+    "fields": {
+      "name": "Lactulose Syrup",
+      "generic_name": "Lactulose",
+      "category": "syrup",
+      "unit": "bottle",
+      "reorder_level": 30,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "ffe79271-68a9-493d-b95a-5207cc25abdb",
+    "fields": {
+      "name": "Antacid Gel Suspension",
+      "generic_name": "Dried Aluminium Hydroxide + Magnesium Hydroxide + Simethicone",
+      "category": "syrup",
+      "unit": "bottle",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "513a6cca-41f9-4a20-9cf5-fe8339e1422b",
+    "fields": {
+      "name": "Calcium Suspension",
+      "generic_name": "Calcium Carbonate + Vitamin D3",
+      "category": "syrup",
+      "unit": "bottle",
+      "reorder_level": 30,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "308287b9-f0f3-407f-9925-a18061126e50",
+    "fields": {
+      "name": "Oral Polio Vaccine (OPV)",
+      "generic_name": "Oral Polio Vaccine",
+      "category": "drops",
+      "unit": "bottle",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "a8467931-b088-4f50-96f5-8ed5c79fd676",
+    "fields": {
+      "name": "Gentamicin Eye/Ear Drops",
+      "generic_name": "Gentamicin Sulfate",
+      "category": "drops",
+      "unit": "bottle",
+      "reorder_level": 20,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "76ebe841-d6f0-4bc7-987d-dd7f1716d397",
+    "fields": {
+      "name": "Diclofenac Suppository 100mg",
+      "generic_name": "Diclofenac Sodium",
+      "category": "suppository",
+      "unit": "suppository",
+      "reorder_level": 20,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "6c51db52-8ab6-47ce-b410-994c49187a41",
+    "fields": {
+      "name": "Clotrimazole Vaginal Cream 2%",
+      "generic_name": "Clotrimazole",
+      "category": "topical",
+      "unit": "tube",
+      "reorder_level": 30,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "52c450f9-932d-4471-a6fc-6a13255d9033",
+    "fields": {
+      "name": "Mupirocin Ointment 2%",
+      "generic_name": "Mupirocin",
+      "category": "topical",
+      "unit": "tube",
+      "reorder_level": 20,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "80efc488-5c7e-4332-a1d7-7fa65d9df2d0",
+    "fields": {
+      "name": "Dinoprostone Vaginal Gel 0.5mg",
+      "generic_name": "Dinoprostone",
+      "category": "topical",
+      "unit": "syringe",
+      "reorder_level": 10,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "58e669f6-bf30-4190-b77e-0195853b6e58",
+    "fields": {
+      "name": "ORS Sachet 21.8g",
+      "generic_name": "Oral Rehydration Salts",
+      "category": "powder",
+      "unit": "sachet",
+      "reorder_level": 100,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "c75a8032-0b22-4906-8f11-09d5ca9dfe82",
+    "fields": {
+      "name": "Dextrose 5% 500ml IV",
+      "generic_name": "Dextrose 5% in Water",
+      "category": "other",
+      "unit": "bottle",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "7fafce5b-db54-4cb7-9c6e-0453ae220cd5",
+    "fields": {
+      "name": "Normal Saline 0.9% 500ml",
+      "generic_name": "Sodium Chloride 0.9%",
+      "category": "other",
+      "unit": "bottle",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "pharmacy.medicine",
+    "pk": "49fb5d53-36d4-480c-9a5d-00f0ffa61762",
+    "fields": {
+      "name": "Ringer's Lactate 500ml",
+      "generic_name": "Ringer's Lactate Solution",
+      "category": "other",
+      "unit": "bottle",
+      "reorder_level": 50,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  }
+]

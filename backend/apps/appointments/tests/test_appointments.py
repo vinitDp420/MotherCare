@@ -42,13 +42,13 @@ class TestTokenAssignment:
 
     def test_first_token_is_101(self) -> None:
         doctor = DoctorFactory()
-        appt_date = (timezone.now() + timedelta(days=1)).date()
+        appt_date = timezone.localdate(timezone.now() + timedelta(days=1))
         token = assign_token(doctor, appt_date)
         assert token == TOKEN_START  # 101
 
     def test_second_token_is_102(self) -> None:
         doctor = DoctorFactory()
-        appt_date = (timezone.now() + timedelta(days=1)).date()
+        appt_date = timezone.localdate(timezone.now() + timedelta(days=1))
 
         # Create first appointment
         AppointmentFactory(
@@ -65,14 +65,14 @@ class TestTokenAssignment:
         doctor = DoctorFactory()
 
         # Tomorrow gets 101
-        tomorrow = (timezone.now() + timedelta(days=1)).date()
+        tomorrow = timezone.localdate(timezone.now() + timedelta(days=1))
         token_tomorrow = assign_token(doctor, tomorrow)
         assert token_tomorrow == TOKEN_START
 
     def test_cancelled_token_not_reassigned(self) -> None:
         """BR-APPT-12: Cancelled appointment tokens are retired."""
         doctor = DoctorFactory()
-        appt_date = (timezone.now() + timedelta(days=1)).date()
+        appt_date = timezone.localdate(timezone.now() + timedelta(days=1))
 
         # Create + cancel an appointment (token 101)
         AppointmentFactory(
@@ -90,7 +90,7 @@ class TestTokenAssignment:
         """Each doctor has their own token sequence per day."""
         doctor_a = DoctorFactory()
         doctor_b = DoctorFactory()
-        appt_date = (timezone.now() + timedelta(days=1)).date()
+        appt_date = timezone.localdate(timezone.now() + timedelta(days=1))
 
         AppointmentFactory(
             doctor=doctor_a,

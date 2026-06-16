@@ -23,6 +23,8 @@ urlpatterns = [
     path("api/v1/consultations/", include("apps.consultations.urls")),
     path("api/v1/prescriptions/", include("apps.prescriptions.urls")),
     path("api/v1/laboratory/",    include("apps.laboratory.urls")),
+    path("api/v1/lab/",           include("apps.laboratory.urls_lab")),
+    path("api/v1/referrals/",     include("apps.referrals.urls")),
     path("api/v1/pharmacy/",      include("apps.pharmacy.urls")),
     path("api/v1/admissions/",    include("apps.admissions.urls")),
     path("api/v1/beds/",          include("apps.admissions.urls_beds")),

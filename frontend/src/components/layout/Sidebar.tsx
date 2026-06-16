@@ -48,6 +48,8 @@ export default function Sidebar() {
   
   const isLabTech = user?.roles.includes('Lab Tech')
   const isPharmacist = user?.roles.includes('Pharmacist')
+  const isPatient = user?.roles.includes('Patient')
+  const patientProfileId = user?.patient_profile_id
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab') || 'pending'
 
@@ -59,6 +61,63 @@ export default function Sidebar() {
     }
     clearAuth()
     navigate('/login')
+  }
+
+  if (isPatient) {
+    const PATIENT_NAV_ITEMS = [
+      ...(patientProfileId ? [{ path: `/patients/${patientProfileId}`, label: 'My Health Record', icon: 'favorite' }] : []),
+      { path: '/appointments', label: 'My Appointments', icon: 'calendar_today' },
+    ]
+    return (
+      <nav className="sidebar-root">
+        {/* Brand Header */}
+        <div className="sidebar-brand">
+          <div className="sidebar-logo-icon" style={{ backgroundColor: '#00685d' }}>
+            <span
+              className="material-symbols-outlined"
+              style={{ fontVariationSettings: "'FILL' 1", fontSize: '20px', color: '#ffffff' }}
+            >
+              salinity
+            </span>
+          </div>
+          <div>
+            <span className="sidebar-brand-name">Patient Portal</span>
+            <span className="sidebar-brand-sub">Shakuntala Hospital</span>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div className="sidebar-nav-scroll">
+          <ul className="sidebar-nav-list">
+            {PATIENT_NAV_ITEMS.map((item) => (
+              <li key={item.path}>
+                <NavLink
+                  to={item.path}
+                  className={({ isActive }) =>
+                    `sidebar-nav-item${isActive ? ' sidebar-nav-item-active' : ''}`
+                  }
+                >
+                  <span className="material-symbols-outlined sidebar-nav-icon">{item.icon}</span>
+                  <span className="sidebar-nav-label">{item.label}</span>
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Footer */}
+        <div className="sidebar-footer">
+          <button
+            onClick={handleLogout}
+            className="sidebar-nav-item w-full text-left bg-transparent border-none cursor-pointer"
+            style={{ display: 'flex', alignItems: 'center' }}
+          >
+            <span className="material-symbols-outlined sidebar-nav-icon">logout</span>
+            <span className="sidebar-nav-label">Logout</span>
+          </button>
+        </div>
+      </nav>
+    )
   }
 
   if (isLabTech) {

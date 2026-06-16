@@ -1,9 +1,11 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDashboardStats } from '@/hooks/useDashboard'
 import { useAuthStore } from '@/store/authStore'
 import { useUIStore } from '@/store/uiStore'
 
 const translations = {
+// ... [truncated for ease of matching, we will select a smaller target content range below]
   en: {
     goodMorning: 'Good Morning',
     goodAfternoon: 'Good Afternoon',
@@ -157,9 +159,16 @@ const translations = {
 } as const
 
 export default function DashboardPage() {
-  const { data: stats, isLoading, error } = useDashboardStats()
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
+
+  useEffect(() => {
+    if (user?.roles.includes('Patient') && user.patient_profile_id) {
+      navigate(`/patients/${user.patient_profile_id}`, { replace: true })
+    }
+  }, [user, navigate])
+
+  const { data: stats, isLoading, error } = useDashboardStats()
   const { language } = useUIStore()
 
   const t = translations[language]

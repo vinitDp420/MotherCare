@@ -355,3 +355,22 @@ class TestPrescriptionAPI:
         assert response.status_code == 200
         assert isinstance(response.data, list)
         assert len(response.data) == 1
+
+    def test_prescription_detail_fields(self, auth_client: APIClient) -> None:
+        from datetime import date
+        from apps.people.tests.factories import DoctorFactory
+        patient = PatientFactory(dob=date(2000, 1, 1))
+        doctor = DoctorFactory(registration_no="DOC-12345")
+        rx = PrescriptionFactory(patient=patient, doctor=doctor)
+        response = auth_client.get(f"/api/v1/prescriptions/{rx.id}/")
+        assert response.status_code == 200
+        assert "patient_age" in response.data
+        assert response.data["patient_age"] == date.today().year - 2000 - ((date.today().month, date.today().day) < (1, 1))
+        assert response.data["doctor_name"] == doctor.staff.full_name
+        assert response.data["doctor_registration_no"] == "DOC-12345"
+
+    def test_export_pdf_endpoint(self, auth_client: APIClient) -> None:
+        rx = PrescriptionFactory()
+        response = auth_client.get(f"/api/v1/prescriptions/{rx.id}/export/")
+        assert response.status_code == 200
+        assert response["Content-Type"] == "application/pdf"

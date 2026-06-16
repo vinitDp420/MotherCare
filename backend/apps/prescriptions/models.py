@@ -55,6 +55,24 @@ class Prescription(BaseModel):
         blank=True,
         help_text="General notes for the prescription (e.g. special instructions, pharmacist notes).",
     )
+    doctor = models.ForeignKey(
+        "people.Doctor",
+        on_delete=models.RESTRICT,
+        null=True,
+        blank=True,
+        related_name="prescriptions",
+        help_text="The doctor who issued this prescription."
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("draft", "Draft"),
+            ("saved", "Saved"),
+            ("dispensed", "Dispensed")
+        ],
+        default="saved",
+        help_text="Status of the prescription."
+    )
 
     class Meta:
         db_table = "prescription"
@@ -110,6 +128,20 @@ class PrescriptionItem(BaseModel):
     duration = models.CharField(
         max_length=50,
         help_text="Treatment duration: e.g. 7 days, 30 days, Ongoing.",
+    )
+    duration_days = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="Duration in integer days."
+    )
+    route = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="Route of administration (e.g. Oral, IV, IM, Topical)."
+    )
+    quantity_to_dispense = models.IntegerField(
+        default=1,
+        help_text="Total unit quantity to dispense."
     )
     instructions = models.TextField(
         blank=True,

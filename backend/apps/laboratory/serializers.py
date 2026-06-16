@@ -33,12 +33,8 @@ class LabReportFileSerializer(serializers.ModelSerializer):
 
 class LabReportFileUploadSerializer(serializers.Serializer):
     """Input for POST /api/v1/laboratory/lab-tests/{id}/upload-report/"""
-    file_url = serializers.URLField(
-        help_text="Full URL to the uploaded file (S3, CDN, or local media).",
-    )
-    file_type = serializers.ChoiceField(
-        choices=FILE_TYPE_CHOICES,
-        default="pdf",
+    file = serializers.FileField(
+        help_text="The report file to upload (PDF, JPEG, PNG, DICOM).",
     )
     notes = serializers.CharField(required=False, allow_blank=True, default="")
 
@@ -144,3 +140,110 @@ class StatusUpdateSerializer(serializers.Serializer):
 class FlagSerializer(serializers.Serializer):
     """Input for POST /flag/ action."""
     reason = serializers.CharField(required=False, allow_blank=True, default="")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TestMaster, LabOrder, LabOrderItem, LabReport
+# ─────────────────────────────────────────────────────────────────────────────
+from apps.laboratory.models import TestMaster, LabOrder, LabOrderItem, LabReport
+
+class TestMasterSerializer(serializers.ModelSerializer):
+    """Serializer for TestMaster database catalog records."""
+    class Meta:
+        model = TestMaster
+        fields = [
+            "id", "name", "code", "category", "normal_range",
+            "unit", "price", "turnaround_hours", "is_active",
+            "created_at", "updated_at"
+        ]
+        read_only_fields = ["id", "created_at", "updated_at"]
+
+
+class LabReportSerializer(serializers.ModelSerializer):
+    """Serializer for uploaded Lab Reports."""
+    uploaded_by_name = serializers.CharField(source="uploaded_by.username", read_only=True)
+
+    class Meta:
+        model = LabReport
+        fields = [
+            "id", "lab_order", "report_file", "uploaded_by",
+            "uploaded_by_name", "uploaded_at", "doctor_comment",
+            "reviewed_at", "created_at", "updated_at"
+        ]
+        read_only_fields = ["id", "uploaded_by", "uploaded_at", "created_at", "updated_at"]
+
+
+class LabOrderItemSerializer(serializers.ModelSerializer):
+    """Serializer for LabOrderItem (individual ordered test results)."""
+    test_name = serializers.CharField(source="test.name", read_only=True)
+    test_code = serializers.CharField(source="test.code", read_only=True)
+    test_category = serializers.CharField(source="test.category", read_only=True)
+    test_normal_range = serializers.CharField(source="test.normal_range", read_only=True)
+    test_unit = serializers.CharField(source="test.unit", read_only=True)
+
+    class Meta:
+        model = LabOrderItem
+        fields = [
+            "id", "lab_order", "test", "test_name", "test_code",
+            "test_category", "test_normal_range", "test_unit",
+            "result_value", "result_note", "is_abnormal",
+            "created_at", "updated_at"
+        ]
+        read_only_fields = ["id", "created_at", "updated_at"]
+
+
+class LabOrderSerializer(serializers.ModelSerializer):
+    """Detail read serializer for LabOrder."""
+    patient_name = serializers.CharField(source="patient.full_name", read_only=True)
+    patient_mrn = serializers.CharField(source="patient.mrn", read_only=True)
+    doctor_name = serializers.CharField(source="doctor.staff.full_name", read_only=True)
+    status_display = serializers.CharField(source="get_status_display", read_only=True)
+    items = LabOrderItemSerializer(many=True, read_only=True)
+    reports = LabReportSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = LabOrder
+        fields = [
+            "id", "consultation", "patient", "patient_name", "patient_mrn",
+            "doctor", "doctor_name", "status", "status_display",
+            "clinical_note", "ordered_at", "completed_at",
+            "items", "reports", "created_at", "updated_at"
+        ]
+        read_only_fields = fields
+
+
+class LabOrderWriteSerializer(serializers.ModelSerializer):
+    """Write serializer for creating grouped lab orders with multiple items."""
+    from apps.people.models import Patient as _Patient  # noqa: PLC0415
+    from apps.people.models import Doctor as _Doctor  # noqa: PLC0415
+    from apps.consultations.models import Consultation as _Consultation  # noqa: PLC0415
+
+    patient = serializers.PrimaryKeyRelatedField(queryset=_Patient.objects.all())
+    doctor = serializers.PrimaryKeyRelatedField(queryset=_Doctor.objects.all())
+    consultation = serializers.PrimaryKeyRelatedField(
+        queryset=_Consultation.objects.all(),
+        required=False,
+        allow_null=True
+    )
+    tests = serializers.PrimaryKeyRelatedField(
+        queryset=TestMaster.objects.filter(is_active=True),
+        many=True,
+        write_only=True
+    )
+
+    class Meta:
+        model = LabOrder
+        fields = ["consultation", "patient", "doctor", "clinical_note", "tests"]
+
+
+class LabReportUploadInputSerializer(serializers.Serializer):
+    """Serializer mapping fields for uploaded report PDFs."""
+    file = serializers.FileField(help_text="Lab report PDF file.")
+
+
+class LabOrderReviewSerializer(serializers.ModelSerializer):
+    """Serializer mapping fields for adding comments."""
+    class Meta:
+        model = LabReport
+        fields = ["doctor_comment"]
+

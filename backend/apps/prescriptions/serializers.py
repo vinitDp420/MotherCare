@@ -33,7 +33,8 @@ class PrescriptionItemSerializer(serializers.ModelSerializer):
         fields = [
             "id", "prescription", "medicine",
             "dosage", "frequency", "frequency_display",
-            "duration", "instructions", "sort_order",
+            "duration", "duration_days", "route", "quantity_to_dispense",
+            "instructions", "sort_order",
             "created_at",
         ]
         read_only_fields = fields
@@ -55,7 +56,8 @@ class PrescriptionItemWriteSerializer(serializers.ModelSerializer):
         model = PrescriptionItem
         fields = [
             "prescription", "medicine", "dosage",
-            "frequency", "duration", "instructions", "sort_order",
+            "frequency", "duration", "duration_days", "route",
+            "quantity_to_dispense", "instructions", "sort_order",
         ]
 
     def validate_medicine(self, medicine: object) -> object:
@@ -74,18 +76,24 @@ class PrescriptionItemWriteSerializer(serializers.ModelSerializer):
 class PrescriptionListSerializer(serializers.ModelSerializer):
     patient_name = serializers.CharField(source="patient.full_name", read_only=True)
     patient_mrn = serializers.CharField(source="patient.mrn", read_only=True)
+    doctor_name = serializers.CharField(source="doctor.staff.full_name", read_only=True, default="")
     item_count = serializers.SerializerMethodField()
+    is_dispensed = serializers.SerializerMethodField()
 
     class Meta:
         model = Prescription
         fields = [
             "id", "consultation", "patient", "patient_name", "patient_mrn",
-            "issued_at", "notes", "item_count", "created_at",
+            "doctor", "doctor_name", "status",
+            "issued_at", "notes", "item_count", "is_dispensed", "created_at",
         ]
         read_only_fields = fields
 
     def get_item_count(self, obj: Prescription) -> int:
         return obj.items.count()
+
+    def get_is_dispensed(self, obj: Prescription) -> bool:
+        return obj.pharmacy_sales.exists()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -96,20 +104,37 @@ class PrescriptionDetailSerializer(serializers.ModelSerializer):
     patient_name = serializers.CharField(source="patient.full_name", read_only=True)
     patient_mrn = serializers.CharField(source="patient.mrn", read_only=True)
     patient_blood_group = serializers.CharField(source="patient.blood_group", read_only=True)
+    patient_age = serializers.SerializerMethodField()
+    doctor_name = serializers.CharField(source="doctor.staff.full_name", read_only=True, default="")
+    doctor_registration_no = serializers.CharField(source="doctor.registration_no", read_only=True, default="")
     item_count = serializers.SerializerMethodField()
     items = PrescriptionItemSerializer(many=True, source="items.all", read_only=True)
+    is_dispensed = serializers.SerializerMethodField()
 
     class Meta:
         model = Prescription
         fields = [
             "id", "consultation", "patient", "patient_name", "patient_mrn",
-            "patient_blood_group",
-            "issued_at", "notes", "item_count", "items", "created_at", "updated_at",
+            "patient_blood_group", "patient_age", "doctor", "doctor_name", "doctor_registration_no",
+            "status", "issued_at", "notes", "item_count", "items", "is_dispensed", "created_at", "updated_at",
         ]
         read_only_fields = fields
 
     def get_item_count(self, obj: Prescription) -> int:
         return obj.items.count()
+
+    def get_is_dispensed(self, obj: Prescription) -> bool:
+        return obj.pharmacy_sales.exists()
+
+    def get_patient_age(self, obj: Prescription) -> int | None:
+        if not obj.patient or not obj.patient.dob:
+            return None
+        from datetime import date
+        today = date.today()
+        dob = obj.patient.dob
+        return today.year - dob.year - (
+            (today.month, today.day) < (dob.month, dob.day)
+        )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -120,6 +145,7 @@ class PrescriptionWriteSerializer(serializers.ModelSerializer):
     """Create a full prescription (header + items) in one request."""
     from apps.consultations.models import Consultation as _Consultation  # noqa: PLC0415
     from apps.people.models import Patient as _Patient  # noqa: PLC0415
+    from apps.people.models import Doctor as _Doctor  # noqa: PLC0415
 
     consultation = serializers.PrimaryKeyRelatedField(
         queryset=_Consultation.objects.all(),  # type: ignore[attr-defined]
@@ -127,12 +153,22 @@ class PrescriptionWriteSerializer(serializers.ModelSerializer):
     patient = serializers.PrimaryKeyRelatedField(
         queryset=_Patient.objects.all(),  # type: ignore[attr-defined]
     )
+    doctor = serializers.PrimaryKeyRelatedField(
+        queryset=_Doctor.objects.all(),
+        required=False,
+        allow_null=True,
+    )
     notes = serializers.CharField(required=False, allow_blank=True, default="")
+    status = serializers.ChoiceField(
+        choices=[("draft", "Draft"), ("saved", "Saved"), ("dispensed", "Dispensed")],
+        default="saved",
+        required=False,
+    )
     items = PrescriptionItemWriteSerializer(many=True, required=False, default=list)
 
     class Meta:
         model = Prescription
-        fields = ["consultation", "patient", "notes", "items"]
+        fields = ["consultation", "patient", "doctor", "status", "notes", "items"]
 
     def validate_consultation(self, consultation: object) -> object:
         from apps.consultations.constants import CONS_STATUS_CANCELLED

@@ -206,8 +206,6 @@ def _deduct_stock_fifo(sale, medicine, qty_needed) -> float:
         if batch.quantity >= remaining_needed:
             # Deduct full remaining qty
             qty_to_take = remaining_needed
-            batch.quantity = F("quantity") - qty_to_take
-            batch.save()
             
             line_total = qty_to_take * batch.selling_price
             PharmacySaleItem.objects.create(
@@ -223,8 +221,6 @@ def _deduct_stock_fifo(sale, medicine, qty_needed) -> float:
         else:
             # Deduct entire batch qty
             qty_to_take = batch.quantity
-            batch.quantity = 0
-            batch.save()
             
             line_total = qty_to_take * batch.selling_price
             PharmacySaleItem.objects.create(
