@@ -2,7 +2,7 @@
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios'
 import type { ApiError } from '@/types/common.types'
 
-const BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? 'https://mothercare-2.onrender.com/api/v1'
+const BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? 'https://mothercare-oo66.onrender.com/api/v1'
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: BASE_URL,
