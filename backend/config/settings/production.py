@@ -8,6 +8,8 @@ from .base import *  # noqa: F401, F403
 # Security hardening
 # ─────────────────────────────────────────────────────────────────────────────
 DEBUG = config("DEBUG", default=False, cast=bool)
+ALLOWED_HOSTS = ["*"]
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Support cloud reverse proxies (Render, Heroku, AWS ALB)
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
