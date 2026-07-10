@@ -91,7 +91,7 @@ export default function NewbornManagementPage() {
 
   // Forms
   const registerForm = useForm<RegisterNewbornValues>({
-    resolver: zodResolver(registerNewbornSchema),
+    resolver: zodResolver(registerNewbornSchema) as any,
     defaultValues: {
       delivery: '',
       gender: 'U',
@@ -106,7 +106,7 @@ export default function NewbornManagementPage() {
   })
 
   const vitalForm = useForm<VitalValues>({
-    resolver: zodResolver(vitalSchema),
+    resolver: zodResolver(vitalSchema) as any,
     defaultValues: {
       weight_kg: 3.0,
       head_circ_cm: 34.0,
@@ -116,7 +116,7 @@ export default function NewbornManagementPage() {
   })
 
   const feedingForm = useForm<FeedingValues>({
-    resolver: zodResolver(feedingSchema),
+    resolver: zodResolver(feedingSchema) as any,
     defaultValues: {
       feed_type: 'breast',
       volume_ml: null,
@@ -125,7 +125,7 @@ export default function NewbornManagementPage() {
   })
 
   const vaccineForm = useForm<VaccineValues>({
-    resolver: zodResolver(vaccineSchema),
+    resolver: zodResolver(vaccineSchema) as any,
     defaultValues: {
       status: 'administered',
       administered_date: new Date().toISOString().split('T')[0],
@@ -538,7 +538,7 @@ export default function NewbornManagementPage() {
               </button>
             </div>
 
-            <form onSubmit={registerForm.handleSubmit(handleRegisterSubmit)} className="p-lg space-y-md">
+            <form onSubmit={registerForm.handleSubmit((data: any) => handleRegisterSubmit(data))} className="p-lg space-y-md">
               {serverError && <div className="bg-error-container text-on-error-container p-md rounded-xl text-body-md font-semibold">{serverError}</div>}
 
               <div>
@@ -672,7 +672,7 @@ export default function NewbornManagementPage() {
               </button>
             </div>
 
-            <form onSubmit={vitalForm.handleSubmit(handleVitalSubmit)} className="p-lg space-y-md">
+            <form onSubmit={vitalForm.handleSubmit((data: any) => handleVitalSubmit(data))} className="p-lg space-y-md">
               {serverError && <div className="bg-error-container text-on-error-container p-md rounded-xl text-body-md font-semibold">{serverError}</div>}
 
               <div>
@@ -736,7 +736,7 @@ export default function NewbornManagementPage() {
               </button>
             </div>
 
-            <form onSubmit={feedingForm.handleSubmit(handleFeedingSubmit)} className="p-lg space-y-md">
+            <form onSubmit={feedingForm.handleSubmit((data: any) => handleFeedingSubmit(data))} className="p-lg space-y-md">
               {serverError && <div className="bg-error-container text-on-error-container p-md rounded-xl text-body-md font-semibold">{serverError}</div>}
 
               <div>
@@ -793,7 +793,7 @@ export default function NewbornManagementPage() {
               </button>
             </div>
 
-            <form onSubmit={vaccineForm.handleSubmit(handleVaccineSubmit)} className="p-lg space-y-md">
+            <form onSubmit={vaccineForm.handleSubmit((data: any) => handleVaccineSubmit(data))} className="p-lg space-y-md">
               {serverError && <div className="bg-error-container text-on-error-container p-md rounded-xl text-body-md font-semibold">{serverError}</div>}
 
               <div>

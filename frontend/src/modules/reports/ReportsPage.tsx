@@ -252,7 +252,7 @@ export default function ReportsPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.07)" />
                 <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `₹${Math.round(v / 1000)}k`} />
-                <Tooltip contentStyle={{ borderRadius: 8, fontSize: 13 }} formatter={(v: number) => fmt(v)} />
+                <Tooltip contentStyle={{ borderRadius: 8, fontSize: 13 }} formatter={(v: any) => fmt(Number(v || 0))} />
                 <Legend />
                 <Bar dataKey="billed" fill="#7C4DFF" radius={[3, 3, 0, 0]} name="Total Billed" />
                 <Bar dataKey="paid" fill="#26C6DA" radius={[3, 3, 0, 0]} name="Total Paid" />
@@ -271,7 +271,7 @@ export default function ReportsPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.07)" />
                 <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `₹${Math.round(v / 1000)}k`} />
-                <Tooltip contentStyle={{ borderRadius: 8, fontSize: 13 }} formatter={(v: number) => fmt(v)} />
+                <Tooltip contentStyle={{ borderRadius: 8, fontSize: 13 }} formatter={(v: any) => fmt(Number(v || 0))} />
                 <Line type="monotone" dataKey="revenue" stroke="#7C4DFF" strokeWidth={2} dot={{ r: 5 }} name="Revenue" />
               </LineChart>
             </ResponsiveContainer>

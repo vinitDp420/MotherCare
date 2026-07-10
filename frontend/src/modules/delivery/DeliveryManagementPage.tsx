@@ -74,7 +74,7 @@ export default function DeliveryManagementPage() {
     reset,
     formState: { errors, isSubmitting },
   } = useForm<DeliveryFormValues>({
-    resolver: zodResolver(deliverySchema),
+    resolver: zodResolver(deliverySchema) as any,
     defaultValues: {
       admission: '',
       patient: '',
@@ -381,7 +381,7 @@ export default function DeliveryManagementPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="p-lg space-y-lg flex-1">
+            <form onSubmit={handleSubmit((data: any) => onSubmit(data))} className="p-lg space-y-lg flex-1">
               {serverError && (
                 <div className="bg-error-container text-on-error-container p-md rounded-xl text-body-md font-semibold">
                   {serverError}

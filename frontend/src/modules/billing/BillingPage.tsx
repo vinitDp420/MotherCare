@@ -12,7 +12,7 @@ const billSchema = z.object({
 })
 
 const paymentSchema = z.object({
-  amount: z.number({ invalid_type_error: 'Enter a valid amount' }).positive('Amount must be positive'),
+  amount: z.coerce.number().positive('Amount must be positive'),
   payment_method: z.enum(['cash', 'card', 'upi', 'netbanking', 'insurance', 'cheque']),
   transaction_ref: z.string().optional().default(''),
 })
