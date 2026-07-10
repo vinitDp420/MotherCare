@@ -6,9 +6,26 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from django.http import JsonResponse
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
+
+def root_health_check(request):
+    """Root health check view for Render / uptime monitors."""
+    return JsonResponse({
+        "service": "MotherCare Maternity HIS API",
+        "status": "online",
+        "version": "1.0.0",
+        "documentation": "/api/schema/swagger-ui/",
+        "admin": "/admin/",
+        "api_v1": "/api/v1/",
+    })
+
+
 urlpatterns = [
+    # Root Health Check
+    path("", root_health_check, name="root_health_check"),
+
     # Django admin
     path("admin/", admin.site.urls),
 
