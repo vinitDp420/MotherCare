@@ -11,17 +11,17 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write("Starting database seeding...")
 
-        # 1. Hospital Config (Shakuntala Hospital)
+        # 1. Hospital Config (MotherCare Hospital)
         hospital, created = Hospital.objects.get_or_create(
             code="SH-MAT-2024",
             defaults={
-                "name": "Shakuntala Hospital",
+                "name": "MotherCare Hospital",
                 "address": "12, Ring Road, Lajpat Nagar",
                 "city": "New Delhi",
                 "state": "Delhi",
                 "pincode": "110024",
                 "phone": "+91-11-4567890",
-                "email": "info@shakuntala.hospital",
+                "email": "info@mothercare.hospital",
                 "timezone": "Asia/Kolkata",
                 "locale": "en-IN",
             }

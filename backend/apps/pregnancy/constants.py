@@ -70,7 +70,7 @@ VACCINATION_STATUS_CHOICES: list[tuple[str, str]] = [
     (VACC_STATUS_SKIPPED, "Skipped"),
 ]
 
-# Standard maternal vaccines for Shakuntala Hospital
+# Standard maternal vaccines for MotherCare Hospital
 STANDARD_MATERNAL_VACCINES: list[dict] = [
     {"name": "TT (Tetanus Toxoid) Dose 1", "due_week_start": 16, "due_week_end": 20},
     {"name": "TT (Tetanus Toxoid) Dose 2", "due_week_start": 20, "due_week_end": 28},

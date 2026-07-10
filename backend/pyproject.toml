@@ -1,7 +1,7 @@
 [project]
 name = "mothercare"
 version = "0.1.0"
-description = "MotherCare — Shakuntala Hospital Maternity HIS"
+description = "MotherCare — MotherCare Hospital Maternity HIS"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

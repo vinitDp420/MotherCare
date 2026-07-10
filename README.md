@@ -1,5 +1,5 @@
 # MotherCare — Maternity Hospital Management System
-**Shakuntala Hospital** | *Compassionate Care, Advanced Technology*
+**MotherCare Maternity Hospital** | *Compassionate Care, Advanced Technology*
 
 MotherCare is a purpose-built, SaaS-ready Hospital Information System (HIS) for dedicated maternity care facilities. It covers the full maternity journey — from patient registration through pregnancy tracking, delivery, newborn care, and discharge.
 
@@ -113,4 +113,4 @@ docker-compose up --build
 
 ---
 
-*MotherCare v1.0 MVP — Shakuntala Hospital*
+*MotherCare v1.0 MVP — MotherCare Maternity Hospital*

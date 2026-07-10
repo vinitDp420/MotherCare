@@ -21,7 +21,7 @@ from core.models import BaseModel
 class Hospital(BaseModel):
     """
     Single-row institutional configuration master.
-    Hospital code: SH-MAT-2024 (Shakuntala Hospital, New Delhi).
+    Hospital code: SH-MAT-2024 (MotherCare Hospital, New Delhi).
     CLAUDE.md: Never hard-code hospital ID — always read from Hospital singleton.
     """
 

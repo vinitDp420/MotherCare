@@ -10,7 +10,7 @@ import { useAuthStore } from '@/store/authStore'
 const translations = {
   en: {
     appName: 'MotherCare',
-    hospital: 'SHAKUNTALA HOSPITAL',
+    hospital: 'MOTHERCARE HOSPITAL',
     welcomeBack: 'Welcome back',
     subtitle: 'Please enter your clinical credentials to access the system.',
     emailLabel: 'Email / Username',
@@ -21,10 +21,10 @@ const translations = {
     rememberMe: 'Remember me on this device',
     login: 'Login',
     authenticating: 'Authenticating...',
-    footer: '© 2024 Shakuntala Hospital. Powered by MotherCare SaaS.',
+    footer: '© 2024 MotherCare Hospital. Powered by MotherCare SaaS.',
     heroTitle: 'Compassionate Care, Advanced Technology',
     heroSubtitle:
-      'Providing a secure and empathetic environment for mothers and newborns at Shakuntala Hospital through MotherCare SaaS.',
+      'Providing a secure and empathetic environment for mothers and newborns at MotherCare Hospital through MotherCare SaaS.',
     english: 'English',
     marathi: 'मराठी',
     hindi: 'Hindi',
@@ -34,7 +34,7 @@ const translations = {
   },
   mr: {
     appName: 'मदरकेअर',
-    hospital: 'शकुंतला हॉस्पिटल',
+    hospital: 'मदरकेअर हॉस्पिटल',
     welcomeBack: 'पुन्हा स्वागत आहे',
     subtitle: 'सिस्टममध्ये प्रवेश करण्यासाठी कृपया आपले क्लिनिकल क्रेडेन्शियल्स प्रविष्ट करा.',
     emailLabel: 'ईमेल / वापरकर्तानाव',
@@ -45,10 +45,10 @@ const translations = {
     rememberMe: 'या डिव्हाइसवर मला लक्षात ठेवा',
     login: 'लॉगिन करा',
     authenticating: 'प्रमाणीकरण चालू आहे...',
-    footer: '© २०२४ शकुंतला हॉस्पिटल. मदरकेअर SaaS द्वारे संचालित.',
+    footer: '© २०२४ मदरकेअर हॉस्पिटल. मदरकेअर SaaS द्वारे संचालित.',
     heroTitle: 'सहानुभूतीपूर्ण काळजी, प्रगत तंत्रज्ञान',
     heroSubtitle:
-      'मदरकेअर SaaS द्वारे शकुंतला हॉस्पिटलमध्ये माता आणि नवजात बालकांसाठी सुरक्षित आणि सहानुभूतीपूर्ण वातावरण प्रदान करणे.',
+      'मदरकेअर SaaS द्वारे मदरकेअर हॉस्पिटलमध्ये माता आणि नवजात बालकांसाठी सुरक्षित आणि सहानुभूतीपूर्ण वातावरण प्रदान करणे.',
     english: 'English',
     marathi: 'मराठी',
     hindi: 'हिंदी',
@@ -58,7 +58,7 @@ const translations = {
   },
   hi: {
     appName: 'मदरकेअर',
-    hospital: 'शकुंतला अस्पताल',
+    hospital: 'मदरकेअर अस्पताल',
     welcomeBack: 'पुनः स्वागत है',
     subtitle: 'सिस्टम में प्रवेश करने के लिए कृपया अपने क्लिनिकल क्रेडेंशियल्स दर्ज करें।',
     emailLabel: 'ईमेल / उपयोगकर्ता नाम',
@@ -69,10 +69,10 @@ const translations = {
     rememberMe: 'इस डिवाइस पर मुझे याद रखें',
     login: 'लॉगिन करें',
     authenticating: 'प्रमाणित किया जा रहा है...',
-    footer: '© २०२४ शकुंतला अस्पताल। मदरकेअर SaaS द्वारा संचालित।',
+    footer: '© २०२४ मदरकेअर अस्पताल। मदरकेअर SaaS द्वारा संचालित।',
     heroTitle: 'सहानुभूतिपूर्ण देखभाल, उन्नत तकनीक',
     heroSubtitle:
-      'मदरकेअर SaaS के माध्यम से शकुंतला अस्पताल में माताओं और नवजात शिशुओं के लिए एक सुरक्षित और सहानुभूतिपूर्ण वातावरण प्रदान करना।',
+      'मदरकेअर SaaS के माध्यम से मदरकेअर अस्पताल में माताओं और नवजात शिशुओं के लिए एक सुरक्षित और सहानुभूतिपूर्ण वातावरण प्रदान करना।',
     english: 'English',
     marathi: 'मराठी',
     hindi: 'हिंदी',

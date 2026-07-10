@@ -71,7 +71,7 @@ export default function PrintPrescriptionPage() {
               MOTHERCARE HOSPITALS
             </h1>
             <p className="text-xs text-neutral-500 font-medium">
-              Shakuntala Maternity and Child Care Center
+              MotherCare Maternity and Child Care Center
             </p>
             <p className="text-[10px] text-neutral-400">
               12, Hospital Road, Kolkata, WB • Phone: +91 33 2456-7890

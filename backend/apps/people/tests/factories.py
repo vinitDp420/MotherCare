@@ -28,7 +28,7 @@ class UserFactory(DjangoModelFactory):
         django_get_or_create = ("username",)
 
     username = factory.Sequence(lambda n: f"user_{n}")
-    email = factory.LazyAttribute(lambda obj: f"{obj.username}@shakuntala.hospital")
+    email = factory.LazyAttribute(lambda obj: f"{obj.username}@mothercare.hospital")
     is_active = True
 
 

@@ -36,7 +36,7 @@ export default function SettingsPage() {
 <form className="space-y-md">
 <div>
 <label className="block text-label-md font-label-md text-on-surface-variant mb-xs">Institution Name</label>
-<input className="w-full px-md py-sm rounded-lg border border-outline-variant bg-surface focus:border-primary focus:ring-3 focus:ring-primary/10 transition-all outline-none dark:bg-inverse-surface/10" type="text" value="Shakuntala Hospital"/>
+<input className="w-full px-md py-sm rounded-lg border border-outline-variant bg-surface focus:border-primary focus:ring-3 focus:ring-primary/10 transition-all outline-none dark:bg-inverse-surface/10" type="text" value="MotherCare Hospital"/>
 </div>
 <div>
 <label className="block text-label-md font-label-md text-on-surface-variant mb-xs">Hospital Code</label>

@@ -232,7 +232,7 @@ CORS_ALLOW_CREDENTIALS = True
 # ─────────────────────────────────────────────────────────────────────────────
 SPECTACULAR_SETTINGS = {
     "TITLE": "MotherCare API",
-    "DESCRIPTION": "Maternity Hospital Information System — Shakuntala Hospital",
+    "DESCRIPTION": "Maternity Hospital Information System — MotherCare Hospital",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "SCHEMA_PATH_PREFIX": "/api/v1/",
@@ -248,7 +248,7 @@ EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
-DEFAULT_FROM_EMAIL = f"MotherCare <noreply@{config('HOSPITAL_CODE', default='shakuntala').lower()}.hospital>"
+DEFAULT_FROM_EMAIL = f"MotherCare <noreply@{config('HOSPITAL_CODE', default='mothercare').lower()}.hospital>"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Hospital Configuration (G-07: no hard-coded hospital ID)

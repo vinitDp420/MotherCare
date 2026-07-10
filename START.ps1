@@ -11,7 +11,7 @@ $root = $PSScriptRoot
 Write-Host ""
 Write-Host "╔══════════════════════════════════════════════╗" -ForegroundColor Cyan
 Write-Host "║     MotherCare — Startup Script              ║" -ForegroundColor Cyan
-Write-Host "║     Shakuntala Hospital Management System    ║" -ForegroundColor Cyan
+Write-Host "║     Maternity Hospital Management System     ║" -ForegroundColor Cyan
 Write-Host "╚══════════════════════════════════════════════╝" -ForegroundColor Cyan
 Write-Host ""
 

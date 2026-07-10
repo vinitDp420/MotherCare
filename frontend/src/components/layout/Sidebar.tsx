@@ -82,7 +82,7 @@ export default function Sidebar() {
           </div>
           <div>
             <span className="sidebar-brand-name">Patient Portal</span>
-            <span className="sidebar-brand-sub">Shakuntala Hospital</span>
+            <span className="sidebar-brand-sub">Maternity Hospital</span>
           </div>
         </div>
 
@@ -275,7 +275,7 @@ export default function Sidebar() {
         </div>
         <div>
           <span className="sidebar-brand-name">MotherCare</span>
-          <span className="sidebar-brand-sub">Shakuntala Hospital</span>
+          <span className="sidebar-brand-sub">Maternity Hospital</span>
         </div>
       </div>
 
