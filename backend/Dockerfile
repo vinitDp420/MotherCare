@@ -40,5 +40,5 @@ RUN python manage.py collectstatic --noinput
 
 EXPOSE 8000
 
-# Production: use gunicorn (add gunicorn to deps when needed)
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Production: run migrations, create superuser, and start server
+CMD sh -c "python manage.py migrate && python manage.py createsuperuser --noinput --username admin --email admin@example.com || true && python manage.py runserver 0.0.0.0:8000"
