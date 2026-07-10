@@ -119,3 +119,12 @@ export function useDoctorsList(params?: { page?: number; search?: string }) {
     queryFn: () => patientsApi.listDoctors(params),
   })
 }
+
+// Staff hooks
+export function useStaffList(params?: { page?: number; search?: string; department?: string }) {
+  return useQuery({
+    queryKey: ['staff', params],
+    queryFn: () => patientsApi.listStaff(params),
+    placeholderData: (prev) => prev,
+  })
+}

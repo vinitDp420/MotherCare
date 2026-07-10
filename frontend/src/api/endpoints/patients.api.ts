@@ -49,4 +49,8 @@ export const patientsApi = {
   // Doctors
   listDoctors: (params?: { page?: number; search?: string }) =>
     apiClient.get<PaginatedResponse<Doctor>>('/doctors/', { params }).then((r) => r.data),
+
+  // Staff
+  listStaff: (params?: { page?: number; search?: string; department?: string }) =>
+    apiClient.get<PaginatedResponse<any>>('/staff/', { params }).then((r) => r.data),
 }

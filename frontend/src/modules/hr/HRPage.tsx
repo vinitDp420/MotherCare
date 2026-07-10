@@ -1,334 +1,323 @@
-import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { useHRSummary, useLeaveRequests, useReviewLeave } from '@/hooks/useHR'
+import { useStaffList } from '@/hooks/usePatients'
+
+type Tab = 'directory' | 'attendance' | 'payroll' | 'leave' | 'shifts'
+
+const TABS: { id: Tab; label: string; icon: string }[] = [
+  { id: 'directory', label: 'Staff Directory', icon: 'badge' },
+  { id: 'attendance', label: 'Attendance', icon: 'calendar_today' },
+  { id: 'payroll', label: 'Payroll & Slip', icon: 'payments' },
+  { id: 'leave', label: 'Leave Status', icon: 'event_busy' },
+  { id: 'shifts', label: 'Shift Assignments', icon: 'schedule' },
+]
+
+const LEAVE_STATUS_BADGE: Record<string, string> = {
+  pending: 'bg-orange-100 text-orange-600 border border-orange-200',
+  approved: 'bg-primary/10 text-primary border border-primary/20',
+  rejected: 'bg-error-container text-error border border-error/20',
+  cancelled: 'bg-surface-variant text-on-surface-variant border border-outline-variant',
+}
 
 export default function HRPage() {
-  const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState<Tab>('directory')
+  const [leaveFilter, setLeaveFilter] = useState('')
+  const [staffSearch, setStaffSearch] = useState('')
 
-  const switchTab = (tab: string) => {
-    console.log('Switching to tab:', tab)
+  const { data: summary, isLoading: summaryLoading } = useHRSummary()
+  const { data: leaveData, isLoading: leaveLoading } = useLeaveRequests({ status: leaveFilter || undefined })
+  const { data: staffData, isLoading: staffLoading } = useStaffList({ search: staffSearch })
+  const reviewLeave = useReviewLeave()
+
+  const leaves = leaveData?.results ?? []
+  const staff = staffData?.results ?? []
+
+  const handleReview = (id: string, status: 'approved' | 'rejected') => {
+    reviewLeave.mutate({ id, data: { status } })
   }
 
   return (
-    <>
+    <div className="p-margin-desktop">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-xs mb-md text-label-md font-label-md text-on-surface-variant">
+        <span>Dashboard</span>
+        <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+        <span className="text-on-surface font-semibold">HR & Staff</span>
+      </div>
 
+      {/* Header */}
+      <div className="flex justify-between items-end mb-lg">
+        <div>
+          <h2 className="font-headline-lg text-headline-lg text-on-surface dark:text-surface-bright">Staff Management</h2>
+          <p className="font-body-md text-body-md text-on-surface-variant">Manage your clinical and administrative team.</p>
+        </div>
+        <div className="flex gap-sm">
+          <button className="flex items-center gap-xs px-md py-sm bg-surface-container-high rounded-lg font-label-lg hover:bg-surface-container-highest transition-colors">
+            <span className="material-symbols-outlined">download</span> Export
+          </button>
+          <button className="flex items-center gap-xs px-md py-sm bg-primary text-on-primary rounded-lg font-label-lg hover:opacity-90 transition-all shadow-sm">
+            <span className="material-symbols-outlined">person_add</span> Add Staff
+          </button>
+        </div>
+      </div>
 
+      {/* KPI Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-xl">
+        {[
+          { icon: 'groups', label: 'Total Staff', value: summary?.total_staff ?? '—', badge: 'Active', color: 'text-primary', bg: 'bg-primary-container/20' },
+          { icon: 'how_to_reg', label: 'Present Today', value: summary?.present_today ?? '—', badge: `${summary ? Math.round(((summary.present_today) / (summary.total_staff || 1)) * 100) : 0}%`, color: 'text-secondary', bg: 'bg-secondary-container/20' },
+          { icon: 'event_busy', label: 'On Leave', value: summary?.on_leave_today ?? '—', badge: 'Today', color: 'text-tertiary', bg: 'bg-tertiary-container/20' },
+          { icon: 'pending_actions', label: 'Pending Leaves', value: summary?.pending_leave_requests ?? '—', badge: 'To Review', color: 'text-error', bg: 'bg-error-container/20' },
+        ].map((card) => (
+          <div key={card.label} className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-sm dark:bg-on-surface">
+            <div className="flex justify-between items-start mb-sm">
+              <div className={`p-2 ${card.bg} rounded-lg`}>
+                <span className={`material-symbols-outlined ${card.color}`}>{card.icon}</span>
+              </div>
+              <span className={`${card.color} font-label-md text-label-md bg-surface-container px-2 py-0.5 rounded-full`}>{card.badge}</span>
+            </div>
+            <p className="text-on-surface-variant font-label-lg">{card.label}</p>
+            <p className={`font-headline-lg text-headline-lg mt-xs ${card.color}`}>{summaryLoading ? '...' : card.value}</p>
+          </div>
+        ))}
+      </div>
 
-<div className="p-margin-desktop">
+      {/* Tab Panel */}
+      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden dark:bg-on-surface">
+        {/* Tab Nav */}
+        <div className="flex px-lg pt-lg border-b border-outline-variant overflow-x-auto scrollbar-hide gap-xs">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-xs px-md py-sm font-label-lg whitespace-nowrap transition-all rounded-t-lg ${
+                activeTab === tab.id
+                  ? 'text-primary border-b-2 border-primary font-bold'
+                  : 'text-on-surface-variant hover:text-primary'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">{tab.icon}</span>
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-<div className="flex items-center gap-xs mb-md text-label-md font-label-md text-on-surface-variant dark:text-secondary-fixed-dim">
-<a className="hover:text-primary transition-colors" href="#" onClick={(e) => e.preventDefault()}>Dashboard</a>
-<span className="material-symbols-outlined text-[16px]">chevron_right</span>
-<span className="text-on-surface dark:text-surface-bright font-semibold">Staff</span>
-</div>
+        <div className="p-lg">
+          {/* ── STAFF DIRECTORY ── */}
+          {activeTab === 'directory' && (
+            <div>
+              <div className="flex flex-col sm:flex-row gap-md justify-between items-center mb-md">
+                <input
+                  type="text"
+                  value={staffSearch}
+                  onChange={(e) => setStaffSearch(e.target.value)}
+                  placeholder="Search staff name, designation..."
+                  className="w-full sm:w-80 px-md py-sm border border-outline-variant rounded-lg text-body-md bg-surface-container-low"
+                />
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead className="text-on-surface-variant border-b border-outline-variant">
+                    <tr>
+                      <th className="py-sm font-label-lg">Name</th>
+                      <th className="py-sm font-label-lg">Department</th>
+                      <th className="py-sm font-label-lg">Designation</th>
+                      <th className="py-sm font-label-lg">Phone</th>
+                      <th className="py-sm font-label-lg">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-outline-variant/30">
+                    {staffLoading ? (
+                      Array.from({ length: 4 }).map((_, i) => (
+                        <tr key={i}><td colSpan={5} className="py-md"><div className="h-4 bg-surface-container-low rounded animate-pulse" /></td></tr>
+                      ))
+                    ) : staff.length === 0 ? (
+                      <tr><td colSpan={5} className="text-center py-xl text-on-surface-variant">No staff found.</td></tr>
+                    ) : (
+                      staff.map((s: any) => (
+                        <tr key={s.id} className="hover:bg-surface-container-low transition-colors group">
+                          <td className="py-md">
+                            <div className="flex items-center gap-sm">
+                              <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
+                                {s.full_name?.slice(0, 2).toUpperCase()}
+                              </div>
+                              <div>
+                                <p className="font-label-lg text-on-surface">{s.full_name}</p>
+                                <p className="text-xs text-on-surface-variant">{s.email}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-md text-body-md">{s.department_name ?? '—'}</td>
+                          <td className="py-md text-body-md">{s.designation}</td>
+                          <td className="py-md text-body-md">{s.phone}</td>
+                          <td className="py-md">
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${s.is_active ? 'bg-primary/10 text-primary' : 'bg-error-container text-error'}`}>
+                              {s.is_active ? 'Active' : 'Inactive'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
-<div className="flex justify-between items-end mb-lg">
-<div>
-<h2 className="font-headline-lg text-headline-lg text-on-surface dark:text-surface-bright">Staff Management</h2>
-<p className="font-body-md text-body-md text-on-surface-variant dark:text-secondary-fixed-dim">Manage your clinical and administrative team efficiently.</p>
-</div>
-<div className="flex gap-sm">
-<button className="flex items-center gap-xs px-md py-sm bg-surface-container-high rounded-lg font-label-lg text-label-lg hover:bg-surface-container-highest transition-colors dark:bg-surface-container-highest/10 dark:text-surface-bright">
-<span className="material-symbols-outlined">download</span> Export Report
-                    </button>
-<button className="flex items-center gap-xs px-md py-sm bg-primary text-on-primary rounded-lg font-label-lg text-label-lg hover:opacity-90 transition-all shadow-sm dark:bg-primary-fixed dark:text-on-primary-fixed">
-<span className="material-symbols-outlined">person_add</span> Add New Staff
-                    </button>
-</div>
-</div>
+          {/* ── ATTENDANCE ── */}
+          {activeTab === 'attendance' && (
+            <div className="space-y-md">
+              <h3 className="font-title-lg text-on-surface">
+                {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })} Attendance
+              </h3>
+              <div className="grid grid-cols-3 gap-md">
+                {[
+                  { label: 'Present Today', value: summary?.present_today, color: 'text-primary', bg: 'bg-primary/5' },
+                  { label: 'On Leave Today', value: summary?.on_leave_today, color: 'text-error', bg: 'bg-error/5' },
+                  { label: 'Total Staff', value: summary?.total_staff, color: 'text-secondary', bg: 'bg-secondary/5' },
+                ].map((s) => (
+                  <div key={s.label} className={`${s.bg} rounded-xl p-lg text-center border border-outline-variant`}>
+                    <p className={`font-display-lg text-[2.5rem] font-bold ${s.color}`}>{summaryLoading ? '—' : s.value}</p>
+                    <p className="font-label-lg text-on-surface-variant mt-xs">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="bg-surface-container-low p-md rounded-lg text-center text-on-surface-variant">
+                <span className="material-symbols-outlined text-[48px] block mb-sm opacity-30">calendar_month</span>
+                <p className="font-body-md">Detailed attendance calendar requires HR attendance system integration.</p>
+              </div>
+            </div>
+          )}
 
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-xl">
+          {/* ── PAYROLL ── */}
+          {activeTab === 'payroll' && (
+            <div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead className="text-on-surface-variant border-b border-outline-variant">
+                    <tr>
+                      <th className="py-sm font-label-lg">Name</th>
+                      <th className="py-sm font-label-lg">Department</th>
+                      <th className="py-sm font-label-lg">Month</th>
+                      <th className="py-sm font-label-lg text-right">Download Slip</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-outline-variant/30">
+                    {staffLoading ? (
+                      Array.from({ length: 3 }).map((_, i) => (
+                        <tr key={i}><td colSpan={4} className="py-md"><div className="h-4 bg-surface-container-low rounded animate-pulse" /></td></tr>
+                      ))
+                    ) : (
+                      staff.slice(0, 8).map((s: any) => (
+                        <tr key={s.id} className="hover:bg-surface-container-low transition-colors">
+                          <td className="py-md font-label-lg text-on-surface">{s.full_name}</td>
+                          <td className="py-md text-body-md text-on-surface-variant">{s.department_name ?? '—'}</td>
+                          <td className="py-md text-body-md">{new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}</td>
+                          <td className="py-md text-right">
+                            <button className="flex items-center gap-xs ml-auto px-md py-1 bg-surface-container-high rounded-lg text-label-md font-label-md hover:bg-primary hover:text-white transition-all">
+                              <span className="material-symbols-outlined text-[18px]">download</span> PDF
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
-<div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-sm dark:bg-on-surface">
-<div className="flex justify-between items-start mb-sm">
-<div className="p-2 bg-primary-container/20 rounded-lg dark:bg-primary-container/10">
-<span className="material-symbols-outlined text-primary dark:text-primary-fixed">groups</span>
-</div>
-<span className="text-primary font-label-md text-label-md bg-primary-fixed px-2 py-0.5 rounded-full dark:bg-primary-container/20 dark:text-primary-fixed">+4 this month</span>
-</div>
-<p className="text-on-surface-variant font-label-lg text-label-lg dark:text-secondary-fixed-dim">Total Staff</p>
-<p className="text-on-surface font-headline-lg text-headline-lg mt-xs dark:text-surface-bright">248</p>
-</div>
+          {/* ── LEAVE STATUS ── */}
+          {activeTab === 'leave' && (
+            <div className="space-y-md">
+              <div className="flex justify-between items-center">
+                <h3 className="font-title-lg text-on-surface">Leave Requests</h3>
+                <select
+                  value={leaveFilter}
+                  onChange={(e) => setLeaveFilter(e.target.value)}
+                  className="px-md py-sm border border-outline-variant rounded-lg text-body-md bg-surface-container-low"
+                >
+                  <option value="">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+              {leaveLoading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="h-20 bg-surface-container-low rounded-lg animate-pulse" />
+                ))
+              ) : leaves.length === 0 ? (
+                <div className="text-center py-xl text-on-surface-variant">
+                  <span className="material-symbols-outlined text-[48px] block opacity-30 mb-sm">event_busy</span>
+                  No leave requests found.
+                </div>
+              ) : (
+                leaves.map((leave) => (
+                  <div key={leave.id} className="bg-surface-container-low p-md rounded-xl border border-outline-variant">
+                    <div className="flex justify-between items-start mb-sm">
+                      <div className="flex items-center gap-sm">
+                        <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
+                          {leave.staff_name?.slice(0, 2).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="font-label-lg text-on-surface">{leave.staff_name}</p>
+                          <p className="text-xs text-on-surface-variant">{leave.leave_type_display} • {leave.duration_days} day{leave.duration_days !== 1 ? 's' : ''}</p>
+                        </div>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${LEAVE_STATUS_BADGE[leave.status] ?? ''}`}>
+                        {leave.status_display ?? leave.status}
+                      </span>
+                    </div>
+                    <p className="text-xs text-on-surface-variant mb-sm">
+                      {new Date(leave.start_date).toLocaleDateString()} → {new Date(leave.end_date).toLocaleDateString()}
+                    </p>
+                    {leave.reason && <p className="text-sm text-on-surface-variant italic mb-sm">"{leave.reason}"</p>}
+                    {leave.status === 'pending' && (
+                      <div className="flex gap-sm mt-md">
+                        <button
+                          onClick={() => handleReview(leave.id, 'approved')}
+                          className="flex-1 py-1.5 bg-primary text-on-primary rounded text-label-md font-semibold"
+                        >Approve</button>
+                        <button
+                          onClick={() => handleReview(leave.id, 'rejected')}
+                          className="flex-1 py-1.5 bg-surface-container-highest text-on-surface rounded text-label-md"
+                        >Reject</button>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          )}
 
-<div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-sm dark:bg-on-surface">
-<div className="flex justify-between items-start mb-sm">
-<div className="p-2 bg-secondary-container/20 rounded-lg dark:bg-secondary-container/10">
-<span className="material-symbols-outlined text-secondary dark:text-secondary-fixed-dim">how_to_reg</span>
-</div>
-<span className="text-secondary font-label-md text-label-md bg-secondary-fixed px-2 py-0.5 rounded-full dark:bg-secondary-container/20 dark:text-secondary-fixed-dim">92% attendance</span>
-</div>
-<p className="text-on-surface-variant font-label-lg text-label-lg dark:text-secondary-fixed-dim">Present Today</p>
-<p className="text-on-surface font-headline-lg text-headline-lg mt-xs dark:text-surface-bright">226</p>
-</div>
-
-<div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-sm dark:bg-on-surface">
-<div className="flex justify-between items-start mb-sm">
-<div className="p-2 bg-tertiary-container/20 rounded-lg dark:bg-tertiary-container/10">
-<span className="material-symbols-outlined text-tertiary dark:text-tertiary-fixed-dim">event_busy</span>
-</div>
-</div>
-<p className="text-on-surface-variant font-label-lg text-label-lg dark:text-secondary-fixed-dim">On Leave</p>
-<p className="text-on-surface font-headline-lg text-headline-lg mt-xs dark:text-surface-bright">14</p>
-</div>
-
-<div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-sm dark:bg-on-surface">
-<div className="flex justify-between items-start mb-sm">
-<div className="p-2 bg-error-container/20 rounded-lg dark:bg-error-container/10">
-<span className="material-symbols-outlined text-error">payments</span>
-</div>
-<span className="text-error font-label-md text-label-md bg-error-container px-2 py-0.5 rounded-full dark:bg-error-container/20">Due in 3 days</span>
-</div>
-<p className="text-on-surface-variant font-label-lg text-label-lg dark:text-secondary-fixed-dim">Payroll Due</p>
-<p className="text-on-surface font-headline-lg text-headline-lg mt-xs dark:text-surface-bright">$142k</p>
-</div>
-</div>
-
-<div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden dark:bg-on-surface">
-
-<div className="flex px-lg pt-lg border-b border-outline-variant overflow-x-auto scrollbar-hide dark:border-outline">
-<button className="px-md py-sm font-label-lg text-label-lg active-tab whitespace-nowrap transition-all" id="tab-directory" onClick={(e) => { switchTab('directory') }}>Staff Directory</button>
-<button className="px-md py-sm font-label-lg text-label-lg text-on-surface-variant hover:text-primary whitespace-nowrap transition-all dark:text-secondary-fixed-dim dark:hover:text-primary-fixed" id="tab-attendance" onClick={(e) => { switchTab('attendance') }}>Attendance Calendar</button>
-<button className="px-md py-sm font-label-lg text-label-lg text-on-surface-variant hover:text-primary whitespace-nowrap transition-all dark:text-secondary-fixed-dim dark:hover:text-primary-fixed" id="tab-payroll" onClick={(e) => { switchTab('payroll') }}>Payroll & Slip</button>
-<button className="px-md py-sm font-label-lg text-label-lg text-on-surface-variant hover:text-primary whitespace-nowrap transition-all dark:text-secondary-fixed-dim dark:hover:text-primary-fixed" id="tab-leave" onClick={(e) => { switchTab('leave') }}>Leave Status</button>
-<button className="px-md py-sm font-label-lg text-label-lg text-on-surface-variant hover:text-primary whitespace-nowrap transition-all dark:text-secondary-fixed-dim dark:hover:text-primary-fixed" id="tab-shift" onClick={(e) => { switchTab('shift') }}>Shift Assignments</button>
-</div>
-
-<div className="p-lg">
-
-<div className="view-content block" id="view-directory">
-<div className="flex flex-col sm:flex-row gap-md justify-between items-center mb-md">
-<div className="flex gap-sm overflow-x-auto w-full sm:w-auto">
-<select className="bg-surface-container-low border-outline-variant rounded-lg text-label-md font-label-md dark:bg-surface-container-highest/10 dark:text-surface-bright dark:border-outline">
-<option>All Departments</option>
-<option>Obstetrics</option>
-<option>Pediatrics</option>
-<option>Nursing</option>
-<option>Admin</option>
-</select>
-<select className="bg-surface-container-low border-outline-variant rounded-lg text-label-md font-label-md dark:bg-surface-container-highest/10 dark:text-surface-bright dark:border-outline">
-<option>Active Status</option>
-<option>On Leave</option>
-<option>Resigned</option>
-</select>
-</div>
-</div>
-<div className="overflow-x-auto">
-<table className="w-full text-left">
-<thead className="text-on-surface-variant border-b border-outline-variant dark:text-secondary-fixed-dim dark:border-outline">
-<tr>
-<th className="py-sm font-label-lg text-label-lg">Employee ID</th>
-<th className="py-sm font-label-lg text-label-lg">Name</th>
-<th className="py-sm font-label-lg text-label-lg">Department</th>
-<th className="py-sm font-label-lg text-label-lg">Role</th>
-<th className="py-sm font-label-lg text-label-lg">Status</th>
-<th className="py-sm font-label-lg text-label-lg text-right">Action</th>
-</tr>
-</thead>
-<tbody className="divide-y divide-outline-variant/30 dark:divide-outline/30">
-
-<tr className="hover:bg-surface-container-low transition-colors group dark:hover:bg-surface-container-highest/5">
-<td className="py-md font-body-md text-body-md">#MC-9082</td>
-<td className="py-md">
-<div className="flex items-center gap-sm">
-<img alt="Dr. Anita" className="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLs5qLoYTqb68zAUfLjBMlWnHY08_OC-gulttwexacuNGNjqOWr5Nvi6wDwGLjeZBF2hhDLVx20Oq8ZxDurvpzTnoN3XJmT5KIOyNPNXPXPpo07CslSeo1q58Ulfe2d77aAxpB3tokZMgf6DxVmQAwgrRNmcPr3uA4i_CfDJsAvPhicGu0fYNpJeSB0EaSfMiim4S03oH_RqQcBqK4XkTrcAdP3-iSntrjXAAJv5F1CzxSZFUmffI7ANnefN"/>
-<div>
-<p className="font-label-lg text-label-lg text-on-surface dark:text-surface-bright">Dr. Anita Nair</p>
-<p className="text-[10px] text-on-surface-variant dark:text-secondary-fixed-dim">anita.n@mothercare.com</p>
-</div>
-</div>
-</td>
-<td className="py-md font-body-md text-body-md">Obstetrics</td>
-<td className="py-md font-body-md text-body-md">Sr. Consultant</td>
-<td className="py-md">
-<span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary uppercase dark:bg-primary-container/20 dark:text-primary-fixed">Active</span>
-</td>
-<td className="py-md text-right">
-<div className="flex justify-end gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
-<button className="p-1 hover:bg-surface-container-highest rounded transition-colors dark:hover:bg-surface-container-highest/20" title="Download Payslip">
-<span className="material-symbols-outlined text-[20px] text-primary dark:text-primary-fixed">receipt_long</span>
-</button>
-<button className="p-1 hover:bg-surface-container-highest rounded transition-colors dark:hover:bg-surface-container-highest/20">
-<span className="material-symbols-outlined text-[20px] text-on-surface-variant">more_vert</span>
-</button>
-</div>
-</td>
-</tr>
-
-<tr className="hover:bg-surface-container-low transition-colors group dark:hover:bg-surface-container-highest/5">
-<td className="py-md font-body-md text-body-md">#MC-8541</td>
-<td className="py-md">
-<div className="flex items-center gap-sm">
-<img alt="James" className="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLuIOgldlIQTMUJ9RH_WQ4YMi42Oro-y3otaRGBSj8flfMzA8gp4hO35jCnBfdRbYZNS2zmOhGcPhEI2ElVscrqQ4WcQGENw9A78uRqn5G0Uwaf4-kP2NPm84o4EqOKv8gmzyZkL6CtSahUxgM9dMx9iefPAp3r_w5rsUv41MtFL3XFyVuOr7THeCvwhD_F3fyYifZrD8zoGmgXTuwozykyyPJPckVIwl6qwwa2IKOuoGUHlAsO4VulDQSQC"/>
-<div>
-<p className="font-label-lg text-label-lg text-on-surface dark:text-surface-bright">James Wilson</p>
-<p className="text-[10px] text-on-surface-variant dark:text-secondary-fixed-dim">james.w@mothercare.com</p>
-</div>
-</div>
-</td>
-<td className="py-md font-body-md text-body-md">Nursing</td>
-<td className="py-md font-body-md text-body-md">Head Nurse</td>
-<td className="py-md">
-<span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-tertiary-fixed-dim/20 text-tertiary uppercase dark:bg-tertiary-container/20 dark:text-tertiary-fixed-dim">On Leave</span>
-</td>
-<td className="py-md text-right">
-<div className="flex justify-end gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
-<button className="p-1 hover:bg-surface-container-highest rounded transition-colors dark:hover:bg-surface-container-highest/20" title="Download Payslip">
-<span className="material-symbols-outlined text-[20px] text-primary dark:text-primary-fixed">receipt_long</span>
-</button>
-<button className="p-1 hover:bg-surface-container-highest rounded transition-colors dark:hover:bg-surface-container-highest/20">
-<span className="material-symbols-outlined text-[20px] text-on-surface-variant">more_vert</span>
-</button>
-</div>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-
-<div className="view-content hidden" id="view-attendance">
-<div className="flex items-center justify-between mb-md">
-<h3 className="font-title-lg text-title-lg text-on-surface dark:text-surface-bright">October 2023</h3>
-<div className="flex gap-sm">
-<button className="p-1 rounded border border-outline-variant dark:border-outline hover:bg-surface-container-low dark:hover:bg-surface-container-highest/10"><span className="material-symbols-outlined">chevron_left</span></button>
-<button className="p-1 rounded border border-outline-variant dark:border-outline hover:bg-surface-container-low dark:hover:bg-surface-container-highest/10"><span className="material-symbols-outlined">chevron_right</span></button>
-</div>
-</div>
-<div className="grid grid-cols-7 gap-px bg-outline-variant dark:bg-outline border border-outline-variant dark:border-outline rounded-lg overflow-hidden">
-
-<div className="bg-surface-container-low dark:bg-surface-container-highest/10 p-sm text-center font-label-md text-label-md">Sun</div>
-<div className="bg-surface-container-low dark:bg-surface-container-highest/10 p-sm text-center font-label-md text-label-md">Mon</div>
-<div className="bg-surface-container-low dark:bg-surface-container-highest/10 p-sm text-center font-label-md text-label-md">Tue</div>
-<div className="bg-surface-container-low dark:bg-surface-container-highest/10 p-sm text-center font-label-md text-label-md">Wed</div>
-<div className="bg-surface-container-low dark:bg-surface-container-highest/10 p-sm text-center font-label-md text-label-md">Thu</div>
-<div className="bg-surface-container-low dark:bg-surface-container-highest/10 p-sm text-center font-label-md text-label-md">Fri</div>
-<div className="bg-surface-container-low dark:bg-surface-container-highest/10 p-sm text-center font-label-md text-label-md">Sat</div>
-
-<div className="bg-surface-container-lowest dark:bg-on-surface h-24 p-xs text-on-surface-variant opacity-50">28</div>
-<div className="bg-surface-container-lowest dark:bg-on-surface h-24 p-xs text-on-surface-variant opacity-50">29</div>
-<div className="bg-surface-container-lowest dark:bg-on-surface h-24 p-xs text-on-surface-variant opacity-50">30</div>
-<div className="bg-surface-container-lowest dark:bg-on-surface h-24 p-xs font-bold">1</div>
-<div className="bg-surface-container-lowest dark:bg-on-surface h-24 p-xs font-bold relative">2
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 w-full px-1">
-<span className="w-2 h-2 bg-primary rounded-full"></span>
-<span className="text-[8px] text-center truncate w-full">226 Present</span>
-</div>
-</div>
-<div className="bg-surface-container-lowest dark:bg-on-surface h-24 p-xs font-bold">3</div>
-<div className="bg-surface-container-lowest dark:bg-on-surface h-24 p-xs font-bold">4</div>
-
-</div>
-</div>
-
-<div className="view-content hidden" id="view-payroll">
-<div className="overflow-x-auto">
-<table className="w-full text-left">
-<thead className="text-on-surface-variant border-b border-outline-variant dark:text-secondary-fixed-dim dark:border-outline">
-<tr>
-<th className="py-sm font-label-lg text-label-lg">Name</th>
-<th className="py-sm font-label-lg text-label-lg">Month</th>
-<th className="py-sm font-label-lg text-label-lg">Salary</th>
-<th className="py-sm font-label-lg text-label-lg">Net Salary</th>
-<th className="py-sm font-label-lg text-label-lg text-right">Download Slip</th>
-</tr>
-</thead>
-<tbody className="divide-y divide-outline-variant/30 dark:divide-outline/30">
-<tr className="hover:bg-surface-container-low transition-colors dark:hover:bg-surface-container-highest/5">
-<td className="py-md font-label-lg text-label-lg text-on-surface dark:text-surface-bright">Dr. Rahul Sharma</td>
-<td className="py-md font-body-md text-body-md">October 2023</td>
-<td className="py-md font-body-md text-body-md">$8,500.00</td>
-<td className="py-md font-label-lg text-label-lg text-primary dark:text-primary-fixed">$8,850.00</td>
-<td className="py-md text-right">
-<button className="flex items-center gap-xs ml-auto px-md py-1 bg-surface-container-high dark:bg-surface-container-highest/10 rounded-lg text-label-md font-label-md hover:bg-primary hover:text-white transition-all">
-<span className="material-symbols-outlined text-[18px]">download</span> PDF
-    </button>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-
-<div className="view-content hidden" id="view-leave">
-<div className="grid grid-cols-1 lg:grid-cols-2 gap-lg">
-<div className="space-y-md">
-<h3 className="font-title-lg text-title-lg text-on-surface dark:text-surface-bright">Pending Requests</h3>
-<div className="bg-surface-container-low dark:bg-surface-container-highest/10 p-md rounded-lg border border-outline-variant dark:border-outline">
-<div className="flex justify-between items-start mb-sm">
-<div className="flex items-center gap-sm">
-<img alt="Sarah" className="w-8 h-8 rounded-full" src="https://lh3.googleusercontent.com/aida/AP1WRLs-SCbLPq3uq7OofCFBs2h5olxdmJxEIPdoxv2rDEauk29m-pp6ngQ-yB8VEdPclzmPb_eAKqEdkznPpPzdbPfmGWgUlx8D0rCcCanN-g6VJHEVsgcUhQl2AhEU4XXQDNBOjBmWwcAQrfXl4EqiQO0evgrDyTq3oQoTgdt6aK1M5Jc6QIYSMi6XxloZWzJ8OSdjhjD8047YPiirVlZP5IB2BslPVncpPD_O4Jg2ubBkIlANNX5suXbxCjU"/>
-<div>
-<p className="font-label-lg text-on-surface dark:text-surface-bright">Sarah Lee</p>
-<p className="text-label-md text-on-surface-variant">Sick Leave • 2 Days</p>
-</div>
-</div>
-<span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-warning/10 text-orange-600 dark:text-orange-400 bg-orange-100 uppercase">Pending</span>
-</div>
-<div className="flex gap-sm mt-md">
-<button className="flex-1 py-1.5 bg-primary text-on-primary rounded text-label-md">Approve</button>
-<button className="flex-1 py-1.5 bg-surface-container-highest dark:bg-surface-container-highest/20 text-on-surface rounded text-label-md">Reject</button>
-</div>
-</div>
-</div>
-<div className="space-y-md">
-<h3 className="font-title-lg text-title-lg text-on-surface dark:text-surface-bright">Upcoming Absences</h3>
-<div className="space-y-sm">
-<div className="flex items-center justify-between p-sm border-b border-outline-variant dark:border-outline">
-<p className="text-label-lg">James Wilson</p>
-<p className="text-label-md text-on-surface-variant">Oct 26 - Oct 30</p>
-</div>
-<div className="flex items-center justify-between p-sm border-b border-outline-variant dark:border-outline">
-<p className="text-label-lg">Dr. Anita Nair</p>
-<p className="text-label-md text-on-surface-variant">Nov 02 - Nov 05</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-
-<div className="view-content hidden" id="view-shift">
-<div className="flex justify-between items-center mb-lg">
-<h3 className="font-title-lg text-title-lg text-on-surface dark:text-surface-bright">Shift Schedule: Oct 24, 2023</h3>
-<button className="px-md py-1.5 bg-primary-container text-on-primary-container rounded-lg text-label-md font-label-md">Auto-Assign Shifts</button>
-</div>
-<div className="space-y-md">
-
-<div className="bg-surface-container-low dark:bg-surface-container-highest/5 p-md rounded-xl border-l-4 border-primary">
-<div className="flex justify-between items-center mb-sm">
-<h4 className="font-label-lg text-primary">Morning Shift (07:00 - 15:00)</h4>
-<span className="text-label-md text-on-surface-variant">12 Staff assigned</span>
-</div>
-<div className="flex flex-wrap gap-xs">
-<img className="w-8 h-8 rounded-full border-2 border-surface" src="https://lh3.googleusercontent.com/aida/AP1WRLs5qLoYTqb68zAUfLjBMlWnHY08_OC-gulttwexacuNGNjqOWr5Nvi6wDwGLjeZBF2hhDLVx20Oq8ZxDurvpzTnoN3XJmT5KIOyNPNXPXPpo07CslSeo1q58Ulfe2d77aAxpB3tokZMgf6DxVmQAwgrRNmcPr3uA4i_CfDJsAvPhicGu0fYNpJeSB0EaSfMiim4S03oH_RqQcBqK4XkTrcAdP3-iSntrjXAAJv5F1CzxSZFUmffI7ANnefN"/>
-<img className="w-8 h-8 rounded-full border-2 border-surface" src="https://lh3.googleusercontent.com/aida/AP1WRLvAWAppcVTmrpPwsj00OlcDfk4-CBcuXC-FZV78FkgGWWrPCNWd_ESupniPlw1fKTXC2UUugtNhxQ7fuP6FWJqxHkZh2mC6PSC3WVbhiXp4aHw7R8iK3a0xlq4PCz3kp8H23kCUxj_zuKtvKX3w0i_7JBKPOLFFyFh1XdRGSHAapUbTSNUPrZx-v2mIsqJB9T3Ow7gYxKvK-kHX4N_rnHOnFSt-_NWgGXWx51mGM8PP1-jL57gVsuLghtk"/>
-<button className="w-8 h-8 rounded-full bg-surface-container-high dark:bg-surface-container-highest/20 flex items-center justify-center text-[18px]"><span className="material-symbols-outlined">add</span></button>
-</div>
-</div>
-
-<div className="bg-surface-container-low dark:bg-surface-container-highest/5 p-md rounded-xl border-l-4 border-secondary">
-<div className="flex justify-between items-center mb-sm">
-<h4 className="font-label-lg text-secondary">Afternoon Shift (15:00 - 23:00)</h4>
-<span className="text-label-md text-on-surface-variant">8 Staff assigned</span>
-</div>
-<div className="flex flex-wrap gap-xs">
-<img className="w-8 h-8 rounded-full border-2 border-surface" src="https://lh3.googleusercontent.com/aida/AP1WRLuIOgldlIQTMUJ9RH_WQ4YMi42Oro-y3otaRGBSj8flfMzA8gp4hO35jCnBfdRbYZNS2zmOhGcPhEI2ElVscrqQ4WcQGENw9A78uRqn5G0Uwaf4-kP2NPm84o4EqOKv8gmzyZkL6CtSahUxgM9dMx9iefPAp3r_w5rsUv41MtFL3XFyVuOr7THeCvwhD_F3fyYifZrD8zoGmgXTuwozykyyPJPckVIwl6qwwa2IKOuoGUHlAsO4VulDQSQC"/>
-<button className="w-8 h-8 rounded-full bg-surface-container-high dark:bg-surface-container-highest/20 flex items-center justify-center text-[18px]"><span className="material-symbols-outlined">add</span></button>
-</div>
-</div>
-
-<div className="bg-surface-container-low dark:bg-surface-container-highest/5 p-md rounded-xl border-l-4 border-tertiary">
-<div className="flex justify-between items-center mb-sm">
-<h4 className="font-label-lg text-tertiary">Night Shift (23:00 - 07:00)</h4>
-<span className="text-label-md text-on-surface-variant">5 Staff assigned</span>
-</div>
-<div className="flex flex-wrap gap-xs">
-<button className="w-8 h-8 rounded-full bg-surface-container-high dark:bg-surface-container-highest/20 flex items-center justify-center text-[18px]"><span className="material-symbols-outlined">add</span></button>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-
-    </>
+          {/* ── SHIFTS ── */}
+          {activeTab === 'shifts' && (
+            <div className="space-y-md">
+              <div className="flex justify-between items-center">
+                <h3 className="font-title-lg text-on-surface">
+                  Today's Shifts — {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}
+                </h3>
+              </div>
+              {[
+                { label: 'Morning Shift (07:00–15:00)', key: 'morning', count: summary?.shifts_today?.morning ?? 0, color: 'border-primary', textColor: 'text-primary' },
+                { label: 'Afternoon Shift (15:00–23:00)', key: 'afternoon', count: summary?.shifts_today?.afternoon ?? 0, color: 'border-secondary', textColor: 'text-secondary' },
+                { label: 'Night Shift (23:00–07:00)', key: 'night', count: summary?.shifts_today?.night ?? 0, color: 'border-tertiary', textColor: 'text-tertiary' },
+              ].map((shift) => (
+                <div key={shift.key} className={`bg-surface-container-low p-md rounded-xl border-l-4 ${shift.color}`}>
+                  <div className="flex justify-between items-center">
+                    <h4 className={`font-label-lg ${shift.textColor}`}>{shift.label}</h4>
+                    <span className="text-label-md text-on-surface-variant">{shift.count} Staff assigned</span>
+                  </div>
+                  {shift.count === 0 && (
+                    <p className="text-xs text-on-surface-variant mt-xs italic">No assignments recorded for today yet.</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   )
 }
