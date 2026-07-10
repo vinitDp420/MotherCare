@@ -1,56 +1,41 @@
 """
 MotherCare — Production Settings
-Extends base.py with production hardening.
-DEBUG must always be False in production.
+Extends base.py with production hardening for Render / Cloud deployment.
 """
 from .base import *  # noqa: F401, F403
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Security hardening
 # ─────────────────────────────────────────────────────────────────────────────
-DEBUG = False  # CRITICAL: always False in production
+DEBUG = config("DEBUG", default=False, cast=bool)
+
+# Support cloud reverse proxies (Render, Heroku, AWS ALB)
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
-SECURE_HSTS_SECONDS = 31536000  # 1 year
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_HTTPONLY = True
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Static / Media — use S3 in production (configure AWS_* env vars)
+# Static / Media — use local or S3 in production
 # ─────────────────────────────────────────────────────────────────────────────
-from decouple import config  # noqa: E402, F811
-
 STORAGE_BACKEND = config("STORAGE_BACKEND", default="local")
 
 if STORAGE_BACKEND == "s3":
-    # Requires django-storages[boto3] in production dependencies
-    AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID")
-    AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")
-    AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME")
+    AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID", default="")
+    AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY", default="")
+    AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME", default="")
     AWS_S3_REGION_NAME = config("AWS_S3_REGION_NAME", default="ap-south-1")
-    AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
-    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
-    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
+    if AWS_STORAGE_BUCKET_NAME:
+        AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+        MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Database — connection pooling for production
+# Database — connection pooling
 # ─────────────────────────────────────────────────────────────────────────────
-DATABASES["default"]["CONN_MAX_AGE"] = 300  # noqa: F405  — 5 minutes pooling
+DATABASES["default"]["CONN_MAX_AGE"] = 300  # noqa: F405
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Logging — structured logging for production
+# Logging — Console logging for Render / Container environments
 # ─────────────────────────────────────────────────────────────────────────────
-LOGGING["handlers"]["file"] = {  # noqa: F405
-    "class": "logging.handlers.RotatingFileHandler",
-    "filename": "/var/log/mothercare/app.log",
-    "maxBytes": 10485760,  # 10 MB
-    "backupCount": 10,
-    "formatter": "verbose",
-}
-LOGGING["root"]["handlers"] = ["console", "file"]  # noqa: F405
+LOGGING["root"]["handlers"] = ["console"]  # noqa: F405
