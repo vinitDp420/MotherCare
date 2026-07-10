@@ -3,7 +3,7 @@
  * All routes are lazy-loaded for performance.
  */
 import { lazy } from 'react'
-import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { createHashRouter, Navigate } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import AppLayout from '@/components/layout/AppLayout'
@@ -40,7 +40,7 @@ function RequireAuth({ children }: { children: ReactNode }) {
 }
 
 // ── Router ───────────────────────────────────────────────────────────────────
-export const router = createBrowserRouter([
+export const router = createHashRouter([
   // Auth routes
   {
     element: <AuthLayout />,
